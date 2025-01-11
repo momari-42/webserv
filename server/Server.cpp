@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/11 11:08:47 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/11 11:49:52 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ void Server::serverAccepting ( void ) {
         // here we will create the requiste object
         std::cout << this->request << std::endl;
         std::cout << "this is the request number : ==> " << flag++  << std::endl;
-        close(this->sockfdClient);
         this->request = "";
     }
 }
@@ -84,16 +83,14 @@ void Server::receiveRequest ( void ) {
     int     n;
     char    buffer[11];
 
-    n = 1;
+    n = 10;
     memset(buffer, 0, 11);
-    while (n) {
+    while (n >= 10) {
         n = recv(this->sockfdClient, buffer, 10, 0);
         buffer[n] = '\0';
         this->request += buffer;
         memset(buffer, 0, 11);
     }
-    std::cout << "The request :" << std::endl;
-    std::cout << this->request << std::endl;
 }
 void Server::runServer ( void ) {
     Server::serverBinding();
