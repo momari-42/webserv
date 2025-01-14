@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/01/11 10:15:50 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/11 12:04:22 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class Server
         void serverListning ();
         void serverAccepting ();
         void receiveRequest ();
+        void setSockOption ();
 
     public:
         Server (int port);

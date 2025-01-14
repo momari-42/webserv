@@ -3,14 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/11 11:49:52 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/11 13:17:12 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Server.hpp"
+
+void Server::setSockOption (void) {
+    int option; 
+    
+    option = setsockopt(this->sockfdServer, SOL_SOCKET, SO_REUSEADDR, &this->addressServer, sizeof(this->addressServer));
+    if (option == -1) {
+        throw (ServerExceptions(strerror(errno)));
+    }
+}
 
 Server::Server (int port) {
     // close(this->sockfdServer);
@@ -32,9 +41,8 @@ Server::Server (int port) {
     this->addressServer.sin_port = htons(port);
     // Specific IP address in this case htonl(INADDR_LOOPBACK) = 127.0.0.1
     this->addressServer.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    Server::setSockOption();
 
-    int opt; 
-    opt = setsockopt(this->sockfdServer, SOL_SOCKET, SO_REUSEADDR, &this->addressServer, sizeof(this->addressServer));
 }
 
 Server::~Server ( void ) {
@@ -73,6 +81,8 @@ void Server::serverAccepting ( void ) {
         }
         Server::receiveRequest();
         // here we will create the requiste object
+        const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+        send(this->sockfdClient, hello, strlen(hello), 0);
         std::cout << this->request << std::endl;
         std::cout << "this is the request number : ==> " << flag++  << std::endl;
         this->request = "";
