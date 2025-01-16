@@ -1,4 +1,4 @@
-SRC			= main.cpp server/Server.cpp
+SRC			= main.cpp server/Server.cpp request/Request.cpp request/body/Body.cpp request/header/Header.cpp request/requestLine/RequestLine.cpp
 OBJ			= $(SRC:.cpp=.o)
 NAME		= webserv
 CPP			= c++

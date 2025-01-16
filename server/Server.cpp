@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/15 13:41:48 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/16 14:35:09 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,8 @@ void Server::serverAccepting ( void ) {
         // here we will create the requiste object
         const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
         send(this->sockfdClient, hello, strlen(hello), 0);
-        std::cout << this->request << std::endl;
+        // std::cout << this->request << std::endl;
+        Request req(this->request);
         std::cout << "this is the request number : ==> " << flag++  << std::endl;
         this->request = "";
     }

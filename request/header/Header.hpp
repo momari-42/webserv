@@ -6,13 +6,13 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:16:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/16 11:32:23 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/16 14:44:22 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "../../webserver.hpp"
+#include <iostream>
 
 class Header
 {

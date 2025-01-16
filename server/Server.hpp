@@ -6,13 +6,20 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/01/16 11:12:23 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/16 14:48:19 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "../webserver.hpp"
+#include <iostream>
+#include <exception>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <unistd.h>
+#include "../request/Request.hpp"
 
 class Server
 {
