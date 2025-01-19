@@ -6,12 +6,12 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/19 10:42:59 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/19 15:30:46 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Server.hpp"
-
+#define BUFFER_SIZE 1024
 Server::Server ( std::vector<int> vec ) {
     this->lenSocket = sizeof(this->addressClient);
     for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); it++) {
@@ -43,6 +43,8 @@ bool Server::findFdSocket ( int sockfd ) {
 //     }
 // }
 
+#include <fstream>
+
 
 void Server::startServer() {
     int kq;
@@ -55,56 +57,81 @@ void Server::startServer() {
     kq = kqueue();
     if ( kq == -1 )
         throw (Server::ServerExceptions(strerror(errno)));
+    std::cout << "The fds sockets : " ;
     for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
         EV_SET(&events[number], (*it).getSockfd(), EVFILT_READ, EV_ADD, 0, 0, NULL);
+        std::cout << (*it).getSockfd() << " - ";
         number++;
     }
+    std::cout << std::endl;
     if (kevent(kq, events, this->sockets.size(), 0, 0, 0) == -1)
         throw (Server::ServerExceptions(strerror(errno)));
     while (true) {
         struct kevent  readyEvents[128];
+
         memset(readyEvents, 0, sizeof(readyEvents));
         
-        // std::cout << "****************************************************>>" <<  std::endl;
         errorTrack = kevent(kq, NULL, 0, readyEvents, 128, 0);
-        // std::cout << "====================================================>>" << errorTrack <<  std::endl;
         if (errorTrack == -1)
             throw (Server::ServerExceptions(strerror(errno)));
         else if (errorTrack > 0) {
             for (int i = 0; i < errorTrack; i++) {
-                if (readyEvents[i].filter == EVFILT_READ) {
-                    if ( findFdSocket(readyEvents[i].ident) ) {
-                        std::cout << "ila l9ahaaaaaaa" <<  std::endl;
-                        struct kevent clientEvent;
-                        this->sockfdClient = accept(readyEvents[i].ident, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
-                        std::cout << readyEvents[i].ident << "---->" << this->sockfdClient << std::endl;
-                        if (this->sockfdClient == -1) {
-                            std::cout << "Problem in accept function" << std::endl; 
-                            throw (ServerExceptions(strerror(errno)));
-                        }
-                        fcntl(this->sockfdClient, O_NONBLOCK);
-                        EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
-                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
-                            throw (Server::ServerExceptions(strerror(errno)));
-                    } else  {
-                        std::cout << "ila mal9ahachchchchchchchchchchchchchchchch" <<  std::endl;
-                        char buffer[800];
-                        int re = recv(readyEvents[i].ident, buffer, 799, 0);
-                        if (re <= 0) {
-                            std::cout << "looooool" << std::endl;
-                            break;
-                        }
-                        buffer[re] = '\0';
-                        std::cout << buffer << std::endl;
-                        memset(buffer, 0, 800);
-                        struct kevent toDelete;
-                        EV_SET(&toDelete, readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-                        if ((kevent(kq, &toDelete, 1, NULL, 0, NULL)) == -1) {
-                            throw (Server::ServerExceptions(strerror(errno)));
-                        }
-                        close(this->sockfdClient);
-                        close(readyEvents[i].ident);
+                int filedes = readyEvents[i].ident;
+                if ( findFdSocket(filedes) ) {
+                    struct kevent clientEvent;
+
+                    this->sockfdClient = accept(filedes, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
+                    if (this->sockfdClient == -1) {
+                        std::cout << "Problem in accept function" << std::endl; 
+                        throw (ServerExceptions(strerror(errno)));
                     }
+
+                    fcntl(filedes, O_NONBLOCK);
+                    EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        throw (Server::ServerExceptions(strerror(errno)));
+
+                }
+                else  {
+
+                // Handle data from a client socket
+                char buffer[BUFFER_SIZE];
+                ssize_t bytes_read = 0;
+                std::string request_data = "";
+
+                // Read all available data from the socket
+                    memset(buffer, 0, BUFFER_SIZE);
+                while ((bytes_read = read(filedes, buffer, sizeof(buffer) - 1)) > 0) {
+                    request_data += buffer;  // Accumulate the data
+                    buffer[bytes_read] = '\0';
+
+                    // Check if a complete request has been received
+                    if (bytes_read < BUFFER_SIZE - 1) {
+                        // We have a complete HTTP request
+                        break;
+                    }
+                    memset(buffer, 0, BUFFER_SIZE);
+                }
+
+                if (bytes_read == 0) {
+                    std::cout << "Client disconnected\n";
+                    close(filedes);
+                    continue;
+                } else if (bytes_read < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
+                    perror("read error");
+                    close(filedes);
+                    continue;
+                }
+                std::ofstream of("test.txt", std::ios::binary | std::ios::out);
+                of << request_data;
+                // Process the complete request data
+                // std::cout << "Received request:\n" << request_data << "\n";
+
+                    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
+                    write(filedes, response.c_str(), response.size());
+                    std::cout << filedes << "......" << this->sockfdClient << std::endl;
+                    // close(this->sockfdClient);  // Close the connection after sending the response
+                    close(filedes);  // Close the connection after sending the response
                 }
             }
         }
