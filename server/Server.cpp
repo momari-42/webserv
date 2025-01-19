@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/19 15:30:46 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/19 18:10:05 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void Server::startServer() {
                     continue;
                 }
                 std::ofstream of("test.txt", std::ios::binary | std::ios::out);
-                of << request_data;
+                of.write(request_data.c_str(), request_data.length());
                 // Process the complete request data
                 // std::cout << "Received request:\n" << request_data << "\n";
 
