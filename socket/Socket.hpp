@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/01/19 10:26:55 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/18 19:44:44 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,32 +21,34 @@
 #include <unistd.h>
 #include <poll.h>
 #include "../request/Request.hpp"
-#include <vector>
-#include "../socket/Socket.hpp"
-#include <sys/event.h>
-#include <fcntl.h>
 
-class Server
+class Socket
 {
     private:
-        socklen_t           lenSocket;
-        int                 sockfdClient;
-        struct sockaddr_in  addressClient;
-        std::vector<Socket> sockets;
-        // this function check if sockfd exist in sockets container
-        bool findFdSocket ( int sockfd );
+        int                 sockfd;
+        int                 backlog;
+        struct sockaddr_in  addressServer;
+        void socketBinding ();
+        void socketListning ();
+        // void socketAccepting ();
+        // void receiveRequest ();
+        void setSockOption ();
 
     public:
-        void startServer();
-        Server ( std::vector<int> vec );
-        ~Server ( );
-        class ServerExceptions : public std::exception
+        Socket ( int port );
+        ~Socket ( );
+        int getSockfd();
+        void initializeSocketCommunication ();
+
+        // Exception class;
+
+        class SocketExceptions : public std::exception
         {
             private:
                 std::string errorMsg;
             public:
-                ServerExceptions( const std::string& errorMsg );
-                ~ServerExceptions() throw() {
+                SocketExceptions( const std::string& errorMsg );
+                ~SocketExceptions() throw() {
                 };
                 const char* what() const throw();
         };

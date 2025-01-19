@@ -3,110 +3,116 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/16 14:35:09 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/19 10:42:59 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Server.hpp"
 
-void Server::setSockOption (void) {
-    int option; 
-    
-    option = setsockopt(this->sockfdServer, SOL_SOCKET, SO_REUSEADDR, &this->addressServer, sizeof(this->addressServer));
-    if (option == -1) {
-        throw (ServerExceptions(strerror(errno)));
+Server::Server ( std::vector<int> vec ) {
+    this->lenSocket = sizeof(this->addressClient);
+    for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); it++) {
+        Socket soc(*it);
+        this->sockets.push_back(soc);
     }
+    for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
+        (*it).initializeSocketCommunication();
+    }
+    memset(&this->addressClient, 0, sizeof(this->addressClient));
 }
 
-Server::Server (int port) {
-    // close(this->sockfdServer);
-    this->sockfdServer = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->sockfdServer == -1) {
-        std::cout << "Problem in socket function" << std::endl;
-        throw (ServerExceptions(strerror(errno)));
+bool Server::findFdSocket ( int sockfd ) {
+    for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
+        if ((*it).getSockfd() == sockfd)
+            return (true);
     }
+    return (false);
+}
 
-    this->client_len = sizeof(this->addressClient);
-    this->backlog = 5;
-    // Init client and server struct with 0;
-    memset(&this->addressServer, 0, sizeof(this->addressServer));
-    memset(&this->addressClient, 0, sizeof(this->addressClient));
 
-    // Specifies that the socket will use IPv4 addresses
-    this->addressServer.sin_family = AF_INET;
-    // Specifies the port number
-    this->addressServer.sin_port = htons(port);
-    // Specific IP address in this case htonl(INADDR_LOOPBACK) = 127.0.0.1
-    this->addressServer.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    Server::setSockOption();
+// void Socket::socketAccepting ( void ) {
+//     std::cout << "we are here" << std::endl;
+//     close(this->sockfdClient);
+//     this->sockfdClient = accept(this->sockfd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->client_len);
+//     if (this->sockfdClient == -1) {
+//         std::cout << "Problem in accept function" << std::endl; 
+//         throw (SocketExceptions(strerror(errno)));
+//     }
+// }
 
+
+void Server::startServer() {
+    int kq;
+    int number = 0;
+    int errorTrack;
+    struct kevent  events[this->sockets.size()];
+
+    
+    memset(events, 0, sizeof(events));
+    kq = kqueue();
+    if ( kq == -1 )
+        throw (Server::ServerExceptions(strerror(errno)));
+    for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
+        EV_SET(&events[number], (*it).getSockfd(), EVFILT_READ, EV_ADD, 0, 0, NULL);
+        number++;
+    }
+    if (kevent(kq, events, this->sockets.size(), 0, 0, 0) == -1)
+        throw (Server::ServerExceptions(strerror(errno)));
+    while (true) {
+        struct kevent  readyEvents[128];
+        memset(readyEvents, 0, sizeof(readyEvents));
+        
+        // std::cout << "****************************************************>>" <<  std::endl;
+        errorTrack = kevent(kq, NULL, 0, readyEvents, 128, 0);
+        // std::cout << "====================================================>>" << errorTrack <<  std::endl;
+        if (errorTrack == -1)
+            throw (Server::ServerExceptions(strerror(errno)));
+        else if (errorTrack > 0) {
+            for (int i = 0; i < errorTrack; i++) {
+                if (readyEvents[i].filter == EVFILT_READ) {
+                    if ( findFdSocket(readyEvents[i].ident) ) {
+                        std::cout << "ila l9ahaaaaaaa" <<  std::endl;
+                        struct kevent clientEvent;
+                        this->sockfdClient = accept(readyEvents[i].ident, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
+                        std::cout << readyEvents[i].ident << "---->" << this->sockfdClient << std::endl;
+                        if (this->sockfdClient == -1) {
+                            std::cout << "Problem in accept function" << std::endl; 
+                            throw (ServerExceptions(strerror(errno)));
+                        }
+                        fcntl(this->sockfdClient, O_NONBLOCK);
+                        EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                            throw (Server::ServerExceptions(strerror(errno)));
+                    } else  {
+                        std::cout << "ila mal9ahachchchchchchchchchchchchchchchch" <<  std::endl;
+                        char buffer[800];
+                        int re = recv(readyEvents[i].ident, buffer, 799, 0);
+                        if (re <= 0) {
+                            std::cout << "looooool" << std::endl;
+                            break;
+                        }
+                        buffer[re] = '\0';
+                        std::cout << buffer << std::endl;
+                        memset(buffer, 0, 800);
+                        struct kevent toDelete;
+                        EV_SET(&toDelete, readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+                        if ((kevent(kq, &toDelete, 1, NULL, 0, NULL)) == -1) {
+                            throw (Server::ServerExceptions(strerror(errno)));
+                        }
+                        close(this->sockfdClient);
+                        close(readyEvents[i].ident);
+                    }
+                }
+            }
+        }
+        
+    }
 }
 
 Server::~Server ( void ) {
-    close(this->sockfdServer);
-}
-
-void Server::serverBinding ( void ) {
-    int status;
-
-    // The bind function link the socket file descriptor with a specific socket address (IP Adress and Port Number)
-    status = bind(this->sockfdServer, reinterpret_cast<const sockaddr *>(&this->addressServer), sizeof(this->addressServer));
-    if (status == -1) {
-        std::cout << "Problem in bind function" << std::endl;
-        throw (ServerExceptions(strerror(errno)));
-    }
-}
-
-void Server::serverListning ( void ) {
-    int status;
-
-    status = listen(this->sockfdServer, this->backlog);
-    if (status == -1) {
-        std::cout << "Problem in listen function" << std::endl;
-        throw (ServerExceptions(strerror(errno)));
-    }
-}
-
-void Server::serverAccepting ( void ) {
-    int flag = 0;
-    close(this->sockfdClient);
-    while (1) {
-        this->sockfdClient = accept(this->sockfdServer, reinterpret_cast<sockaddr *>(&this->addressClient), &this->client_len);
-        if (this->sockfdClient == -1) {
-            std::cout << "Problem in accept function" << std::endl;
-            throw (ServerExceptions(strerror(errno)));
-        }
-        Server::receiveRequest();
-        // here we will create the requiste object
-        const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-        send(this->sockfdClient, hello, strlen(hello), 0);
-        // std::cout << this->request << std::endl;
-        Request req(this->request);
-        std::cout << "this is the request number : ==> " << flag++  << std::endl;
-        this->request = "";
-    }
-}
-
-void Server::receiveRequest ( void ) {
-    int     n;
-    char    buffer[11];
-
-    n = 10;
-    memset(buffer, 0, 11);
-    while (n >= 10) {
-        n = recv(this->sockfdClient, buffer, 10, 0);
-        buffer[n] = '\0';
-        this->request += buffer;
-        memset(buffer, 0, 11);
-    }
-}
-void Server::runServer ( void ) {
-    Server::serverBinding();
-    Server::serverListning();
-    Server::serverAccepting();
 }
 
 Server::ServerExceptions::ServerExceptions ( const std::string& errorMsg ) {

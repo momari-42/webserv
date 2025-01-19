@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/01/16 13:38:44 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/18 21:52:20 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,13 @@
 
 int main() {
     try {
-        Server server(12346);
+        std::vector<int> vec;
+        vec.push_back(8080);
+        vec.push_back(8081);
+        Server server(vec);
+        server.startServer();
         // signal(SIGINT, server.sigHandler);
-        server.runServer ();
+        // server.runServer ();
     }
     catch ( std::exception& e ) {
         std::cout << "exception" << std::endl;
