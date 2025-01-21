@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/20 19:23:06 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/21 13:13:29 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void Server::startServer() {
                         }
                         body.append(buffer, bytesRead);
                     }
-                    std::ofstream outputFile("hello.txt", std::ios::binary);
+                    std::ofstream outputFile("momari.jpeg", std::ios::binary);
                     outputFile.write(body.data(), body.size());
                     outputFile.close();
                     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
