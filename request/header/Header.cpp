@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/17 10:33:18 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/20 17:36:14 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,17 @@ Header::Header ( const std::string& header ) {
         if (number == std::string::npos)
             number-=2;
         tempraryHeader.erase(0, number + 2);
+        if (firstPortion == "Content-Length")
+            this->contentLength = atoi(secondPortion.c_str());
     }
     for (std::map<std::string, std::string>::iterator it = this->httpHeadersMap.begin(); it != this->httpHeadersMap.end(); it++) {
         std::cout << (*it).first << " <-> " << (*it).second  << std::endl;
     }
 }
 
+int Header::getContentLenght() {
+    return this->contentLength;
+}
 
 Header::~Header ( void ) {
     

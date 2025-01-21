@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:19:44 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/16 14:50:41 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/20 17:37:34 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class Request
     public:
         Request(const std::string &request);
         // std::string getRequestLine() const;
-        // std::string getHeader() const;
+        Header& getHeader();
         // std::string getBody() const;
         ~Request();
 };

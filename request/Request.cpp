@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/16 14:50:37 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/20 17:37:21 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@ Request::Request( const std::string& request ) : requestLine(request), header(re
     // this->requestLine.setRequestLine(strtok((char *)request.c_str(), " "));
     // this->requestLine.setHeader(strtok((char *)request.c_str(), " "));
     // this->requestLine.setBody(request);
+}
+
+Header& Request::getHeader() {
+    return this->header;
 }
 
 Request::~Request () {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:16:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/16 16:09:56 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/20 17:29:57 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@ class Header
     private:
         std::map<std::string, std::string> httpHeadersMap;
         std::string header;
+        int contentLength;
     public:
         Header(const std::string &header);
+        int getContentLenght();
         ~Header();
 };
