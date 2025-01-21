@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/21 13:13:29 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/21 16:25:06 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,14 +79,12 @@ void Server::startServer() {
                 int filedes = readyEvents[i].ident;
                 if ( findFdSocket(filedes) ) {
                     struct kevent clientEvent;
-
                     this->sockfdClient = accept(filedes, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
                     if (this->sockfdClient == -1) {
                         std::cout << "Problem in accept function" << std::endl; 
                         throw (ServerExceptions(strerror(errno)));
                     }
-
-                    fcntl(filedes, O_NONBLOCK);
+                    fcntl(filedes, F_SETFL, O_NONBLOCK);
                     EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
                     if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
                         throw (Server::ServerExceptions(strerror(errno)));
@@ -94,54 +92,80 @@ void Server::startServer() {
                 }
                 else  {
 
-                // Handle data from a client socket
+                    // Handle data from a client socket
                     char buffer[BUFFER_SIZE];
                     ssize_t bytes_read = 0;
                     std::string request_data = "";
+                    
 
                     // Read all available data from the socket
-                        memset(buffer, 0, BUFFER_SIZE);
-                    while ((bytes_read = read(filedes, buffer, sizeof(buffer) - 1)) > 0) {
-                        request_data += buffer;  // Accumulate the data
+                    memset(buffer, 0, BUFFER_SIZE);
+                    
+                    while ((bytes_read = recv(filedes, buffer, sizeof(buffer) - 1, 0)) > 0) {
+                        request_data += buffer;
                         buffer[bytes_read] = '\0';
-
-                        // Check if a complete request has been received
-                        if (bytes_read < BUFFER_SIZE - 1) {
-                            // We have a complete HTTP request
+                        if (request_data.find("\r\n\r\n") != std::string::npos) {
                             break;
                         }
                         memset(buffer, 0, BUFFER_SIZE);
                     }
-
-                    if (bytes_read == 0) {
-                        std::cout << "Client disconnected\n";
-                        close(filedes);
-                        continue;
-                    } else if (bytes_read < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                        perror("read error");
-                        close(filedes);
-                        continue;
-                    }
-                    size_t bytesRead = sizeof(buffer);
+                    
+                    // if (bytes_read == 0) {
+                    //     std::cout << "Client disconnected\n";
+                    //     close(filedes);
+                    //     continue;
+                    // } else if (bytes_read < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
+                    //     perror("read error");
+                    //     close(filedes);
+                    //     continue;
+                    // }
+                    // size_t bytesRead = sizeof(buffer);
+                    // Request req(request_data);
+                    // std::string body = request_data.substr(request_data.find("\r\n\r\n") + 4);
+                    // while (bytesRead == sizeof(buffer)) {
+                    //     bytesRead = recv(filedes, buffer, sizeof(buffer), 0);
+                    //     std::cout << bytesRead << std::endl;
+                    //     if (bytesRead <= 0) {
+                    //         std::cerr << "Error or connection closed while reading data.\n";
+                    //         close(filedes);
+                    //         break;
+                    //     }
+                    //     body.append(buffer, bytesRead);
+                    // }
+                    // std::ofstream outputFile("momari.jpeg", std::ios::binary);
+                    // outputFile.write(body.data(), body.size());
+                    // outputFile.close();
+                    // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
+                    // write(filedes, response.c_str(), response.size());
+                    // std::cout << filedes << "......" << this->sockfdClient << std::endl;
+                    // close(filedes);  // Close the connection after sending the response
+                    long BytesRead = 0;
                     Request req(request_data);
                     std::string body = request_data.substr(request_data.find("\r\n\r\n") + 4);
-                    while (bytesRead == sizeof(buffer)) {
-                        bytesRead = recv(filedes, buffer, sizeof(buffer), 0);
-                        std::cout << bytesRead << std::endl;
-                        if (bytesRead <= 0) {
-                            std::cerr << "Error or connection closed while reading data.\n";
+                    long BytesStill = req.getHeader().getContentLenght() - body.length();
+                    while (BytesStill > 0) {
+                        std::cout << filedes << std::endl;
+                        if (BytesStill > BUFFER_SIZE)
+                            BytesRead = recv(filedes, buffer, BUFFER_SIZE - 1, 0);
+                        else
+                            BytesRead = recv(filedes, buffer, BytesStill, 0);
+                        std::cout << req.getHeader().getContentLenght() << " == " << BytesRead << " + " << BytesStill << std::endl;
+                        if (BytesRead <= 0) {
+                            std::cerr << "Error or connection closed while reading data." << std::endl;
                             close(filedes);
                             break;
                         }
-                        body.append(buffer, bytesRead);
+                        body.append(buffer, BytesRead);
+                        BytesStill -= BytesRead;
                     }
-                    std::ofstream outputFile("momari.jpeg", std::ios::binary);
+                    std::ofstream outputFile("data_receve.txt", std::ios::binary);
                     outputFile.write(body.data(), body.size());
                     outputFile.close();
                     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
                     write(filedes, response.c_str(), response.size());
                     std::cout << filedes << "......" << this->sockfdClient << std::endl;
-                    close(filedes);  // Close the connection after sending the response
+                    // if (BytesStill <= 0)
+                    //     close(filedes);  // Close the connection after sending the response
                 }
             }
         }

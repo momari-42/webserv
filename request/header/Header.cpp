@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/20 17:36:14 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/21 15:55:16 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ Header::Header ( const std::string& header ) {
     std::string     firstPortion;
     std::string     secondPortion;
 
+    this->contentLength = 0;
     this->header = header;
     if (this->header.find("\r\n\r\n") != std::string::npos)
         this->header.erase(this->header.find("\r\n\r\n"), this->header.size());
