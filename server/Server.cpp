@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/21 16:25:06 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/22 09:53:52 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,10 @@ void Server::startServer() {
     kq = kqueue();
     if ( kq == -1 )
         throw (Server::ServerExceptions(strerror(errno)));
-    std::cout << "The fds sockets : " ;
     for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
         EV_SET(&events[number], (*it).getSockfd(), EVFILT_READ, EV_ADD, 0, 0, NULL);
-        std::cout << (*it).getSockfd() << " - ";
         number++;
     }
-    std::cout << std::endl;
     if (kevent(kq, events, this->sockets.size(), 0, 0, 0) == -1)
         throw (Server::ServerExceptions(strerror(errno)));
     while (true) {
@@ -96,76 +93,41 @@ void Server::startServer() {
                     char buffer[BUFFER_SIZE];
                     ssize_t bytes_read = 0;
                     std::string request_data = "";
+                    std::string contentString = "Content-Length: ";
                     
 
                     // Read all available data from the socket
                     memset(buffer, 0, BUFFER_SIZE);
-                    
                     while ((bytes_read = recv(filedes, buffer, sizeof(buffer) - 1, 0)) > 0) {
-                        request_data += buffer;
+                        std::cout << "\033[31m" << bytes_read << "\033[0m" << std::endl;
                         buffer[bytes_read] = '\0';
+                        request_data.append(buffer, bytes_read);
                         if (request_data.find("\r\n\r\n") != std::string::npos) {
-                            break;
+                            if (request_data.find(contentString) != std::string::npos) {
+                                long startContentLength = request_data.find(contentString) + contentString.length();
+                                long endContentLength = request_data.find("\r\n", startContentLength);
+                                long contentLength = std::stod(request_data.substr(startContentLength, endContentLength - startContentLength));
+                                if (request_data.length() >= contentLength + 4 + request_data.find("\r\n\r\n")) {
+                                    std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
+                                    break;
+                                }
+                                std::cout << "\033[33m" << request_data.length() << "<=>" << contentLength + 4 + request_data.find("\r\n\r\n") << "\033[0m" << std::endl;
+                            }
+                            else {
+                                std::cout << "\033[31m" << "body not found !!!" << "\033[0m" << std::endl;
+                                break;
+                            }
                         }
                         memset(buffer, 0, BUFFER_SIZE);
                     }
-                    
-                    // if (bytes_read == 0) {
-                    //     std::cout << "Client disconnected\n";
-                    //     close(filedes);
-                    //     continue;
-                    // } else if (bytes_read < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                    //     perror("read error");
-                    //     close(filedes);
-                    //     continue;
-                    // }
-                    // size_t bytesRead = sizeof(buffer);
-                    // Request req(request_data);
-                    // std::string body = request_data.substr(request_data.find("\r\n\r\n") + 4);
-                    // while (bytesRead == sizeof(buffer)) {
-                    //     bytesRead = recv(filedes, buffer, sizeof(buffer), 0);
-                    //     std::cout << bytesRead << std::endl;
-                    //     if (bytesRead <= 0) {
-                    //         std::cerr << "Error or connection closed while reading data.\n";
-                    //         close(filedes);
-                    //         break;
-                    //     }
-                    //     body.append(buffer, bytesRead);
-                    // }
-                    // std::ofstream outputFile("momari.jpeg", std::ios::binary);
-                    // outputFile.write(body.data(), body.size());
-                    // outputFile.close();
-                    // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
-                    // write(filedes, response.c_str(), response.size());
-                    // std::cout << filedes << "......" << this->sockfdClient << std::endl;
-                    // close(filedes);  // Close the connection after sending the response
-                    long BytesRead = 0;
-                    Request req(request_data);
-                    std::string body = request_data.substr(request_data.find("\r\n\r\n") + 4);
-                    long BytesStill = req.getHeader().getContentLenght() - body.length();
-                    while (BytesStill > 0) {
-                        std::cout << filedes << std::endl;
-                        if (BytesStill > BUFFER_SIZE)
-                            BytesRead = recv(filedes, buffer, BUFFER_SIZE - 1, 0);
-                        else
-                            BytesRead = recv(filedes, buffer, BytesStill, 0);
-                        std::cout << req.getHeader().getContentLenght() << " == " << BytesRead << " + " << BytesStill << std::endl;
-                        if (BytesRead <= 0) {
-                            std::cerr << "Error or connection closed while reading data." << std::endl;
-                            close(filedes);
-                            break;
-                        }
-                        body.append(buffer, BytesRead);
-                        BytesStill -= BytesRead;
-                    }
-                    std::ofstream outputFile("data_receve.txt", std::ios::binary);
-                    outputFile.write(body.data(), body.size());
-                    outputFile.close();
+                    Request request(request_data);
+                    std::ofstream outputFile("momari.png", std::ios::binary);
+                    outputFile.write(request_data.data(), request_data.size());
+                    outputFile.close(); 
                     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
                     write(filedes, response.c_str(), response.size());
-                    std::cout << filedes << "......" << this->sockfdClient << std::endl;
                     // if (BytesStill <= 0)
-                    //     close(filedes);  // Close the connection after sending the response
+                    close(filedes);  // Close the connection after sending the response
                 }
             }
         }
