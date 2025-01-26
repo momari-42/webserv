@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:19:44 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/20 17:37:34 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/25 15:10:49 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,13 @@
 class Request
 {
     private:
-        std::string request;
         RequestLine requestLine;
         Header      header;
         Body        body;
+        int         trackingRequestNumber;
         
     public:
-        Request(const std::string &request);
-        // std::string getRequestLine() const;
-        Header& getHeader();
-        // std::string getBody() const;
+        Request( void );
+        void parseRequest ( std::string& requestData );
         ~Request();
 };

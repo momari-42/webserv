@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/01/18 21:52:20 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/26 10:58:24 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@
 int main() {
     try {
         std::vector<int> vec;
-        vec.push_back(8080);
-        vec.push_back(8081);
+        vec.push_back(9999);
+        // vec.push_back(9998);
         Server server(vec);
         server.startServer();
         // signal(SIGINT, server.sigHandler);

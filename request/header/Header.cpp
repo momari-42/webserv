@@ -3,54 +3,97 @@
 /*                                                        :::      ::::::::   */
 /*   Header.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/21 15:55:16 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/26 12:54:05 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Header.hpp"
 
-Header::Header ( const std::string& header ) {
-    size_t          number = 0;
-    std::string     tempraryHeader;
-    std::string     portion;
-    std::string     firstPortion;
-    std::string     secondPortion;
+Header::Header ( void ) {
+}
 
-    this->contentLength = 0;
-    this->header = header;
-    if (this->header.find("\r\n\r\n") != std::string::npos)
-        this->header.erase(this->header.find("\r\n\r\n"), this->header.size());
-    tempraryHeader = this->header;
-    number = tempraryHeader.find("\r\n");
-    if (number == std::string::npos)
-        number -= 2; 
-    tempraryHeader.erase(0, number + 2);
-    while (tempraryHeader.size()) {
-        number = tempraryHeader.find("\r\n");
-        portion = tempraryHeader.substr(0, number);
-        firstPortion = portion.substr(0, portion.find(":"));
-        // std::cout << tempraryHeader << std::endl;
-        secondPortion = portion.substr(portion.find(":") + 1, portion.size());
-        if (secondPortion.find_first_not_of(" ") != std::string::npos)
-            secondPortion.erase(0, secondPortion.find_first_not_of(" ") != std::string::npos);
-        this->httpHeadersMap.insert(std::pair<std::string, std::string>(firstPortion, secondPortion));
-        if (number == std::string::npos)
-            number-=2;
-        tempraryHeader.erase(0, number + 2);
-        if (firstPortion == "Content-Length")
-            this->contentLength = atoi(secondPortion.c_str());
+void Header::setHeader( const std::string &header ) {
+    std::string portion;
+    std::string firstPortion;
+    std::string secondPortion;
+    std::string request = this->rest + header;
+
+    // std::cout << "HHHHh : " << request.find(":", 0, 21) << std::endl;
+    while (request.find("\r\n") != std::string::npos) {
+        if (request.find(":") < request.find("\r\n")) {
+            portion = request.substr(0, request.find("\r\n"));
+            firstPortion = portion.substr(0, portion.find(":"));
+
+            if (firstPortion.find(" ") != std::string::npos || firstPortion.find("\t") != std::string::npos) {
+                // if the field is HOST header we must genrate a error for any find of /t or space
+                // 400 Bad Request
+            }
+            portion.erase(0, portion.find(":") + 1);
+            secondPortion = portion.substr(portion.find_first_not_of(" "));
+            this->httpHeadersMap[firstPortion] = secondPortion;
+            request.erase(0, request.find("\r\n") + 2);
+        }
+        else {
+            // 400 Bad Request
+        }
     }
+    this->rest = request;
+}
+
+
+void Header::print() {
     for (std::map<std::string, std::string>::iterator it = this->httpHeadersMap.begin(); it != this->httpHeadersMap.end(); it++) {
-        std::cout << (*it).first << " <-> " << (*it).second  << std::endl;
+        std::cout << "\033[31m" << (*it).first << " <-> " << (*it).second << "\033[0m" << std::endl;
     }
 }
+// Header::Header ( const std::string& request ) {
+//     size_t          number = 0;
+//     std::string     tempraryHeader;
+//     std::string     portion;
+//     std::string     firstPortion;
+//     std::string     secondPortion;
 
-int Header::getContentLenght() {
-    return this->contentLength;
-}
+//     this->header = request;
+//     tempraryHeader = this->header;
+//     if (tempraryHeader.find("\r\n\r\n") != std::string::npos) {
+//         this->header.erase(0, this->header.find("\r\n\r\n"));
+//         tempraryHeader.erase(tempraryHeader.find("\r\n\r\n"), tempraryHeader.size());
+//     }
+//     number = tempraryHeader.find("\r\n");
+//     if (number == std::string::npos)
+//         number -= 2;
+//     tempraryHeader.erase(0, number + 2);
+//     while (tempraryHeader.size()) {
+//         number = tempraryHeader.find("\r\n");
+//         portion = tempraryHeader.substr(0, number);
+//         firstPortion = portion.substr(0, portion.find(":"));
+//         secondPortion = portion.substr(portion.find(":") + 1, portion.size());
+//         if (secondPortion.find_first_not_of(" ") != std::string::npos)
+//             secondPortion.erase(0, secondPortion.find_first_not_of(" ") != std::string::npos);
+//         this->httpHeadersMap.insert(std::pair<std::string, std::string>(firstPortion, secondPortion));
+//         if (number == std::string::npos)
+//             number-=2;
+//         tempraryHeader.erase(0, number + 2);
+//     }
+
+//     // Get the value of the boundary if i found it
+
+//     std::map<std::string, std::string>::iterator it = this->httpHeadersMap.find("Content-Type");
+//     if (it != this->httpHeadersMap.end()) {
+//         secondPortion = (*it).second;
+//         if (secondPortion.find("boundary")) {
+//             this->boundary = secondPortion.substr(secondPortion.find("boundary") + 1);
+//         }
+//     }
+    
+//     // for (std::map<std::string, std::string>::iterator it = this->httpHeadersMap.begin(); it != this->httpHeadersMap.end(); it++) {
+//     //     std::cout << "\033[31m" << (*it).first << " <-> " << (*it).second << "\033[0m" << std::endl;
+//     // }
+// }
+
 
 Header::~Header ( void ) {
     

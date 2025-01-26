@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Body.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/16 14:43:40 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/25 15:10:57 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Body.hpp"
 
-Body::Body(const std::string &body) {
-    (void) body;
+Body::Body( void ) {
 }
 
 Body::~Body() {}

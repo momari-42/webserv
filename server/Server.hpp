@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/01/19 10:26:55 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/24 09:19:46 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@
 #include "../socket/Socket.hpp"
 #include <sys/event.h>
 #include <fcntl.h>
+
+// This is the buffer macro that i read from the client
+#define BUFFER_SIZE 4052
 
 class Server
 {
