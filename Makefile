@@ -9,6 +9,8 @@ all : $(NAME)
 
 $(NAME): $(OBJ) 
 	$(CPP) $(CPPFLAGS) $(OBJ) -o $(NAME)
+	clear
+	./webserv
 
 %.o: %.cpp $(HDERS)
 	$(CPP) $(CPPFLAGS) -c $< -o $@

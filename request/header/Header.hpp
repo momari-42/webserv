@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:16:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/20 17:29:57 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/26 10:56:24 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,22 @@
 
 #include <iostream>
 #include <map>
+#include <algorithm>
 
 class Header
 {
     private:
-        std::map<std::string, std::string> httpHeadersMap;
-        std::string header;
-        int contentLength;
+        std::string                         rest;
+        std::map<std::string, std::string>  httpHeadersMap;
     public:
-        Header(const std::string &header);
-        int getContentLenght();
+        Header( void );
+        void setHeader( const std::string &header );
         ~Header();
+
+
+
+
+
+        // this just for debug
+        void print( void );
 };
