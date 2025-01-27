@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/25 17:33:12 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/27 09:18:13 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,34 @@
 RequestLine::RequestLine( void ) {
 }
 
-void RequestLine::setRequestLine( const std::string& requestLine ) {
-    std::string request = requestLine;
-    
-    if (request.find('\t') != std::string::npos || request.find_first_not_of(" \t")) {
-        // 400 Bad Request
+
+void RequestLine::printFirstLine( void ) {
+    std::cout << "1;) " << this->method << std::endl;
+    std::cout << "1;) " << this->requestTarget << std::endl;
+    std::cout << "1;) " << this->httpVersion << std::endl;
+}
+
+void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequestNumber ) {
+    this->rest += requestLine;
+    // std::cout << "a : " << this->rest << std::endl;
+    if (this->rest.find("\r\n") != std::string::npos) {
+        this->rest.erase(this->rest.find("\r\n"));
+        if (this->rest.find('\t') != std::string::npos || this->rest.find_first_not_of(" ")) {
+            // 400 Bad this->rest
+        }
+        this->method = this->rest.substr(0, this->rest.find(' '));
+        this->rest.erase(0, this->rest.find(' '));
+        this->rest.erase(0, this->rest.find_first_not_of(" "));
+        this->requestTarget = this->rest.substr(0, this->rest.find(' '));
+        this->rest.erase(0, this->rest.find(' '));
+        this->rest.erase(0, this->rest.find_first_not_of(" "));
+        this->httpVersion = this->rest.substr(0, this->rest.find(' '));
+        this->rest = "";
+        requestLine.erase(0, requestLine.find("\r\n") + 2);
+        trackingRequestNumber++;
     }
-    this->method = request.substr(0, request.find(' '));
-    request.erase(0, request.find(' '));
-    request.erase(0, request.find_first_not_of(" "));
-    this->requestTarget = request.substr(0, request.find(' '));
-    request.erase(0, request.find(' '));
-    request.erase(0, request.find_first_not_of(" "));
-    this->httpVersion = request.substr(0, request.find(' '));
+    else
+        requestLine = "";
 }
 
 // RequestLine::RequestLine(const std::string &request) {

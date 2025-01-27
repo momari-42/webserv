@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:19:44 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/25 15:10:49 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/27 09:32:55 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class Request
         
     public:
         Request( void );
-        void parseRequest ( std::string& requestData );
+        void print( void );
+        void parseRequest ( std::string requestData );
         ~Request();
 };

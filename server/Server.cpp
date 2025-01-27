@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/26 11:15:19 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/27 14:55:42 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,11 @@ void Server::startServer() {
                 else  {
                     // Read all available data from the socket
                     memset(buffer, 0, BUFFER_SIZE);
+                    std::ofstream file("momari.py", std::ios::binary | std::ios::app);
+                    if (!file.is_open()) {
+                        std::cerr << "ERROR" << std::endl;
+                        exit(1);
+                    }
                     while (1) {
                         // std::cout << "\033[31m" << bytes_read << "\033[0m" << std::endl;
                         bytesRead = recv(filedes, buffer, sizeof(buffer) - 1, 0);
@@ -100,6 +105,10 @@ void Server::startServer() {
                             break;
                         buffer[bytesRead] = '\0';
                         requestData.append(buffer, bytesRead);
+                        ///////
+                        file.write(buffer, bytesRead);
+                        // file << "\n\n==============================4==================\n\n";
+                        ////// 
                         request.parseRequest(requestData);
                         memset(buffer, 0, BUFFER_SIZE);
                         requestData = "";
@@ -107,8 +116,15 @@ void Server::startServer() {
                     // std::ofstream outputFile("momari.txt", std::ios::binary);
                     // outputFile.write(request_data.data(), request_data.size());
                     // outputFile.close();
-                    std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
-                    std::cout << "\033[31m" << bytesRead <<   std::endl << requestData  << "\033[0m" << std::endl;
+
+
+                    request.print();
+
+
+
+                    
+                    // std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
+                    // std::cout << "\033[31m" << bytesRead <<   std::endl << requestData  << "\033[0m" << std::endl;
 
                     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
                     write(filedes, response.c_str(), response.size());
