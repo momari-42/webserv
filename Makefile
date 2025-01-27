@@ -3,14 +3,14 @@ OBJ			= $(SRC:.cpp=.o)
 NAME		= webserv
 CPP			= c++
 CPPFLAGS	= -Wall -Wextra -Werror -std=c++98 -fsanitize=address
-HDERS		= webserver.hpp server/server.hpp socket/Socket.hpp
+HDERS		= webserver.hpp server/server.hpp socket/Socket.hpp request/Request.hpp request/body/Body.hpp request/header/Header.hpp request/requestLine/RequestLine.hpp
 
 all : $(NAME)
+	@clear
+	./webserv
 
 $(NAME): $(OBJ) 
 	$(CPP) $(CPPFLAGS) $(OBJ) -o $(NAME)
-	clear
-	./webserv
 
 %.o: %.cpp $(HDERS)
 	$(CPP) $(CPPFLAGS) -c $< -o $@
@@ -22,4 +22,3 @@ fclean: clean
 	rm -rf $(NAME)
 
 re: fclean $(NAME)
-	./webserv

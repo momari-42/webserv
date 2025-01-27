@@ -1,7 +1,7 @@
 #include <iostream>
-
+#include <cstring>
 int main() {
-    std::string str = "momari:abc";
-    size_t res = str.find(":", 0);
-    std::cout << res << std::endl;
+    std::string test = "5ca4";
+    ssize_t result = -1;
+    std::cout << "this is the result : " << result << std::endl;
 }

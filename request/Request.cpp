@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/26 12:58:02 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/27 14:58:39 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,34 +16,42 @@ Request::Request( void ) {
     this->trackingRequestNumber = 0;
 }
 
-void Request::parseRequest ( std::string& requestData ) {
-    std::cout << requestData;
+// Red     : \033[31m
+// Green   : \033[32m
+// Yellow  : \033[33m
+// Blue    : \033[34m
+// Magenta : \033[35m
+// Cyan    : \033[36m
+// White   : \033[37m
+
+void Request::parseRequest ( std::string requestData ) {
     if (this->trackingRequestNumber == 0) {
-        if (requestData.find("\r\n") != std::string::npos) {
-            this->requestLine.setRequestLine(requestData.substr(0, requestData.find("\r\n")));
-            requestData.erase(0, requestData.find("\r\n") + 2);
-            this->trackingRequestNumber++;
-        }
-        else {
-            //  error "414 Request-URI Too Large";
-        }
-        
+        this->requestLine.setRequestLine(requestData, this->trackingRequestNumber);
     }
-
     if (this->trackingRequestNumber == 1) {
-        if (requestData.find("\r\n\r\n") != std::string::npos) {
-            this->header.setHeader(requestData.substr(0, requestData.find("\r\n\r\n") + 2));
-            requestData.substr(0, requestData.find("\r\n\r\n") + 4);
-
-            this->trackingRequestNumber++;
-        } else {
-            this->header.setHeader(requestData);
-        }
+        this->header.setHeader(requestData, this->trackingRequestNumber);
     }
     if (this->trackingRequestNumber == 2) {
-        
+        this->body.setBody(requestData, this->trackingRequestNumber);
     }
 }
+
+void Request::print( void ) {
+    // std::cout << "\033[34m" << "-----------------------------------------------" << "\0303[m" << std::endl;
+    // std::cout << "\033[34m" << "|---------This is the Requesrt Line-----------|" << "\033[0m" << std::endl;
+    // std::cout << "\033[34m" << "-----------------------------------------------" << "\033[0m" << std::endl;
+    // this->requestLine.printFirstLine();
+    // std::cout << "\033[32m" << "-----------------------------------------------" << "\033[0m" << std::endl;
+    // std::cout << "\033[32m" << "|--------------This is the Header-------------|" << "\033[0m" << std::endl;
+    // std::cout << "\033[32m" << "-----------------------------------------------" << "\033[0m" << std::endl;
+    // this->header.print();
+    std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
+    std::cout << "\033[31m" << "|--------------This is the Body---------------|" << "\033[0m" << std::endl;
+    std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
+    this->body.printBody();
+    
+}
+
 
 Request::~Request () {
     
