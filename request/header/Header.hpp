@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:16:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/27 09:05:17 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/27 15:28:15 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class Header
     public:
         Header( void );
         void setHeader( std::string &header, int& trackingRequestNumber );
+        std::string getValue(const std::string& key);
         ~Header();
 
         
