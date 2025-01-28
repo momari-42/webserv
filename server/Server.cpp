@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/27 14:55:42 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/28 16:12:32 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void Server::startServer() {
                 else  {
                     // Read all available data from the socket
                     memset(buffer, 0, BUFFER_SIZE);
-                    std::ofstream file("momari.py", std::ios::binary | std::ios::app);
+                    std::ofstream file("test.txt", std::ios::binary | std::ios::app);
                     if (!file.is_open()) {
                         std::cerr << "ERROR" << std::endl;
                         exit(1);
@@ -113,6 +113,7 @@ void Server::startServer() {
                         memset(buffer, 0, BUFFER_SIZE);
                         requestData = "";
                     }
+                    file.close();
                     // std::ofstream outputFile("momari.txt", std::ios::binary);
                     // outputFile.write(request_data.data(), request_data.size());
                     // outputFile.close();
