@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/28 16:12:32 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/28 17:46:52 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ void Server::startServer() {
 
 
                     
-                    // std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
+                    std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
                     // std::cout << "\033[31m" << bytesRead <<   std::endl << requestData  << "\033[0m" << std::endl;
 
                     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";

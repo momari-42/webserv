@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/28 16:12:24 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/28 17:49:53 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Body::Body( void ) {
 }
 
 void Body::printBody( void ) {
-    std::cout << this->body << std::endl;
+    std::cout << this->rest << std::endl;
 }
 
 Body::~Body() {}
@@ -55,36 +55,39 @@ void Body::setBoundaryBody( const std::string& requestData, const std::string& t
             this->data.back().contenet = body;
         if (this->rest.find(token) == this->rest.find(token + "--") && this->rest.find(token) == 0)
             this->rest.erase(0, token.size() + 2);
-    } else
-        std::cout << "need more information => " << this->rest.size() << std::endl;
+    }
 }
 
 void Body::setBoundaryChunkedBody( std::string& requestData, const std::string& token ) {
     // this->rest += requestData;
-    while (requestData.size()) {
-        if ( !this->bodyTrackingNumber  && requestData.find("\r\n") != std::string::npos ) {
-            this->bodyTrackingNumber = strtol(requestData.substr(0, requestData.find("\r\n")).c_str(), NULL, 16);
-            requestData.erase(0, requestData.find("\r\n") + 2);
-        }
-        if (this->bodyTrackingNumber && this->bodyTrackingNumber <= requestData.size()) {
-            this->rest.append(requestData, 0, this->bodyTrackingNumber);
-            requestData.erase(0, this->bodyTrackingNumber);
-            this->bodyTrackingNumber = 0;
-        }
-        else if ( this->bodyTrackingNumber ) {
-            this->rest += requestData;
-            this->bodyTrackingNumber -= requestData.size();
-            requestData = "";
-        }
-        // std::cout << requestData.size() << " => " << this->bodyTrackingNumber << std::endl;
+    // while (requestData.size()) {
+    //     if ( !this->bodyTrackingNumber  && requestData.find("\r\n") != std::string::npos ) {
+    //         this->bodyTrackingNumber = strtol(requestData.substr(0, requestData.find("\r\n")).c_str(), NULL, 16);
+    //         requestData.erase(0, requestData.find("\r\n") + 2);
+    //     }
+    //     if (this->bodyTrackingNumber && this->bodyTrackingNumber <= requestData.size()) {
+    //         this->rest.append(requestData, 0, this->bodyTrackingNumber);
+    //         requestData.erase(0, this->bodyTrackingNumber);
+    //         this->bodyTrackingNumber = 0;
+    //     }
+    //     else if ( this->bodyTrackingNumber ) {
+    //         this->rest += requestData;
+    //         this->bodyTrackingNumber -= requestData.size();
+    //         requestData = "";
+    //     }
+    //     // std::cout << requestData.size() << " => " << this->bodyTrackingNumber << std::endl;
         
-        // std::cout << "=============== before out =====================" << std::endl;
-    }
+    //     // std::cout << "=============== before out =====================" << std::endl;
+    // }
         // std::cout << "=============== out =====================" << std::endl;
     // std::ofstream before("before.txt", std::ios::binary);
     // before.write(this->rest.data(), this->rest.size());
     // before.close();
-    setBoundaryBody("", token);
+    // ======================================================================================
+    (void) token;
+    setChunkedBody( requestData );
+    // if (this->bodyTrackingNumber == 0 && this->rest.size() == 0)
+    //     setBoundaryBody(this->body, token);
 }
 
 void Body::setBody( std::string& body, int &trackingRequestNumber, std::string token, std::string chunked ) {
@@ -95,29 +98,33 @@ void Body::setBody( std::string& body, int &trackingRequestNumber, std::string t
     else if (token.find("boundary=") != std::string::npos)
         Body::setBoundaryBody(body, "--" + token.substr(token.find("boundary=") + 9));
     else
-        Body::setChunkedBody(body, trackingRequestNumber);
+        Body::setChunkedBody(body);
 }
 
-void Body::setChunkedBody( std::string& body, int &trackingRequestNumber ) {
-    (void)trackingRequestNumber;
+void Body::setChunkedBody( std::string& body ) {
     this->rest += body;
     if ( !this->bodyTrackingNumber  && this->rest.find("\r\n") != std::string::npos ) {
-        this->bodyTrackingNumber = strtol(this->rest.substr(0, this->rest.find(";")).c_str(), NULL, 16);
+        this->bodyTrackingNumber = strtol(this->rest.substr(0, this->rest.find("\r\n")).c_str(), NULL, 16);
+        if (this->bodyTrackingNumber == 0 && this->rest.find("\r\n\r\n") != std::string::npos)
+        {
+            this->isBodyReceived = true;
+            this->rest = "";
+        }
         this->rest.erase(0, this->rest.find("\r\n") + 2);
     }
     if ( this->bodyTrackingNumber && this->rest.size() <= this->bodyTrackingNumber ) {
-        // std::cout << "1 :" << this->bodyTrackingNumber << std::endl;
-        // std::cout << "2 :" << this->rest << " <><><><> " << this->rest.size() << std::endl;
         this->body += this->rest;
         this->bodyTrackingNumber -= this->rest.size();
         this->rest = "";
     }
     else if ( this->bodyTrackingNumber ) {
-        // std::cout << "3 :"  << this->bodyTrackingNumber << std::endl;
-        // std::cout << "4 :"  << this->rest.size() << std::endl;
         this->body += this->rest.substr(0, this->bodyTrackingNumber);
-        this->rest.erase(0, this->bodyTrackingNumber);
-        // std::cout << this->rest << std::endl;
+        this->rest.erase(0, this->bodyTrackingNumber + 2);
+        this->bodyTrackingNumber = strtol(this->rest.substr(0, this->rest.find(";")).c_str(), NULL, 16);
+        if (this->bodyTrackingNumber == 0 && this->rest.find("\r\n\r\n") != std::string::npos) {
+            this->isBodyReceived = true;
+            this->rest = "";
+        }
         this->bodyTrackingNumber = 0;
     }
     body = "";

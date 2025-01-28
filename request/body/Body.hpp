@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/28 13:46:34 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/28 17:21:11 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,13 @@ typedef struct boundaryData {
 class Body
 {
     private:
+        bool        isBodyReceived;
         size_t      bodyTrackingNumber;
         std::string body;
         std::string rest;
         // Request *request;
         std::vector<boundaryData_t> data;
-        void setChunkedBody( std::string& body, int &trackingRequestNumber );
+        void setChunkedBody( std::string& body );
         void setBoundaryBody( const std::string& requestData, const std::string& token );
         void setBoundaryChunkedBody( std::string& requestData, const std::string& token );
     public:
