@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/01/27 13:24:07 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/29 11:03:31 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 #include <cstring>
 
 // This is the buffer macro that i read from the client
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 500
 
 class Server
 {

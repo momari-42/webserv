@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/28 12:49:52 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/29 10:31:47 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request( void ) {
+Request::Request( void ) : header(), body(&header) {
     this->trackingRequestNumber = 0;
 }
 
@@ -32,7 +32,7 @@ void Request::parseRequest ( std::string requestData ) {
         this->header.setHeader(requestData, this->trackingRequestNumber);
     }
     if (this->trackingRequestNumber == 2) {
-        this->body.setBody(requestData, this->trackingRequestNumber, this->header.getValue("Content-Type"), this->header.getValue("Transfer-Encoding"));
+        this->body.setBody( requestData );
     }
 }
 

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/28 17:46:52 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/29 08:27:34 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void Server::startServer() {
                 else  {
                     // Read all available data from the socket
                     memset(buffer, 0, BUFFER_SIZE);
-                    std::ofstream file("test.txt", std::ios::binary | std::ios::app);
+                    std::ofstream file("momari.py", std::ios::binary | std::ios::app);
                     if (!file.is_open()) {
                         std::cerr << "ERROR" << std::endl;
                         exit(1);
@@ -124,7 +124,7 @@ void Server::startServer() {
 
 
                     
-                    std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
+                    // std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
                     // std::cout << "\033[31m" << bytesRead <<   std::endl << requestData  << "\033[0m" << std::endl;
 
                     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
