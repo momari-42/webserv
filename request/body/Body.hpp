@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/29 10:51:58 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/29 11:25:58 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class Body
         std::vector<boundaryData_t> data;
         void setChunkedBody( std::string& body );
         void setBoundaryBody( const std::string& requestData, const std::string& token );
-        void setBoundaryChunkedBody( std::string& requestData, const std::string& token );
+        void setBoundaryChunkedBody( std::string& requestData);
         void initiateBodyParams( void );
     public:
         Body( Header *header );
