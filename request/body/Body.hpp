@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/28 17:21:11 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/29 10:51:58 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-// #include "../header/Header.hpp"
+#include <map>
+#include "../header/Header.hpp"
 // #include "../Request.hpp"
 
 // class Request;
@@ -29,19 +30,34 @@ typedef struct boundaryData {
 class Body
 {
     private:
-        bool        isBodyReceived;
-        size_t      bodyTrackingNumber;
-        std::string body;
-        std::string rest;
+        // this is a boolean for tracking initialization of the body parameters
+        bool                                isBodyInitiates;
+        // this is a pointer to header request
+        Header                              *header;
+
+
+
+    
+
+        ssize_t                             contentLength;
+        
+        // this is the data needed in body
+        bool                                isBodyReceived;
+        size_t                              bodyTrackingNumber;
+        std::string                         body;
+        std::string                         rest;
+        std::string                         bodyRequestType;
+        // std::map<std::string, std::string>  boundryData;
         // Request *request;
         std::vector<boundaryData_t> data;
         void setChunkedBody( std::string& body );
         void setBoundaryBody( const std::string& requestData, const std::string& token );
         void setBoundaryChunkedBody( std::string& requestData, const std::string& token );
+        void initiateBodyParams( void );
     public:
-        Body( void );
+        Body( Header *header );
         void printBody( void );
-        void setBody( std::string& body, int &trackingRequestNumber, std::string token, std::string chunked );
+        void setBody( std::string& body );
         void parseBoundaryHeader(std::string& header);
         ~Body();
 };
