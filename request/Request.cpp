@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/29 10:31:47 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/30 14:42:38 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,12 @@ void Request::parseRequest ( std::string requestData ) {
         this->body.setBody( requestData );
     }
 }
+
+
+bool Request::getBodyComplete( void) {
+    return (this->body.getBodyComplete());
+}
+
 
 void Request::print( void ) {
     // std::cout << "\033[34m" << "-----------------------------------------------" << "\0303[m" << std::endl;

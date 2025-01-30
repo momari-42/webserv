@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/01/29 11:03:31 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/30 14:46:30 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,39 @@
 #include <sys/event.h>
 #include <fcntl.h>
 #include <cstring>
+#include <fstream>
 
 // This is the buffer macro that i read from the client
 #define BUFFER_SIZE 500
+#define NEVENTS     128
 
 class Server
 {
     private:
+
+
+
+        size_t                              clientComplet;
+        bool                                isClientComplet;
+
+
+
+
+
+
+
+
+
+
+    
+        // this is the attributte of the starting server;
+        int                             kq;
+        std::map<size_t, Request>       requestsClient;
+        std::string                     buffer;
+        ssize_t                         bytesRead;
+        struct kevent                   readyEvents[NEVENTS];
+        size_t                          readyFd;
+    
         socklen_t           lenSocket;
         int                 sockfdClient;
         struct sockaddr_in  addressClient;
