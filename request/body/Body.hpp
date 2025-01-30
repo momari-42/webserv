@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/29 11:25:58 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/30 12:50:52 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct boundaryData {
     std::string name;
     std::string filename;
     std::string contenet;
+    bool isFile;
 } boundaryData_t;
 
 class Body
@@ -58,6 +59,6 @@ class Body
         Body( Header *header );
         void printBody( void );
         void setBody( std::string& body );
-        void parseBoundaryHeader(std::string& header);
+        void parseBoundaryHeader(const std::string& header);
         ~Body();
 };
