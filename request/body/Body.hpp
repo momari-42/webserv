@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/29 11:25:58 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/30 14:45:40 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,15 @@ typedef struct boundaryData {
 class Body
 {
     private:
+        // this just for test if request is  complete or not
+
+        
+        // this just for test
+        bool                                requestComplete;
         // this is a boolean for tracking initialization of the body parameters
         bool                                isBodyInitiates;
         // this is a pointer to header request
         Header                              *header;
-
 
 
     
@@ -59,5 +63,6 @@ class Body
         void printBody( void );
         void setBody( std::string& body );
         void parseBoundaryHeader(std::string& header);
+        bool getBodyComplete( void);
         ~Body();
 };

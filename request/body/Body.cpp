@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/30 10:15:54 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/30 14:45:42 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ Body::Body( Header *header ) {
     this->header = header;
     this->bodyTrackingNumber = 0;
     this->isBodyInitiates = false;
+    this->requestComplete  = false;
+    
     // this->request = request;
 }
 
@@ -28,6 +30,11 @@ void Body::printBody( void ) {
 
 Body::~Body() {}
 
+bool Body::getBodyComplete( void) {
+    return (this->requestComplete);
+}
+
+
 void Body::parseBoundaryHeader(std::string& header) {
     boundaryData_t part;
     part.name = header.substr(header.find("name=\"") + 6);
@@ -36,6 +43,7 @@ void Body::parseBoundaryHeader(std::string& header) {
     if (header.find("filename=\"") != std::string::npos) {
         part.filename = header.substr(header.find("filename=\"") + 10);
         part.filename = part.filename.substr(0, part.filename.find("\""));
+        this->requestComplete = true;
         // std::cout << "The part.filename is |" << part.filename << "|" << std::endl;
     }
     this->data.push_back(part);
@@ -59,6 +67,7 @@ void Body::setBoundaryBody( const std::string& requestData, const std::string& t
         if (this->data.back().filename.length() > 0) {
             std::ofstream outputFile(this->data.back().filename, std::ios::binary);
             outputFile.write(body.data(), body.size());
+            
             // outputFile.close();
         } else
             this->data.back().contenet = body;
