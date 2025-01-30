@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/29 15:21:06 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/30 10:15:54 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void Body::setBoundaryBody( const std::string& requestData, const std::string& t
     // std::cout << this->rest;
     // std::cout << "==============================================================" << std::endl;
     while (this->rest.find(token) == 0 && this->rest.find(token, token.length()) != std::string::npos) {
-        std::cerr << "Boundary" << std::endl;
+        // std::cerr << "Boundary" << std::endl;
         this->rest.erase(0, token.length() + 2);
         std::string header = this->rest.substr(0, this->rest.find("\r\n\r\n"));
         Body::parseBoundaryHeader(header);
@@ -59,7 +59,7 @@ void Body::setBoundaryBody( const std::string& requestData, const std::string& t
         if (this->data.back().filename.length() > 0) {
             std::ofstream outputFile(this->data.back().filename, std::ios::binary);
             outputFile.write(body.data(), body.size());
-            outputFile.close();
+            // outputFile.close();
         } else
             this->data.back().contenet = body;
         if (this->rest.find(token) == this->rest.find(token + "--") && this->rest.find(token) == 0)
@@ -102,16 +102,16 @@ void Body::setBoundaryChunkedBody( std::string& body) {
     // if (this->isBodyReceived == false)
         Body::setChunkedBody(body);
     if (this->isBodyReceived == true) {
-        std::cout << this->body;
-        this->rest = "";
-        std::cout << "===================================================================================" << std::endl;
-        std::cout << "===================================================================================" << std::endl;
-        std::cout << "===================================================================================" << std::endl;
-        std::cout << "===================================================================================" << std::endl;
-        std::cout << "===================================================================================" << std::endl;
-        std::cout << "===================================================================================" << std::endl;
-        std::cout << "===================================================================================" << std::endl;
-        std::cout << "===================================================================================" << std::endl;
+        // std::cout << this->body;
+        // this->rest = "";
+        // std::cout << "===================================================================================" << std::endl;
+        // std::cout << "===================================================================================" << std::endl;
+        // std::cout << "===================================================================================" << std::endl;
+        // std::cout << "===================================================================================" << std::endl;
+        // std::cout << "===================================================================================" << std::endl;
+        // std::cout << "===================================================================================" << std::endl;
+        // std::cout << "===================================================================================" << std::endl;
+        // std::cout << "===================================================================================" << std::endl;
         Body::setBoundaryBody(this->body, "--" + this->header->getValue("Content-Type").substr(this->header->getValue("Content-Type").find("boundary=") + 9));
     }
     // if (this->isBodyReceived){
@@ -155,7 +155,10 @@ void Body::setBody( std::string& body ) {
     else if (this->bodyRequestType == "boundry")
         Body::setBoundaryBody(body, "--" + this->header->getValue("Content-Type").substr(this->header->getValue("Content-Type").find("boundary=") + 9));
     else if (this->bodyRequestType == "chunkedboundry")
+    {
+        // std::cerr << "lol" << std::endl;
         Body::setBoundaryChunkedBody( body );
+    }
 }
 
 void Body::setChunkedBody( std::string& body ) {
@@ -171,7 +174,7 @@ void Body::setChunkedBody( std::string& body ) {
             this->rest.erase(0, this->rest.find("\r\n") + 2);
             if (this->bodyTrackingNumber == 0) {
                 this->isBodyReceived = true;
-                std::cerr << "----------------------------" << std::endl;
+                std::cerr << "-------------***-------------" << std::endl;
                 this->rest = "";
                 break;
             }
