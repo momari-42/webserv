@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/30 12:50:52 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/30 17:36:47 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,5 +64,6 @@ class Body
         void printBody( void );
         void setBody( std::string& body );
         void parseBoundaryHeader(const std::string& header);
+        bool getBodyComplete( void);
         ~Body();
 };

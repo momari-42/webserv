@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/30 14:44:29 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/01/30 17:36:32 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,12 @@ Body::Body( Header *header ) {
     
     // this->request = request;
 }
+
+bool Body::getBodyComplete( void) {
+    return (this->requestComplete);
+}
+
+
 
 void Body::printBody( void ) {
 //     std::cout << this->rest.size() << std::endl;
