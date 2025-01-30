@@ -17,6 +17,8 @@ Body::Body( Header *header ) {
     this->header = header;
     this->bodyTrackingNumber = 0;
     this->isBodyInitiates = false;
+    this->requestComplete  = false;
+    
     // this->request = request;
 }
 

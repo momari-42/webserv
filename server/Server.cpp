@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/30 10:12:24 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/30 17:23:47 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,13 @@ Server::Server ( std::vector<int> vec ) {
         (*it).initializeSocketCommunication();
     }
     memset(&this->addressClient, 0, sizeof(this->addressClient));
+
+
+
+
+    // this is just for test
+    this->clientComplet = 0;
+    this->isClientComplet = false;
 }
 
 bool Server::findFdSocket ( int sockfd ) {
@@ -32,35 +39,17 @@ bool Server::findFdSocket ( int sockfd ) {
     return (false);
 }
 
-
-// void Socket::socketAccepting ( void ) {
-//     std::cout << "we are here" << std::endl;
-//     close(this->sockfdClient);
-//     this->sockfdClient = accept(this->sockfd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->client_len);
-//     if (this->sockfdClient == -1) {
-//         std::cout << "Problem in accept function" << std::endl; 
-//         throw (SocketExceptions(strerror(errno)));
-//     }
-// }
-
-#include <fstream>
-
-
 void Server::startServer() {
-    Request         request;
-    std::string     requestData;
+    int             number = 0;
     struct kevent   events[this->sockets.size()];
     char            buffer[BUFFER_SIZE];
-    ssize_t         bytesRead;
-    int             number = 0;
-    int             errorTrack;
-    int             kq;
-
+    ssize_t         nevents;
     
-    memset(events, 0, sizeof(events));
+
     kq = kqueue();
     if ( kq == -1 )
         throw (Server::ServerExceptions(strerror(errno)));
+    memset(events, 0, sizeof(events));
     for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
         EV_SET(&events[number], (*it).getSockfd(), EVFILT_READ, EV_ADD, 0, 0, NULL);
         number++;
@@ -68,20 +57,19 @@ void Server::startServer() {
     if (kevent(kq, events, this->sockets.size(), 0, 0, 0) == -1)
         throw (Server::ServerExceptions(strerror(errno)));
     while (true) {
-        struct kevent  readyEvents[128];
 
-        memset(readyEvents, 0, sizeof(readyEvents));
+        memset(this->readyEvents, 0, sizeof(this->readyEvents));
         
-        errorTrack = kevent(kq, NULL, 0, readyEvents, 128, 0);
-        if (errorTrack == -1)
+        nevents = kevent(kq, NULL, 0, readyEvents, 128, 0);
+        if (nevents == -1)
             throw (Server::ServerExceptions(strerror(errno)));
-        else if (errorTrack > 0) {
-            for (int i = 0; i < errorTrack; i++) {
-                int filedes = readyEvents[i].ident;
-                fcntl(filedes, F_SETFL, O_NONBLOCK);
-                if ( findFdSocket(filedes) ) {
+        else if (nevents > 0) {
+            for (ssize_t i = 0; i < nevents; i++) {
+                this->readyFd = readyEvents[i].ident;
+                fcntl(this->readyFd, F_SETFL, O_NONBLOCK);
+                if ( findFdSocket(this->readyFd) ) {
                     struct kevent clientEvent;
-                    this->sockfdClient = accept(filedes, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
+                    this->sockfdClient = accept(this->readyFd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
                     if (this->sockfdClient == -1) {
                         std::cout << "Problem in accept function" << std::endl; 
                         throw (ServerExceptions(strerror(errno)));
@@ -91,50 +79,35 @@ void Server::startServer() {
                         throw (Server::ServerExceptions(strerror(errno)));
                 }
                 else  {
-                    // Read all available data from the socket
+                    this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
+                    if (bytesRead <= 0)
+                        break;
+                    buffer[this->bytesRead] = '\0';
+                    this->buffer.append(buffer, this->bytesRead);
+
+                    requestsClient[this->readyFd].parseRequest(this->buffer);
                     memset(buffer, 0, BUFFER_SIZE);
-                    std::ofstream file("momari.py", std::ios::binary | std::ios::app);
-                    if (!file.is_open()) {
-                        std::cerr << "ERROR" << std::endl;
-                        exit(1);
-                    }
-                    while (1) {
-                        // std::cout << "\033[31m" << bytes_read << "\033[0m" << std::endl;
-                        bytesRead = recv(filedes, buffer, sizeof(buffer) - 1, 0);
-                        if (bytesRead <= 0)
-                            break;
-                        buffer[bytesRead] = '\0';
-                        requestData.append(buffer, bytesRead);
-                        ///////
-                        file.write(buffer, bytesRead);
-                        // file.flush();
-                        // file << "\n\n==============================4==================\n\n";
-                        ////// 
-                        request.parseRequest(requestData);
-                        memset(buffer, 0, BUFFER_SIZE);
-                        requestData = "";
-                    }
-                    file.close();
-                    // std::ofstream outputFile("momari.txt", std::ios::binary);
-                    // outputFile.write(request_data.data(), request_data.size());
-                    // outputFile.close();
-
-
-                    // request.print();
-
-
-
+                    this->buffer = "";
                     
-                    std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
-                    // std::cout << "\033[31m" << bytesRead <<   std::endl << requestData  << "\033[0m" << std::endl;
+                    // std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
 
-                    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
-                    write(filedes, response.c_str(), response.size());
-                    close(filedes);  // Close the connection after sending the response
+                    // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
+                    // write(this->readyFd, response.c_str(), response.size());
+                    // close(this->readyFd);  // Close the connection after sending the response
+                    if (this->requestsClient[this->readyFd].getBodyComplete() == true) {
+                        this->isClientComplet = true;
+                        this->clientComplet = this->readyFd;
+                    }
                 }
             }
         }
-        
+        if (this->isClientComplet == true)
+        {
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
+            write(this->clientComplet, response.c_str(), response.size());
+            close(this->clientComplet);  // Close the connection after sending the response
+            requestsClient.erase(this->clientComplet);
+        }
     }
 }
 
