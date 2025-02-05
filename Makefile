@@ -35,3 +35,7 @@ start:
 	done; \
 	printf "\n\033[0m" # Reset text color
 	@./webserv
+
+
+rm :
+	@rm -rf upload/*

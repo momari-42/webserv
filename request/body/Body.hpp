@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/30 17:52:45 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/04 14:58:15 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct boundaryData {
     std::string filename;
     std::string contenet;
     bool isFile;
+    bool isComplete;
 } boundaryData_t;
 
 class Body
@@ -53,9 +54,10 @@ class Body
         std::string                         bodyRequestType;
         // std::map<std::string, std::string>  boundryData;
         // Request *request;
-        std::vector<boundaryData_t> data;
+        std::vector<boundaryData_t>         data;
+        std::map<std::string, boundaryData_t>         boundryData;
         void setChunkedBody( std::string& body );
-        void setBoundaryBody( const std::string& requestData, const std::string& token );
+        void setBoundaryBody( std::string& requestData, const std::string& token );
         void setBoundaryChunkedBody( std::string& requestData);
         void initiateBodyParams( void );
     public:

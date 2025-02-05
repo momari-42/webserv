@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/30 17:23:47 by momari           ###   ########.fr       */
+/*   Updated: 2025/01/30 20:56:58 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,23 @@ void Server::startServer() {
     ssize_t         nevents;
     
 
+
+
+    //----------------------------------------------//
+    //----------------------------------------------//
+
+
+
+    std::ofstream of("momari.py", std::ios::binary);
+    if (!of.is_open()) {
+        std::cerr << "Error" << std::endl;
+        exit(1);
+    }
+
+    
+    //----------------------------------------------//
+    //----------------------------------------------//
+    
     kq = kqueue();
     if ( kq == -1 )
         throw (Server::ServerExceptions(strerror(errno)));
@@ -83,8 +100,8 @@ void Server::startServer() {
                     if (bytesRead <= 0)
                         break;
                     buffer[this->bytesRead] = '\0';
+                    of.write(buffer, bytesRead);
                     this->buffer.append(buffer, this->bytesRead);
-
                     requestsClient[this->readyFd].parseRequest(this->buffer);
                     memset(buffer, 0, BUFFER_SIZE);
                     this->buffer = "";
@@ -101,8 +118,7 @@ void Server::startServer() {
                 }
             }
         }
-        if (this->isClientComplet == true)
-        {
+        if (this->isClientComplet == true) {
             std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
             write(this->clientComplet, response.c_str(), response.size());
             close(this->clientComplet);  // Close the connection after sending the response

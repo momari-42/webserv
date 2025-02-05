@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/01/30 14:46:30 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/05 09:06:01 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 #include <fstream>
 
 // This is the buffer macro that i read from the client
-#define BUFFER_SIZE 500
+#define BUFFER_SIZE 20
 #define NEVENTS     128
 
 class Server
