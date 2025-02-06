@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/02/06 10:45:16 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/06 11:45:42 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 #include <fstream>
 
 // This is the buffer macro that i read from the client
-#define BUFFER_SIZE 80000
+#define BUFFER_SIZE 1000
 #define NEVENTS     128
 
 class Server

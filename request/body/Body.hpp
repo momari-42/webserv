@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/05 12:25:48 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/06 11:41:07 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class Body
         size_t                              bodyTrackingNumber;
         std::string                         body;
         std::string                         rest;
+        std::string                         restChunked;
         std::string                         bodyRequestType;
         // std::map<std::string, std::string>  boundryData;
         // Request *request;
