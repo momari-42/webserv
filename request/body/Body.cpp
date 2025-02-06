@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/06 09:55:55 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/06 11:45:35 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ void Body::parseBoundaryHeader(const std::string& header) {
     part.isFile = false;
     part.isHeaderComplete = false;
     part.isBodyComplete = false;
+    std::cout << "<><start><>" << std::endl;
+    std::cout << header << std::endl;
+    std::cout << "<><end><>" << std::endl;
     part.name = header.substr(header.find("name=\"") + 6);
     part.name = part.name.substr(0, part.name.find("\""));
     if (header.find("filename=\"") != std::string::npos) {
@@ -108,7 +111,7 @@ void Body::setBoundaryBody( std::string& requestData, const std::string& token )
 
             if (!this->data.back().isBodyComplete)
                 manageFile(this->data.back().contenet, this->rest.substr(0, this->rest.find(token + "--") - 2));
-            manageFile("hihhihihihhi.py", this->rest);
+            // manageFile("hihhihihihhi.py", this->rest);
             this->requestComplete = true;
             this->rest = "";
             break;
@@ -125,7 +128,7 @@ void Body::setBoundaryBody( std::string& requestData, const std::string& token )
                 this->rest.erase(0, this->rest.find(token));
                 this->data.back().isBodyComplete = true;
             }
-            if (this->rest.find(token) == 0) {
+            if (this->rest.find(token) == 0 && this->rest.find("\r\n\r\n") != std::string::npos) {
                 // std::cout << "4 " << std::endl;
 
 
@@ -179,7 +182,7 @@ void Body::setBoundaryChunkedBody( std::string& body) {
     //     }
     //     // std::cout << requestData.size() << " => " << this->bodyTrackingNumber << std::endl;
         
-    //     // std::cout << "=============== before out =====================" << std::endl;
+        // std::cout << "=============== before out =====================" << std::endl;
     // }
         // std::cout << "=============== out =====================" << std::endl;
     // std::ofstream before("before.txt", std::ios::binary);
@@ -242,34 +245,34 @@ void Body::setBody( std::string& body ) {
 
 void Body::setChunkedBody( std::string& body ) {
     // std::cout << "I am in with no one where are you guys " << std::endl;
-    this->rest += body;
-    // std::cout << this->rest << std::endl;
-    while ( this->rest.size() )
+    this->restChunked += body;
+    // std::cout << this->restChunked << std::endl;
+    while ( this->restChunked.size() )
     {
-        if ( !this->bodyTrackingNumber  && this->rest.find("\r\n") == std::string::npos )
+        if ( !this->bodyTrackingNumber  && this->restChunked.find("\r\n") == std::string::npos )
             break;
-        if ( !this->bodyTrackingNumber  && this->rest.find("\r\n") != std::string::npos ) {
-            this->bodyTrackingNumber = strtol(this->rest.substr(0, this->rest.find("\r\n")).c_str(), NULL, 16);
-            this->rest.erase(0, this->rest.find("\r\n") + 2);
+        if ( !this->bodyTrackingNumber  && this->restChunked.find("\r\n") != std::string::npos ) {
+            this->bodyTrackingNumber = strtol(this->restChunked.substr(0, this->restChunked.find("\r\n")).c_str(), NULL, 16);
+            this->restChunked.erase(0, this->restChunked.find("\r\n") + 2);
             if (this->bodyTrackingNumber == 0) {
                 this->isBodyReceived = true;
-                std::cerr << "-------------***-------------" << std::endl;
+                // std::cerr << "-------------***-------------" << std::endl;
 
                 // in this i will open a test file for store  the value that i parse just for test
-                manageFile("screenTest.png", this->body);
+                // manageFile("screenTest.png", this->body);
 
-                this->rest = "";
+                this->restChunked = "";
                 break;
             }
         }
-        if ( this->bodyTrackingNumber && this->rest.size() <= this->bodyTrackingNumber ) {
-            this->body += this->rest;
-            this->bodyTrackingNumber -= this->rest.size();
-            this->rest = "";
+        if ( this->bodyTrackingNumber && this->restChunked.size() <= this->bodyTrackingNumber ) {
+            this->body += this->restChunked;
+            this->bodyTrackingNumber -= this->restChunked.size();
+            this->restChunked = "";
         }
         else if ( this->bodyTrackingNumber ) {
-            this->body += this->rest.substr(0, this->bodyTrackingNumber);
-            this->rest.erase(0, this->bodyTrackingNumber + 2);
+            this->body += this->restChunked.substr(0, this->bodyTrackingNumber);
+            this->restChunked.erase(0, this->bodyTrackingNumber + 2);
             this->bodyTrackingNumber = 0;
         }
         // if ( !this->bodyTrackingNumber && this->rest.find("\r\n\r\n") == 0 ) {
