@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/30 20:56:58 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/05 12:33:52 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void Server::startServer() {
                     memset(buffer, 0, BUFFER_SIZE);
                     this->buffer = "";
                     
-                    // std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
+                    // std::cout  << "\033[32m" << bytesRead << "\033[0m" << std::endl;
 
                     // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
                     // write(this->readyFd, response.c_str(), response.size());
