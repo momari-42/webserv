@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/04 14:58:15 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/05 12:25:48 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ typedef struct boundaryData {
     std::string filename;
     std::string contenet;
     bool isFile;
-    bool isComplete;
+    bool isHeaderComplete;
+    bool isBodyComplete;
 } boundaryData_t;
 
 class Body

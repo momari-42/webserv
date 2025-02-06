@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/05 08:53:20 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/06 09:55:55 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ Body::~Body() {}
 void Body::parseBoundaryHeader(const std::string& header) {
     boundaryData_t part;
     part.isFile = false;
-    part.isComplete = false;
+    part.isHeaderComplete = false;
+    part.isBodyComplete = false;
     part.name = header.substr(header.find("name=\"") + 6);
     part.name = part.name.substr(0, part.name.find("\""));
     if (header.find("filename=\"") != std::string::npos) {
@@ -96,39 +97,63 @@ void manageFile(const std::string fileName, const std::string data ) {
 
 void Body::setBoundaryBody( std::string& requestData, const std::string& token ) {
     this->rest += requestData;
-    while (this->rest.size()) {
+
+    while (this->rest.size() && !this->requestComplete) {
+        // std::cout << "0000000000" << std::endl;
+
+
         if (this->rest.find(token + "--") != std::string::npos && this->rest.find(token) == this->rest.find(token + "--")) {
-            manageFile(this->data.back().contenet, this->rest.substr(0, this->rest.find(token + "--") - 2));
+            // std::cout << "1" << std::endl;
+
+
+            if (!this->data.back().isBodyComplete)
+                manageFile(this->data.back().contenet, this->rest.substr(0, this->rest.find(token + "--") - 2));
+            manageFile("hihhihihihhi.py", this->rest);
             this->requestComplete = true;
             this->rest = "";
             break;
         }
         if (this->rest.find(token) != std::string::npos && this->rest.find("\r\n\r\n") != std::string::npos) {
+            // std::cout << "2 " << std::endl;
+
+
             if (this->rest.find(token) != 0) {
+                // std::cout << "3 " << std::endl;
+
+
                 manageFile(this->data.back().contenet, this->rest.substr(0, this->rest.find(token) - 2));
-                this->data.back().isComplete = true;
                 this->rest.erase(0, this->rest.find(token));
+                this->data.back().isBodyComplete = true;
             }
             if (this->rest.find(token) == 0) {
+                // std::cout << "4 " << std::endl;
+
+
                 this->rest.erase(0, token.size() + 2);
                 Body::parseBoundaryHeader(this->rest.substr(0, this->rest.find("\r\n\r\n")));
-                std::cout <<  this->data.back().contenet << std::endl;
+                this->data.back().isHeaderComplete = true;
+                std::cout << this->data.back().contenet << std::endl;
+
+
                 this->rest.erase(0, this->rest.find("\r\n\r\n") + 4);
             }
         }
-        else if (this->data.size() && this->data.back().isComplete) {
-            if (this->rest.find("\r\n")) {
-                manageFile(this->data.back().contenet, this->rest.substr(0, this->rest.find("\r\n")));
-                this->rest.erase(0, this->rest.find("\r\n") + 2);
+        else if (this->data.size() && this->data.back().isHeaderComplete && !this->data.back().isBodyComplete) {
+            // std::cout << "5 " << std::endl;
+            if ( (this->rest.find_last_of(token) == std::string::npos) || ( this->rest.size() - this->rest.find_last_of(token) > token.size() )) {
+                // std::cout << "6 " << std::endl;
+                manageFile(this->data.back().contenet, this->rest); 
+                this->rest = "";
+                break;
             }
             else {
-                manageFile(this->data.back().contenet, this->rest);
-                this->rest = "";
+                // std::cout << "7 " << std::endl;
+                break;
             }
         }
-        else {
+        else
+        
             break;
-        }
     }
     requestData = "";
 }
