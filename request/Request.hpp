@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:19:44 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/30 14:45:51 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/07 20:16:26 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,32 @@
 #include "body/Body.hpp"
 #include "header/Header.hpp"
 #include "requestLine/RequestLine.hpp"
+#include "../response/Response.hpp"
+#include "../error/Error.hpp"
 
 class Request
 {
     private:
+
+        // if any error occure this integer will hold the error code for generate the respose of the error
+        std::string         errorCode;
+        // this objects is for manage parse of request and response
+
         RequestLine requestLine;
         Header      header;
         Body        body;
+
+        //-----------------------------------------------------------
+
         int         trackingRequestNumber;
+        bool        isRequestComplete;
         
     public:
+        // default  constructor and destructor
         Request( void );
+        ~Request();
         void print( void );
         void parseRequest ( std::string requestData );
-        ~Request();
 
 
         // this is just for test

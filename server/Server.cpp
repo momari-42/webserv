@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/02/05 12:33:52 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/07 22:18:13 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,6 @@ Server::Server ( std::vector<int> vec ) {
         (*it).initializeSocketCommunication();
     }
     memset(&this->addressClient, 0, sizeof(this->addressClient));
-
-
-
-
-    // this is just for test
-    this->clientComplet = 0;
-    this->isClientComplet = false;
 }
 
 bool Server::findFdSocket ( int sockfd ) {
@@ -112,17 +105,17 @@ void Server::startServer() {
                     // write(this->readyFd, response.c_str(), response.size());
                     // close(this->readyFd);  // Close the connection after sending the response
                     if (this->requestsClient[this->readyFd].getBodyComplete() == true) {
-                        this->isClientComplet = true;
-                        this->clientComplet = this->readyFd;
+                        // this is where i call the response methode
+                        // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
+                        // write(this->readyFd, response.c_str(), response.size());
+                        Error  error(this->readyFd, "404");
+                        error.sendErrorPage();
+                        close(this->readyFd);  // Close the connection after sending the response
+                        requestsClient.erase(this->readyFd);
+    
                     }
                 }
             }
-        }
-        if (this->isClientComplet == true) {
-            std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
-            write(this->clientComplet, response.c_str(), response.size());
-            close(this->clientComplet);  // Close the connection after sending the response
-            requestsClient.erase(this->clientComplet);
         }
     }
 }

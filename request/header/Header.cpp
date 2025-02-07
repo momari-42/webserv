@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Header.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/27 15:17:21 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/07 21:26:25 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Header.hpp"
 
-Header::Header ( void ) {
+Header::Header ( std::string &errorCode ) : errorCode(errorCode) {
+    (void) this->errorCode;
 }
 
 void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
@@ -36,6 +37,8 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             firstPortion = portion.substr(0, portion.find(":"));
 
             if (firstPortion.find(" ") != std::string::npos || firstPortion.find("\t") != std::string::npos) {
+                this->errorCode = "400";
+                return ;
                 // if the field is HOST header we must genrate a error for any find of /t or space
                 // 400 Bad Request
             }
@@ -45,9 +48,8 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             this->rest.erase(0, this->rest.find("\r\n") + 2);
         }
         else {
-            std::cout << "this is the problem > " << this->rest << std::endl;
-            // 400 Bad Request
-            exit(1);
+            this->errorCode = "400";
+            return ;
         }
     }
     if (trackingRequestNumber == 2 && this->rest.size()) {
