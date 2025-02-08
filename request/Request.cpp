@@ -3,17 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/01/30 17:37:20 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/07 22:15:22 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request( void ) : header(), body(&header) {
+Request::Request( void ) : requestLine( this->errorCode ),
+                            header( this->errorCode ),
+                                body( &header, this->isRequestComplete, this->errorCode ) {
     this->trackingRequestNumber = 0;
+    this->isRequestComplete     = false;
 }
 
 // Red     : \033[31m
@@ -32,25 +35,21 @@ void Request::parseRequest ( std::string requestData ) {
         this->header.setHeader(requestData, this->trackingRequestNumber);
     }
     if (this->trackingRequestNumber == 2) {
+        if (this->requestLine.getMethod() == "GET") {
+            this->isRequestComplete = true;
+            return;
+        }
         this->body.setBody( requestData );
     }
 }
 
 
 bool Request::getBodyComplete( void) {
-    return (this->body.getBodyComplete());
+    return (this->isRequestComplete);
 }
 
 
 void Request::print( void ) {
-    // std::cout << "\033[34m" << "-----------------------------------------------" << "\0303[m" << std::endl;
-    // std::cout << "\033[34m" << "|---------This is the Requesrt Line-----------|" << "\033[0m" << std::endl;
-    // std::cout << "\033[34m" << "-----------------------------------------------" << "\033[0m" << std::endl;
-    // this->requestLine.printFirstLine();
-    // std::cout << "\033[32m" << "-----------------------------------------------" << "\033[0m" << std::endl;
-    // std::cout << "\033[32m" << "|--------------This is the Header-------------|" << "\033[0m" << std::endl;
-    // std::cout << "\033[32m" << "-----------------------------------------------" << "\033[0m" << std::endl;
-    // this->header.print();
     std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
     std::cout << "\033[31m" << "|--------------This is the Body---------------|" << "\033[0m" << std::endl;
     std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;

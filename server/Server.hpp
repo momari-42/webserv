@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/02/06 11:45:42 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/06 15:46:25 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,22 +35,6 @@
 class Server
 {
     private:
-
-
-
-        size_t                              clientComplet;
-        bool                                isClientComplet;
-
-
-
-
-
-
-
-
-
-
-    
         // this is the attributte of the starting server;
         int                             kq;
         std::map<size_t, Request>       requestsClient;

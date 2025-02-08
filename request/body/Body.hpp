@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/06 11:41:07 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/07 20:19:02 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,22 +21,25 @@
 
 // class Request;
 
-typedef struct boundaryData {
+typedef struct  boundaryData {
     std::string name;
     std::string filename;
     std::string contenet;
-    bool isFile;
-    bool isHeaderComplete;
-    bool isBodyComplete;
-} boundaryData_t;
+    bool        isFile;
+    bool        isHeaderComplete;
+    bool        isBodyComplete;
+}               boundaryData_t;
 
 class Body
 {
     private:
-        // this just for test if request is  complete or not
+
+        std::string                         &errorCode;
+        // this boolen is for request complete it point to a boolen in Reqeust class
+        bool                                &isRequestComplete;
         
         // this just for test
-        bool                                requestComplete;
+        // bool                                requestComplete;
         // this is a boolean for tracking initialization of the body parameters
         bool                                isBodyInitiates;
         // this is a pointer to header request
@@ -46,9 +49,9 @@ class Body
     
 
         ssize_t                             contentLength;
-        
+
         // this is the data needed in body
-        bool                                isBodyReceived;
+        // bool                                isBodyReceived;
         size_t                              bodyTrackingNumber;
         std::string                         body;
         std::string                         rest;
@@ -63,10 +66,9 @@ class Body
         void setBoundaryChunkedBody( std::string& requestData);
         void initiateBodyParams( void );
     public:
-        Body( Header *header );
+        Body( Header *header, bool &isRequestComplete, std::string &errorCode );
         void printBody( void );
         void setBody( std::string& body );
         void parseBoundaryHeader(const std::string& header);
-        bool getBodyComplete( void);
         ~Body();
 };
