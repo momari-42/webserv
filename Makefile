@@ -36,6 +36,5 @@ start:
 	printf "\n\033[0m" # Reset text color
 	@./webserv
 
-
 rm :
-	@rm -rf /Users/momari/goinfre/upload/*
+	@rm -rf ./upload/*
