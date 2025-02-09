@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestLine.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/07 21:24:41 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/08 19:46:00 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,15 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->httpVersion = this->rest.substr(0, this->rest.find(' '));
         this->rest = "";
         requestLine.erase(0, requestLine.find("\r\n") + 2);
+        if (this->requestTarget == "/")
+            this->requestTarget = "/index.html";
+        while (this->requestTarget.find("%20") != std::string::npos)
+        {
+            size_t pos = this->requestTarget.find("%20");
+            this->requestTarget.erase(pos, 3);
+            this->requestTarget.insert(pos, " ");
+        }
+        
         if ((this->method != "GET" && this->method != "POST" && this->method != "DELETE")
             || (this->requestTarget.find("/") == std::string::npos)
             ||  (this->httpVersion != "HTTP/1.1")) {

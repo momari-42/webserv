@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/02/08 10:36:48 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/08 11:46:22 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,8 +108,11 @@ void Server::startServer() {
                         // this is where i call the response methode
                         // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
                         // write(this->readyFd, response.c_str(), response.size());
-                        Error  error(this->readyFd, "404");
-                        error.sendErrorPage();
+                        // Error  error(this->readyFd, "404");
+                        // std::cout << "we are here" << std::endl;
+                        Response resp(this->readyFd, &this->requestsClient[this->readyFd]);
+                        // res.sendErrorPage();
+                        resp.makeResponse();
                         close(this->readyFd);  // Close the connection after sending the response
                         requestsClient.erase(this->readyFd);
     

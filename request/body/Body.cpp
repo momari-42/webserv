@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/07 20:21:20 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/08 20:34:38 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,19 @@ void Body::printBody( void ) {
 
 Body::~Body() {}
 
+void parseFileName(std::string &fileName) {
+    std::string extPortion;
+    if (fileName.find_last_of(".") != std::string::npos) {
+        extPortion = fileName.substr(fileName.find_last_of("."));
+        fileName.erase(fileName.find_last_of("."));
+    }
+    while (access(("upload/" + fileName + extPortion).c_str(), F_OK) == 0) {
+        fileName += "_";
+        std::cout << "inf loop" << std::endl;
+    }
+    fileName += extPortion;
+}
+
 void Body::parseBoundaryHeader(const std::string& header) {
     boundaryData_t part;
     part.isFile = false;
@@ -40,13 +53,15 @@ void Body::parseBoundaryHeader(const std::string& header) {
     if (header.find("filename=\"") != std::string::npos) {
         part.contenet = header.substr(header.find("filename=\"") + 10);
         part.contenet = part.contenet.substr(0, part.contenet.find("\""));
+        parseFileName(part.contenet);
         part.isFile = true;
     }
     this->data.push_back(part);
 }
 
 void manageFile(const std::string fileName, const std::string data ) {
-    std::ofstream outputFile( "/Users/momari/goinfre/upload/" + fileName, std::ios::binary | std::ios::app);
+    std::cout << fileName << std::endl;
+    std::ofstream outputFile( "upload/" + fileName, std::ios::binary | std::ios::app);
     outputFile.write(data.data(), data.size());
 }
 

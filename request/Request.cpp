@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/07 22:15:22 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/08 20:13:31 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,14 @@ void Request::print( void ) {
 
 Request::~Request () {
     
+}
+
+RequestLine* Request::getRequestLine() {
+    return (&this->requestLine);
+}
+Header* Request::getHeader() {
+    return (&this->header);
+}
+Body* Request::getBody() {
+    return (&this->body);
 }

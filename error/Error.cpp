@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Error.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/02/07 22:17:41 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/08 13:41:40 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 Error::Error ( int fd, std::string statusCode ) {
     std::string         line;
     
-                        std::cout << "loooool" << std::endl;
+    // std::cout << "loooool" << std::endl;
     this->fd = fd;
     this->statusCode  = statusCode;
     this->httpVersion = "HTTP/1.1";

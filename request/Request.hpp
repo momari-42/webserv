@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:19:44 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/07 20:16:26 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/08 11:22:35 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ class Request
         ~Request();
         void print( void );
         void parseRequest ( std::string requestData );
+        RequestLine* getRequestLine();
+        Header* getHeader();
+        Body* getBody();
 
 
         // this is just for test
