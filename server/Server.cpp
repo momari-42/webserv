@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/02/15 13:12:20 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/15 13:19:13 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,6 @@ void Server::startServer() {
                         this->clients.erase(this->readyFd);
                         continue;
                     }
-                    std::cout << "Client go out " << std::endl;
                     buffer[this->bytesRead] = '\0';
                     of.write(buffer, bytesRead);
                     this->buffer.append(buffer, this->bytesRead);
@@ -129,7 +128,6 @@ void Server::startServer() {
                     }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
-                    // std::cout << this->readyEvents[i].ident << std::endl;
                     this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident );
                     if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
                         if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("Connection") == "close") {
@@ -149,7 +147,6 @@ void Server::startServer() {
                             EV_SET(&clientEvent, this->readyFd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
                             if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
                                 throw (Server::ServerExceptions(strerror(errno)));
-                            // EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
                             EV_SET(&clientEvent, this->readyFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
                             if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
                                 throw (Server::ServerExceptions(strerror(errno)));

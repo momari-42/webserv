@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/02/15 12:52:07 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/15 13:19:48 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,6 @@ void Response::methodGet( size_t fd ) {
             std::cerr << "Error sending data" << std::endl;
             // Handle send error
         }
-        std::cout << response << std::endl;
         setTargetFile();
         this->isHeaderSent = true;
         response.clear();
@@ -196,7 +195,7 @@ void Response::methodGet( size_t fd ) {
         response += hexaNumber + CRLF;
         response += content + CRLF;
         if (send(fd, response.c_str(), response.size(), 0) == -1) {
-            std::cout << "Error sending data ----> " << response.size() << std::endl;
+            std::cout << "Error sending data" << std::endl;
             // Handle send error
         }
     }
