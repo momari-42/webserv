@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/02/08 11:46:22 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/15 13:12:20 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,11 @@ Server::Server ( std::vector<int> vec ) {
         (*it).initializeSocketCommunication();
     }
     memset(&this->addressClient, 0, sizeof(this->addressClient));
+
+
+
+    // this just for delete
+    this->numberOfRequest = 0;
 }
 
 bool Server::findFdSocket ( int sockfd ) {
@@ -37,8 +42,6 @@ void Server::startServer() {
     struct kevent   events[this->sockets.size()];
     char            buffer[BUFFER_SIZE];
     ssize_t         nevents;
-    
-
 
 
     //----------------------------------------------//
@@ -51,7 +54,6 @@ void Server::startServer() {
         std::cerr << "Error" << std::endl;
         exit(1);
     }
-
     
     //----------------------------------------------//
     //----------------------------------------------//
@@ -67,18 +69,17 @@ void Server::startServer() {
     if (kevent(kq, events, this->sockets.size(), 0, 0, 0) == -1)
         throw (Server::ServerExceptions(strerror(errno)));
     while (true) {
-
         memset(this->readyEvents, 0, sizeof(this->readyEvents));
-        
         nevents = kevent(kq, NULL, 0, readyEvents, 128, 0);
         if (nevents == -1)
             throw (Server::ServerExceptions(strerror(errno)));
         else if (nevents > 0) {
             for (ssize_t i = 0; i < nevents; i++) {
                 this->readyFd = readyEvents[i].ident;
-                fcntl(this->readyFd, F_SETFL, O_NONBLOCK);
                 if ( findFdSocket(this->readyFd) ) {
                     struct kevent clientEvent;
+
+                    fcntl(this->readyFd, F_SETFL, O_NONBLOCK);
                     this->sockfdClient = accept(this->readyFd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
                     if (this->sockfdClient == -1) {
                         std::cout << "Problem in accept function" << std::endl; 
@@ -88,36 +89,78 @@ void Server::startServer() {
                     if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
                         throw (Server::ServerExceptions(strerror(errno)));
                 }
-                else  {
+                else if ( this->readyEvents[i].filter == EVFILT_READ ) {
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
-                    if (bytesRead <= 0)
-                        break;
+                    if (bytesRead <= 0) {
+                        std::cout << "Client disconnected" << std::endl;
+                        close(this->readyFd);
+                        this->clients.erase(this->readyFd);
+                        continue;
+                    }
+                    std::cout << "Client go out " << std::endl;
                     buffer[this->bytesRead] = '\0';
                     of.write(buffer, bytesRead);
                     this->buffer.append(buffer, this->bytesRead);
-                    requestsClient[this->readyFd].parseRequest(this->buffer);
+                    this->clients[this->readyFd].getRequest().parseRequest(this->buffer);
                     memset(buffer, 0, BUFFER_SIZE);
                     this->buffer = "";
-                    
-                    // std::cout  << "\033[32m" << bytesRead << "\033[0m" << std::endl;
+                    if ( this->clients[this->readyEvents[i].ident].getRequest().getErrorCode().size() ) {                        
+                        struct kevent clientEvent;
 
-                    // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
-                    // write(this->readyFd, response.c_str(), response.size());
-                    // close(this->readyFd);  // Close the connection after sending the response
-                    if (this->requestsClient[this->readyFd].getBodyComplete() == true) {
-                        // this is where i call the response methode
-                        // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
-                        // write(this->readyFd, response.c_str(), response.size());
-                        // Error  error(this->readyFd, "404");
-                        // std::cout << "we are here" << std::endl;
-                        Response resp(this->readyFd, &this->requestsClient[this->readyFd]);
-                        // res.sendErrorPage();
-                        resp.makeResponse();
-                        close(this->readyFd);  // Close the connection after sending the response
-                        requestsClient.erase(this->readyFd);
-    
+                        std::cout << "\033[1;31mthis is and error happend with code : " << this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
+                        Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() );
+                        error.sendErrorPage();
+                        EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                            throw (Server::ServerExceptions(strerror(errno)));
+                        close(this->readyEvents[i].ident);
+                        this->clients.erase(this->readyEvents[i].ident);
+                    }
+                    else if (this->clients[this->readyEvents[i].ident].getRequest().getBodyComplete() == true) {
+                        struct kevent clientEvent;
+
+                        EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                            throw (Server::ServerExceptions(strerror(errno)));
+
+                        EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                            throw (Server::ServerExceptions(strerror(errno)));
                     }
                 }
+                else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
+                    // std::cout << this->readyEvents[i].ident << std::endl;
+                    this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident );
+                    if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
+                        if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("Connection") == "close") {
+                            std::cout << "\033[32mreqeust  closed : " << this->numberOfRequest++  << "\033[0m" << std::endl;
+                            struct kevent clientEvent;
+
+                            EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                                throw (Server::ServerExceptions(strerror(errno)));
+                            close(this->readyEvents[i].ident);
+                            this->clients.erase(this->readyEvents[i].ident);
+                        }
+                        else {
+                            std::cout << "\033[32mreqeust keep-alive : " << this->numberOfRequest++  << "\033[0m" << std::endl;
+                            struct kevent clientEvent;
+
+                            EV_SET(&clientEvent, this->readyFd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                                throw (Server::ServerExceptions(strerror(errno)));
+                            // EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
+                            EV_SET(&clientEvent, this->readyFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                                throw (Server::ServerExceptions(strerror(errno)));
+                            this->clients[this->readyFd].getRequest().resetAttributes();
+                            this->clients[this->readyFd].getResponse().resetAttributes();
+                        }
+                    }
+                }
+                // else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
+                    
+                // }
             }
         }
     }
@@ -133,29 +176,3 @@ Server::ServerExceptions::ServerExceptions ( const std::string& errorMsg ) {
 const char* Server::ServerExceptions::what() const throw() {
     return (this->errorMsg.c_str());
 }
-
-
-
-
-// we get the content length() ;;;
-
-// if (request_data.find("\r\n\r\n") != std::string::npos) {
-//     if (request_data.find(contentString) != std::string::npos) {
-//         long startContentLength = request_data.find(contentString) + contentString.length();
-//         long endContentLength = request_data.find("\r\n", startContentLength);
-//         long contentLength = std::stod(request_data.substr(startContentLength, endContentLength - startContentLength));
-//         if (request_data.length() >= contentLength + 4 + request_data.find("\r\n\r\n")) {
-//             std::cout  << "\033[32m" << "body received success !!!" << "\033[0m" << std::endl;
-//             break;
-//         }
-
-//         // std::cout << "\033[33m" << request_data.length() << "<=>" << contentLength + 4 + request_data.find("\r\n\r\n") << "\033[0m" << std::endl;
-
-//     }
-//     else {
-
-//         std::cout << "\033[31m" << "body not found !!!" << "\033[0m" << std::endl;
-
-//         break;
-//     }
-// }

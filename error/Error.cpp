@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Error.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/02/08 13:41:40 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/12 15:31:28 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
  
 Error::Error ( int fd, std::string statusCode ) {
     std::string         line;
-    
-    // std::cout << "loooool" << std::endl;
+    std::ostringstream  contentLength;
+
     this->fd = fd;
     this->statusCode  = statusCode;
     this->httpVersion = "HTTP/1.1";
@@ -35,16 +35,18 @@ Error::Error ( int fd, std::string statusCode ) {
     this->description["409"] = "Conflict";
     this->description["500"] = "Internal Server Error";
 
-    // initiate the header of the error response 
+        // initiate the header of the error response 
 
     this->header["Content-Type"] = "text/html; charset=UTF-8";
     this->header["Server"] = "momari-zaelarb";
+    this->header["Connection"] = "close";
 
     std::fstream errorFile( "error/errorPages/" + this->statusCode + ".html");
     while (getline(errorFile, line)) {
         this->content += line + "\n";
     }
-    // this->contentLength = this->content.size();
+    contentLength << this->content.size();
+    this->header["Content-Length"] = contentLength.str();
 }
 
 void Error::sendErrorPage ( void ) {

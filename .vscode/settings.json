@@ -65,6 +65,7 @@
         "iomanip": "cpp",
         "optional": "cpp",
         "sstream": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "csignal": "cpp"
     }
 }

@@ -6,12 +6,12 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/01/30 13:16:14 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/14 17:42:07 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserver.hpp"
-#include "request/requestLine/RequestLine.hpp"
+// #include "request/requestLine/RequestLine.hpp"
 
 // void sigHandler( int signal ) {
 //     try {
@@ -24,15 +24,16 @@
 //     }
 // }
 
+
+
 int main() {
+    signal(SIGPIPE, SIG_IGN);
+
     try {
         std::vector<int> vec;
         vec.push_back(9999);
-        // vec.push_back(a);
         Server server(vec);
         server.startServer();
-        // signal(SIGINT, server.sigHandler);
-        // server.runServer ();
     }
     catch ( std::exception& e ) {
         std::cout << "exception" << std::endl;

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/01/22 14:41:19 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/14 17:41:18 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ void Socket::setSockOption (void) {
     if (option == -1) {
         throw (SocketExceptions(strerror(errno)));
     }
+    // std::cout << "looooool" << std::endl;
+
 }
 
 Socket::Socket ( int port ) {
