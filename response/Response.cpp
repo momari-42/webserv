@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/02/15 12:52:07 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/15 13:16:19 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,40 +128,10 @@ std::string convertDecimalToHexaToString ( size_t number ) {
 }
 
 
-
-    // if (!this->isHeaderSent) {
-    //     if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos) {
-    //         std::string extension = this->request->getRequestLine()->getRequestTarget().substr(
-    //             this->request->getRequestLine()->getRequestTarget().find_last_of("."));
-    //         std::map<std::string, std::string>::iterator it = this->mime.find(extension);
-    //         if (it != this->mime.end()) {
-    //             this->header["Content-Type"] = it->second + "; charset=UTF-8";
-    //         } else {
-    //             this->header["Content-Type"] = "application/octet-stream"; // Default MIME type
-    //         }
-    //     } else {
-    //         this->header["Content-Type"] = "text/plain; charset=UTF-8"; // Default MIME type
-    //     }
-
-    //     response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
-    //     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++) {
-    //         response += it->first + ": " + it->second + CRLF;
-    //     }
-    //     response += "Transfer-Encoding: chunked" + CRLF + CRLF; // Indicate chunked encoding
-    //     this->isHeaderSent = true;
-    //     send(fd, response.c_str(), response.size(), 0); // Send the header immediately
-    //     response.clear(); // Clear the response string to prepare for chunks
-    // }
-
-
-
 void Response::methodGet( size_t fd ) {
     std::string         response;
     char                buffer[BUFFER_SIZE_R];
     std::streamsize     bytesRead;
-    
-    // if ( this->isResponseSent )
-    //     return;
     
     memset(buffer, 0, sizeof(buffer));
     if (!this->isHeaderSent) {
@@ -180,7 +150,6 @@ void Response::methodGet( size_t fd ) {
             std::cerr << "Error sending data" << std::endl;
             // Handle send error
         }
-        std::cout << response << std::endl;
         setTargetFile();
         this->isHeaderSent = true;
         response.clear();
@@ -196,7 +165,7 @@ void Response::methodGet( size_t fd ) {
         response += hexaNumber + CRLF;
         response += content + CRLF;
         if (send(fd, response.c_str(), response.size(), 0) == -1) {
-            std::cout << "Error sending data ----> " << response.size() << std::endl;
+            std::cout << "Error sending data" << std::endl;
             // Handle send error
         }
     }
