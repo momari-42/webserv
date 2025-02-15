@@ -1,9 +1,9 @@
-SRC			= main.cpp server/Server.cpp socket/Socket.cpp  request/Request.cpp request/body/Body.cpp request/header/Header.cpp request/requestLine/RequestLine.cpp response/Response.cpp error/Error.cpp
+SRC			= main.cpp server/Server.cpp socket/Socket.cpp  request/Request.cpp request/body/Body.cpp request/header/Header.cpp request/requestLine/RequestLine.cpp response/Response.cpp error/Error.cpp client/Client.cpp
 OBJ			= $(SRC:.cpp=.o)
 NAME		= webserv
 CPP			= c++
-CPPFLAGS	= -Wall -Wextra -Werror -std=c++98 -fsanitize=address
-HDERS		= webserver.hpp server/Server.hpp socket/Socket.hpp request/Request.hpp request/body/Body.hpp request/header/Header.hpp request/requestLine/RequestLine.hpp response/Response.hpp error/Error.hpp
+CPPFLAGS	= -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
+HDERS		= webserver.hpp server/Server.hpp socket/Socket.hpp request/Request.hpp request/body/Body.hpp request/header/Header.hpp request/requestLine/RequestLine.hpp response/Response.hpp error/Error.hpp client/Client.hpp
 
 all : $(NAME)
 	@printf "\e[31mDo you want to execute the program? (y/n) : \e[0m" && read answer; \

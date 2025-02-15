@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestLine.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/08 19:46:00 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/14 21:18:05 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,15 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
             this->requestTarget.erase(pos, 3);
             this->requestTarget.insert(pos, " ");
         }
-        
         if ((this->method != "GET" && this->method != "POST" && this->method != "DELETE")
             || (this->requestTarget.find("/") == std::string::npos)
             ||  (this->httpVersion != "HTTP/1.1")) {
             this->errorCode = "400";
             return ;
+        }
+        if (this->requestTarget.size() && access( ("." + this->requestTarget).c_str(), F_OK | R_OK) == -1)  {
+            this->errorCode = "404";
+            return;
         }
         trackingRequestNumber++;
     }
@@ -65,3 +68,11 @@ std::string &RequestLine::getRequestTarget ( void ) {
 }
 
 RequestLine::~RequestLine() {}
+
+
+void RequestLine::resetAttributes (void) {
+    this->rest          = "";
+    this->method        = "";
+    this->requestTarget = "";
+    this->httpVersion   = "";
+}

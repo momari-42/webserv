@@ -1,12 +1,12 @@
-/* ************************************************************************** */
+ /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:19:44 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/08 11:22:35 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/09 15:03:51 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ class Request
         bool        isRequestComplete;
         
     public:
+
+        // Reponse     response;
         // default  constructor and destructor
         Request( void );
         ~Request();
@@ -45,7 +47,10 @@ class Request
         Header* getHeader();
         Body* getBody();
 
+        
+        void resetAttributes (void);
 
+        std::string &getErrorCode();
         // this is just for test
         bool getBodyComplete( void);
 };

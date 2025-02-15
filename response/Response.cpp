@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/02/08 16:42:03 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/15 12:52:07 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,55 +92,194 @@ void Response::setMime() {
     this->mime[".7z"]     = "application/x-7z-compressed";
 }
 
-Response::Response (  int fd, Request *request  ) {
+Response::Response ( Request *request  ) {
+    this->isHeaderSent      = false;
+    this->isResponseSent    = false;
     this->request = request;
-    this->fd = fd;
     this->httpVersion = "HTTP/1.1";
     this->description["200"] = "OK";
     this->description["204"] = "No Content";
+    this->description["201"] = "Created";
     Response::setMime();
-    this->header["Server"] = "momari-zaelarb";
-    std::cout << this->request->getRequestLine()->getRequestTarget().length() << std::endl;
-    std::cout << this->request->getRequestLine()->getRequestTarget().substr(this->request->getRequestLine()->getRequestTarget().find_last_of(".")) << std::endl;
-    std::map<std::string, std::string>::iterator it = this->mime.find(this->request->getRequestLine()->getRequestTarget().substr(this->request->getRequestLine()->getRequestTarget().find_last_of(".")));
-    if (it != this->mime.end())
-        this->header["Content-Type"] = it->second + "; charset=UTF-8";
+    // this->header["Server"] = "momari-zaelarb";
+    this->header["Connection"] = "keep-alive";
+    this->header["Transfer-Encoding"] = "chunked";
+    // std::cout << "i am here here : " << this->request->getRequestLine()->getRequestTarget() << std::endl;
 }
 
 Response::~Response (void) {
     
 }
 
-void Response::makeResponse ( void ) {
+void Response::makeResponse ( size_t fd ) {
     if (this->request->getRequestLine()->getMethod() == "GET")
-        methodGet();
+        methodGet( fd );
     else if (this->request->getRequestLine()->getMethod() == "POST")
-        methodPost();
+        methodPost( fd );
     else if (this->request->getRequestLine()->getMethod() == "DELETE")
-        methodDelete();
+        methodDelete( fd );
 }
 
-void Response::methodGet() {
-    std::cout << "we are here" << this->header["Content-Type"] << std::endl;
-    std::string response;
-    std::string line;
+std::string convertDecimalToHexaToString ( size_t number ) {
+    std::ostringstream  stringNumberOne;
+
+    stringNumberOne << std::hex << number;
+    return (stringNumberOne.str());
+}
+
+
+
+    // if (!this->isHeaderSent) {
+    //     if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos) {
+    //         std::string extension = this->request->getRequestLine()->getRequestTarget().substr(
+    //             this->request->getRequestLine()->getRequestTarget().find_last_of("."));
+    //         std::map<std::string, std::string>::iterator it = this->mime.find(extension);
+    //         if (it != this->mime.end()) {
+    //             this->header["Content-Type"] = it->second + "; charset=UTF-8";
+    //         } else {
+    //             this->header["Content-Type"] = "application/octet-stream"; // Default MIME type
+    //         }
+    //     } else {
+    //         this->header["Content-Type"] = "text/plain; charset=UTF-8"; // Default MIME type
+    //     }
+
+    //     response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
+    //     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++) {
+    //         response += it->first + ": " + it->second + CRLF;
+    //     }
+    //     response += "Transfer-Encoding: chunked" + CRLF + CRLF; // Indicate chunked encoding
+    //     this->isHeaderSent = true;
+    //     send(fd, response.c_str(), response.size(), 0); // Send the header immediately
+    //     response.clear(); // Clear the response string to prepare for chunks
+    // }
+
+
+
+void Response::methodGet( size_t fd ) {
+    std::string         response;
+    char                buffer[BUFFER_SIZE_R];
+    std::streamsize     bytesRead;
     
-    std::fstream targetFile( "." + this->request->getRequestLine()->getRequestTarget() );
-    while (getline(targetFile, line)) {
-        this->content += line + "\n";
+    // if ( this->isResponseSent )
+    //     return;
+    
+    memset(buffer, 0, sizeof(buffer));
+    if (!this->isHeaderSent) {
+        if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos ) {
+            std::map<std::string, std::string>::iterator it = this->mime.find( \
+                this->request->getRequestLine()->getRequestTarget().substr(    \
+                    this->request->getRequestLine()->getRequestTarget().find_last_of(".")));
+            if (it != this->mime.end())
+                this->header["Content-Type"] = it->second + "; charset=UTF-8";
+        }
+        response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
+        for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
+            response += it->first + ": " + it->second + CRLF;
+        response += CRLF;
+        if (send(fd, response.c_str(), response.size(), 0) == -1) {
+            std::cerr << "Error sending data" << std::endl;
+            // Handle send error
+        }
+        std::cout << response << std::endl;
+        setTargetFile();
+        this->isHeaderSent = true;
+        response.clear();
     }
-    response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
+
+    memset(buffer, 0, sizeof(buffer));
+    targetFile.read(buffer, BUFFER_SIZE_R);
+    bytesRead = targetFile.gcount();
+
+    if (bytesRead > 0) {
+        std::string content(buffer, bytesRead);
+        std::string hexaNumber = convertDecimalToHexaToString(bytesRead); 
+        response += hexaNumber + CRLF;
+        response += content + CRLF;
+        if (send(fd, response.c_str(), response.size(), 0) == -1) {
+            std::cout << "Error sending data ----> " << response.size() << std::endl;
+            // Handle send error
+        }
+    }
+
+    if (targetFile.eof()) {
+        response = "0" + std::string(CRLF) + CRLF;
+        send(fd, response.c_str(), response.size(), 0);
+        this->isResponseSent = true;
+        targetFile.close(); // Close the file
+    }
+}
+    // if (!this->isHeaderSent) {
+    //     if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos ) {
+    //         std::map<std::string, std::string>::iterator it = this->mime.find( \
+    //             this->request->getRequestLine()->getRequestTarget().substr(    \
+    //                 this->request->getRequestLine()->getRequestTarget().find_last_of(".")));
+    //         if (it != this->mime.end())
+    //             this->header["Content-Type"] = it->second + "; charset=UTF-8";
+    //     }
+    //     response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
+    //     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
+    //         response += it->first + ": " + it->second + CRLF;
+    //     response += CRLF;
+    //     setTargetFile();
+    //     this->isHeaderSent = true;
+    // }
+    // targetFile.read(buffer, BUFFER_SIZE_R - 1);
+    // std::streamsize bytesRead = targetFile.gcount();
+    // std::string content(buffer, bytesRead);
+    // std::string hexaNumber = convertDecimalToHexaToString(content.size());
+    // response += hexaNumber + "\r\n";
+    // response += content + "\r\n";
+    // if ( targetFile.eof() ) {
+    //     response += "0";
+    //     response += "\r\n\r\n";
+    //     send(fd, response.c_str(), response.size(), 0);
+    //     this->isResponseSent = true;
+    //     return;
+    // }
+    // send(fd, response.c_str(), response.size(), 0);
+    // content = "";
+
+std::string calculateBodyLength( std::string &body ) {
+    std::ostringstream size;
+
+    size << body.size();
+    return (size.str());
+}
+
+void Response::methodPost( size_t fd ) {
+    std::string response;
+    std::string body = "File uploaded succefully !!";
+
+    if (this->request->getHeader()->getValue("Connection") == "close") {
+        this->header["Connection"] = "close";
+    }
+    this->header["Content-Length"] = calculateBodyLength( body );
+    this->header["Content-Type"] = this->mime[".txt"];
+    this->header.erase("Transfer-Encoding");
+    response += this->httpVersion + " 201 " + this->description["201"] + CRLF;
     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
         response += it->first + ": " + it->second + CRLF;
     response += CRLF;
-    response += this->content;
-    write(this->fd, response.c_str(), response.size());
+    response += body;
+    write(fd, response.c_str(), response.size());
+    this->isResponseSent = true;
 }
 
-void Response::methodPost() {
-    
+void Response::methodDelete( size_t fd ) {
+    (void)fd;
 }
 
-void Response::methodDelete() {
-    
+bool Response::getIsResponseSent() {
+    return (this->isResponseSent);
+}
+
+void Response::setTargetFile() {
+    std::cout << "momari : " << this->request->getRequestLine()->getRequestTarget().c_str() << std::endl;
+    this->targetFile.open(("." + this->request->getRequestLine()->getRequestTarget()).c_str(), std::ios::in);
+}
+
+void Response::resetAttributes() {
+    this->isHeaderSent = false;
+    this->isResponseSent = false;
+    // targetFile.close();
 }

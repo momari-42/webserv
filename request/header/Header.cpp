@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/07 21:26:25 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/12 16:24:10 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,18 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
         return ;
     }
     while (this->rest.find("\r\n") != std::string::npos) {
-        if (this->rest.find(":") < this->rest.find("\r\n")) {
+        if (this->rest.find(":") != std::string::npos && this->rest.find(":") < this->rest.find("\r\n")) {
             portion = this->rest.substr(0, this->rest.find("\r\n"));
             firstPortion = portion.substr(0, portion.find(":"));
-
             if (firstPortion.find(" ") != std::string::npos || firstPortion.find("\t") != std::string::npos) {
                 this->errorCode = "400";
                 return ;
-                // if the field is HOST header we must genrate a error for any find of /t or space
-                // 400 Bad Request
             }
             portion.erase(0, portion.find(":") + 1);
-            secondPortion = portion.substr(portion.find_first_not_of(" "));
+            if (portion.find_first_not_of(" ") != std::string::npos)
+                secondPortion = portion.substr(portion.find_first_not_of(" "));
+            else
+                secondPortion = portion.substr(0);
             this->httpHeadersMap[firstPortion] = secondPortion;
             this->rest.erase(0, this->rest.find("\r\n") + 2);
         }
@@ -69,4 +69,11 @@ void Header::print() {
 
 Header::~Header ( void ) {
     
+}
+
+void Header::resetAttributes (void) {
+    std::map<std::string, std::string> tmp;
+
+    this->rest = "";
+    this->httpHeadersMap  = tmp;
 }

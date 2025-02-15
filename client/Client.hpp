@@ -1,27 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserver.hpp                                      :+:      :+:    :+:   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/10 15:45:41 by momari            #+#    #+#             */
-/*   Updated: 2025/02/14 17:35:36 by momari           ###   ########.fr       */
+/*   Created: 2025/02/10 17:47:11 by momari            #+#    #+#             */
+/*   Updated: 2025/02/10 20:33:17 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <signal.h>
-#include <iostream>
-#include <exception>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <vector>
-#include "server/Server.hpp"
-#include <csignal>
+#include "../request/Request.hpp"
+#include "../response/Response.hpp"
 
-// #include <cstring>
+class Client
+{
+    private:
+        Request     request;
+        Response    response;
+
+    public:
+        Client( );
+        ~Client();
+        Request &getRequest();
+        Response &getResponse();
+};
