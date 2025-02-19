@@ -3,18 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Header.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:16:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/09 15:57:51 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/19 16:17:19 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <map>
-#include <algorithm>
+#include "../../include/sources.hpp"
 
 class Header
 {

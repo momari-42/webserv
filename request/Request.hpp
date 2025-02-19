@@ -12,11 +12,9 @@
 
 #pragma once
 
+#include "requestLine/RequestLine.hpp"
 #include "body/Body.hpp"
 #include "header/Header.hpp"
-#include "requestLine/RequestLine.hpp"
-#include "../response/Response.hpp"
-#include "../error/Error.hpp"
 
 class Request
 {
@@ -39,7 +37,7 @@ class Request
 
         // Reponse     response;
         // default  constructor and destructor
-        Request( void );
+        Request( );
         ~Request();
         void print( void );
         void parseRequest ( std::string requestData );

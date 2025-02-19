@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   RequestLine.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:10:34 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/13 10:14:34 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/19 16:16:38 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include "../../include/sources.hpp"
 
 class RequestLine
 {

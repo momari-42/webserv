@@ -1,29 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Client.cpp                                         :+:      :+:    :+:   */
+/*   ErrorHandling.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/10 17:47:09 by momari            #+#    #+#             */
-/*   Updated: 2025/02/19 16:41:34 by zaelarb          ###   ########.fr       */
+/*   Created: 2025/02/19 10:57:10 by zaelarb           #+#    #+#             */
+/*   Updated: 2025/02/19 11:46:19 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Client.hpp"
+#pragma once
 
-Client::Client( void ) : request(), response( &this->request ) {
-    
-}
+#include "../include/sources.hpp"
 
-Client::~Client() {
-    
-}
-
-Request &Client::getRequest() {
-    return (this->request);
-}
-
-Response &Client::getResponse() {
-    return (this->response);
-}
+class ErrorHandling : public std::exception
+{
+    private:
+        std::string errorMsg;
+    public:
+        ErrorHandling( const std::string& errorMsg );
+        ~ErrorHandling() throw() {
+        };
+        const char* what() const throw();
+};
