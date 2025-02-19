@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/13 17:34:45 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/19 16:45:29 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request( void ) : requestLine( this->errorCode ),
+Request::Request( ) : requestLine( this->errorCode ),
                             header( this->errorCode ),
                                 body( &header, this->isRequestComplete, this->errorCode ) {
     this->trackingRequestNumber = 0;

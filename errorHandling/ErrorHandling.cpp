@@ -1,29 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Client.cpp                                         :+:      :+:    :+:   */
+/*   ErrorHandling.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/10 17:47:09 by momari            #+#    #+#             */
-/*   Updated: 2025/02/19 16:41:34 by zaelarb          ###   ########.fr       */
+/*   Created: 2025/02/19 10:57:28 by zaelarb           #+#    #+#             */
+/*   Updated: 2025/02/19 10:57:40 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Client.hpp"
+#include "ErrorHandling.hpp"
 
-Client::Client( void ) : request(), response( &this->request ) {
-    
+ErrorHandling::ErrorHandling ( const std::string& errorMsg ) {
+    this->errorMsg = errorMsg;
 }
 
-Client::~Client() {
-    
-}
-
-Request &Client::getRequest() {
-    return (this->request);
-}
-
-Response &Client::getResponse() {
-    return (this->response);
+const char* ErrorHandling::what() const throw() {
+    return (this->errorMsg.c_str());
 }

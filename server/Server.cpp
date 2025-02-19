@@ -3,28 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/02/15 13:19:13 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/19 16:40:14 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Server.hpp"
 
-Server::Server ( std::vector<int> vec ) {
+Server::Server ( std::vector<ConfigFile> vec ) {
     this->lenSocket = sizeof(this->addressClient);
-    for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); it++) {
-        Socket soc(*it);
-        this->sockets.push_back(soc);
+    for (std::vector<ConfigFile>::iterator it = vec.begin(); it != vec.end(); it++) {
+        std::map<int, std::string> ports = (*it).getPorts();
+        for (std::map<int, std::string>::iterator iter = ports.begin(); iter != ports.end(); iter++) {
+            Socket soc((*iter).first);
+            this->srvs[soc.getSockfd()] = *it;
+            this->sockets.push_back(soc);
+        }
     }
     for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
         (*it).initializeSocketCommunication();
     }
     memset(&this->addressClient, 0, sizeof(this->addressClient));
-
-
-
     // this just for delete
     this->numberOfRequest = 0;
 }

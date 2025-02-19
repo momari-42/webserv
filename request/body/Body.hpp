@@ -3,21 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/12 20:33:49 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/19 19:24:39 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <map>
+#include "../../include/sources.hpp"
 #include "../header/Header.hpp"
-// #include "../Request.hpp"
 
 // class Request;
 

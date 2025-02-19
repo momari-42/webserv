@@ -3,31 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/02/12 16:48:12 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/19 15:36:34 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <exception>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <poll.h>
-#include "../request/Request.hpp"
-#include "../client/Client.hpp"
-#include <vector>
-#include "../socket/Socket.hpp"
-#include <sys/event.h>
-#include <fcntl.h>
-#include <cstring>
-#include <fstream>
+#include "../include/sources.hpp"
 
 // This is the buffer macro that i read from the client
 #define BUFFER_SIZE 1000
@@ -55,6 +40,8 @@ class Server
         struct sockaddr_in              addressClient;
         std::vector<Socket>             sockets;
 
+        std::map<int, ConfigFile>       srvs;
+
 
         // this container is for erase the clients that receives the response
         std::vector<size_t>             clientsToErase;
@@ -65,7 +52,7 @@ class Server
 
     public:
         void startServer();
-        Server ( std::vector<int> vec );
+        Server ( std::vector<ConfigFile> vec );
         ~Server ( );
         class ServerExceptions : public std::exception
         {

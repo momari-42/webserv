@@ -3,41 +3,42 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/02/14 17:42:07 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/19 15:38:15 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserver.hpp"
-// #include "request/requestLine/RequestLine.hpp"
+#include "include/sources.hpp"
 
-// void sigHandler( int signal ) {
-//     try {
-//         if ( signal == SIGINT ) {
-//             std::cout << "here" << std::endl;
-//             throw("Close Server");
-//         }   
-//     } catch ( const char* message ) {
-//         std::cout << message << std::endl;
-//     }
-// }
+int main(int ac, char **av) {
 
-
-
-int main() {
-    signal(SIGPIPE, SIG_IGN);
-
+    if (ac != 2) {
+        std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
+        return 1;
+    }
     try {
-        std::vector<int> vec;
-        vec.push_back(9999);
-        Server server(vec);
+        std::vector<ConfigFile> config = parseConfigFile(av[1]);
+        // for (std::vector<ConfigFile>::iterator it = config.begin(); it != config.end(); it++) {
+            
+        // }
+        Server server(config);
         server.startServer();
-    }
-    catch ( std::exception& e ) {
-        std::cout << "exception" << std::endl;
+    } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
-        return (1);
     }
+    // signal(SIGPIPE, SIG_IGN);
+
+    // try {
+    //     std::vector<int> vec;
+    //     vec.push_back(9999);
+    //     Server server(vec);
+    //     server.startServer();
+    // }
+    // catch ( std::exception& e ) {
+    //     std::cout << "exception" << std::endl;
+    //     std::cout << e.what() << std::endl;
+    //     return (1);
+    // }
 }
