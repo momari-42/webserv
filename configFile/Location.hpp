@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 11:21:02 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/19 11:26:49 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/23 10:56:23 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@ class Location
 {
 private:
     // std::string location;
-    std::string root;
-    std::vector<std::string> methods;
-    std::vector<std::string> indexs;
-    bool listing;
-    std::map<std::string, std::string> redirection;
+    std::string                         root;
+    std::vector<std::string>            methods;
+    std::vector<std::string>            indexs;
+    bool                                listing;
+    std::map<std::string, std::string>  redirection;
 public:
     Location();
     // void setLocation(std::string& locationInfo);
@@ -33,5 +33,12 @@ public:
     void setListing(std::vector<std::string> args);
     void setDirection(std::vector<std::string> args);
     void showLocation();
+
+
+    // geters
+    std::vector<std::string>                &getMethods();
+    std::map<std::string, std::string>      &getRedirection();
+    std::string getRoot();
+    std::vector<std::string>  &getIndexs();
     ~Location();
 };

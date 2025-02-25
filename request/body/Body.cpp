@@ -6,99 +6,20 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/13 17:38:11 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/24 13:34:19 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Body.hpp"
 #include <unistd.h>
 
-void Body::setMime() {
-    this->mime["audio/aac"]                                                                 = ".aac"    ;
-    this->mime["application/x-abiword"]                                                     = ".abw"    ;
-    this->mime["image/apng"]                                                                = ".apng"   ;
-    this->mime["application/x-freearc"]                                                     = ".arc"    ;
-    this->mime["image/avif"]                                                                = ".avif"   ;
-    this->mime["video/x-msvideo"]                                                           = ".avi"    ;
-    this->mime["application/vnd.amazon.ebook"]                                              = ".azw"    ;
-    this->mime["application/octet-stream"]                                                  = ".bin"    ;
-    this->mime["image/bmp"]                                                                 = ".bmp"    ;
-    this->mime["application/x-bzip"]                                                        = ".bz"     ;
-    this->mime["application/x-bzip2"]                                                       = ".bz2"    ;
-    this->mime["application/x-cdf"]                                                         = ".cda"    ;
-    this->mime["application/x-csh"]                                                         = ".csh"    ;
-    this->mime["text/css"]                                                                  = ".css"    ;
-    this->mime["text/csv"]                                                                  = ".csv"    ;
-    this->mime["application/msword"]                                                        = ".doc"    ;
-    this->mime["application/vnd.openxmlformats-officedocument.wordprocessingml.document"]   = ".docx"   ;
-    this->mime["application/vnd.ms-fontobject"]                                             = ".eot"    ;
-    this->mime["application/epub+zip"]                                                      = ".epub"   ;
-    this->mime["application/gzip"]                                                          = ".gz"     ;
-    this->mime["image/gif"]                                                                 = ".gif"    ;
-    this->mime["text/html"]                                                                 = ".htm"    ;
-    this->mime["text/html"]                                                                 = ".html"   ;
-    this->mime["image/vnd.microsoft.icon"]                                                  = ".ico"    ;
-    this->mime["text/calendar"]                                                             = ".ics"    ;
-    this->mime["application/java-archive"]                                                  = ".jar"    ;
-    this->mime["image/jpeg"]                                                                = ".jpeg"   ;
-    this->mime["image/jpeg"]                                                                = ".jpg"    ;
-    this->mime["text/javascript"]                                                           = ".js"     ;
-    this->mime["application/json"]                                                          = ".json"   ;
-    this->mime["application/ld+json"]                                                       = ".jsonld" ;
-    this->mime["audio/midi"]                                                                = ".mid"    ;
-    this->mime["audio/midi"]                                                                = ".midi"   ;
-    this->mime["text/javascript"]                                                           = ".mjs"    ;
-    this->mime["audio/mpeg"]                                                                = ".mp3"    ;
-    this->mime["video/mp4"]                                                                 = ".mp4"    ;
-    this->mime["video/mpeg"]                                                                = ".mpeg"   ;
-    this->mime["application/vnd.apple.installer+xml"]                                       = ".mpkg"   ;
-    this->mime["application/vnd.oasis.opendocument.presentation"]                           = ".odp"    ;
-    this->mime["application/vnd.oasis.opendocument.spreadsheet"]                            = ".ods"    ;
-    this->mime["application/vnd.oasis.opendocument.text"]                                   = ".odt"    ;
-    this->mime["audio/ogg"]                                                                 = ".oga"    ;
-    this->mime["video/ogg"]                                                                 = ".ogv"    ;
-    this->mime["application/ogg"]                                                           = ".ogx"    ;
-    this->mime["audio/ogg"]                                                                 = ".opus"   ;
-    this->mime["font/otf"]                                                                  = ".otf"    ;
-    this->mime["image/png"]                                                                 = ".png"    ;
-    this->mime["application/pdf"]                                                           = ".pdf"    ;
-    this->mime["application/x-httpd-php"]                                                   = ".php"    ;
-    this->mime["application/vnd.ms-powerpoint"]                                             = ".ppt"    ;
-    this->mime["application/vnd.openxmlformats-officedocument.presentationml.presentation"] = ".pptx"   ;
-    this->mime["application/vnd.rar"]                                                       = ".rar"    ;
-    this->mime["application/rtf"]                                                           = ".rtf"    ;
-    this->mime["application/x-sh"]                                                          = ".sh"     ;
-    this->mime["image/svg+xml"]                                                             = ".svg"    ;
-    this->mime["application/x-tar"]                                                         = ".tar"    ;
-    this->mime["image/tiff"]                                                                = ".tif"    ;
-    this->mime["image/tiff"]                                                                = ".tiff"   ;
-    this->mime["video/mp2t"]                                                                = ".ts"     ;
-    this->mime["font/ttf"]                                                                  = ".ttf"    ;
-    this->mime["text/plain"]                                                                = ".txt"    ;
-    this->mime["application/vnd.visio"]                                                     = ".vsd"    ;
-    this->mime["audio/wav"]                                                                 = ".wav"    ;
-    this->mime["audio/webm"]                                                                = ".weba"   ;
-    this->mime["video/webm"]                                                                = ".webm"   ;
-    this->mime["image/webp"]                                                                = ".webp"   ;
-    this->mime["font/woff"]                                                                 = ".woff"   ;
-    this->mime["font/woff2"]                                                                = ".woff2"  ;
-    this->mime["application/xhtml+xml"]                                                     = ".xhtml"  ;
-    this->mime["application/vnd.ms-excel"]                                                  = ".xls"    ;
-    this->mime["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]         = ".xlsx"   ;
-    this->mime["application/xml"]                                                           = ".xml"    ;
-    this->mime["application/vnd.mozilla.xul+xml"]                                           = ".xul"    ;
-    this->mime["application/zip"]                                                           = ".zip"    ;
-    this->mime["video/3gpp"]                                                                = ".3gp"    ;
-    this->mime["video/3gpp2"]                                                               = ".3g2"    ;
-    this->mime["application/x-7z-compressed"]                                               = ".7z"     ;
-}
-
 
 Body::Body( Header *header, bool &isRequestComplete, std::string &errorCode ) : errorCode(errorCode), isRequestComplete(isRequestComplete) {
     this->header = header;
     this->bodyTrackingNumber = 0;
     this->isBodyInitiates = false;
-    setMime();
+    this->bodyLength          = 0;
+    // setMime();
     (void) this->errorCode;
 }
 
@@ -143,7 +64,7 @@ void Body::parseBoundaryHeader(const std::string& header) {
 
 void manageFile(const std::string fileName, const std::string data ) {
     // std::cout << fileName << std::endl;
-    std::ofstream outputFile( "upload/" + fileName, std::ios::binary | std::ios::app);
+    std::ofstream outputFile( "/Users/momari/goinfre/" + fileName, std::ios::binary | std::ios::app);
     outputFile.write(data.data(), data.size());
 }
 
@@ -206,25 +127,30 @@ void Body::initiateBodyParams( void ) {
     }
 }
 
-void Body::setBody( std::string& body ) {
+void Body::setBody( std::string& body, ConfigFile& configFile ) {
     if (!this->isBodyInitiates) {
         initiateBodyParams();
         this->isBodyInitiates = true;
     }
+    this->bodyLength += body.size();
+    if (this->bodyLength > configFile.getBodyLimit()) {
+        this->errorCode = "413";
+        return;
+    }
     if (this->bodyRequestType == "chunked") {
-        // std::cout << "1" << std::endl;
         Body::setChunkedBody(body);
     }
     else if (this->bodyRequestType == "boundry") {
-        // std::cout << "2" << std::endl;
         Body::setBoundaryBody(body, "--" + this->header->getValue("Content-Type").substr(this->header->getValue("Content-Type").find("boundary=") + 9));
     }
     else if (this->bodyRequestType == "chunkedboundry") {
-        // std::cout << "3" << std::endl;
         Body::setBoundaryChunkedBody( body );
     }
     else if (this->bodyRequestType == "Content-Length") {
-        // std::cout << "4" << std::endl;
+        if ( this->contentLength > configFile.getBodyLimit() ) {
+            this->errorCode = "413";
+            return;
+        }
         Body::setContentLengthBody( body );
     }
 }
@@ -241,8 +167,8 @@ void Body::generateRandomeName( std::string& name ) {
         name += buffer.at(randomNumber);
     }
     if ( this->header->getValue("Content-Type") != "" ) {
-        std::map<std::string, std::string>::iterator it = this->mime.find(this->header->getValue("Content-Type"));
-        if ( it != this->mime.end()) {
+        std::map<std::string, std::string>::iterator it = this->emim.find(this->header->getValue("Content-Type"));
+        if ( it != this->emim.end()) {
             name += it->second;
         }
     }
@@ -250,18 +176,19 @@ void Body::generateRandomeName( std::string& name ) {
 
 
 void Body::resetAttributes (void) {
-    std::vector<boundaryData_t>         tmp;
-    this->bodyTrackingNumber = 0;
-    this->isBodyInitiates = false;
+    std::vector<boundaryData_t>     tmp;
+    this->bodyTrackingNumber        = 0;
+    this->isBodyInitiates           = false;
 
-    this->randomeChunkedName = "";
-    this->randomeContentLengthName = "";
-    this->restChunked = "";
-    this->body = "";
-    this->rest = "";
-    this->bodyRequestType = "";
-    this->data = tmp;
-    this->contentLength = 0;
+    this->randomeChunkedName        = "";
+    this->randomeContentLengthName  = "";
+    this->restChunked               = "";
+    this->body                      = "";
+    this->rest                      = "";
+    this->bodyRequestType           = "";
+    this->data                      = tmp;
+    this->contentLength             = 0;
+    this->bodyLength                = 0;
 }
 
 
@@ -307,7 +234,7 @@ void Body::setChunkedBody( std::string& body ) {
                 this->body += this->restChunked;
             }
             this->bodyTrackingNumber -= this->restChunked.size();
-            this->restChunked = "";
+            this->restChunked.clear();
         }
         else if ( this->bodyTrackingNumber ) {
             if (this->bodyRequestType == "chunked")
@@ -322,4 +249,8 @@ void Body::setChunkedBody( std::string& body ) {
     }
     // std::cout << this->body << std::endl;
     body = "";
+}
+
+std::string &Body::getFileName() {
+    return (this->randomeContentLengthName);
 }

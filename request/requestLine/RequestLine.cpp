@@ -6,25 +6,40 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/14 21:18:05 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/24 10:49:33 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestLine.hpp"
 
-RequestLine::RequestLine( std::string &errorCode ) : errorCode(errorCode) {
+RequestLine::RequestLine( std::string &errorCode, bool &isCgi ) : isCgi(isCgi), errorCode(errorCode) {
     (void)this->errorCode;
+    (void)this->isCgi;
+} 
+
+void RequestLine::validateMethod( ) {
+    if ((this->method != "GET" && this->method != "POST" && this->method != "DELETE")
+        || (this->requestTarget.find("/") == std::string::npos)
+        ||  (this->httpVersion != "HTTP/1.1")) {
+        this->errorCode = "400";
+        return ;
+    }
 }
 
-void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequestNumber ) {
+
+void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequestNumber, ConfigFile& configFile ) {
+    (void) configFile;
     this->rest += requestLine;
-    // std::cout << "a : " << this->rest << std::endl;
     if (this->rest.find("\r\n") != std::string::npos) {
+        std::string tempraryRequestLine = this->rest.substr(0, this->rest.find("\r\n"));
+        if (tempraryRequestLine.size() - 2 > configFile.getURILimit()) {
+            this->errorCode = "414";
+            return ;
+        }
         this->rest.erase(this->rest.find("\r\n"));
         if (this->rest.find('\t') != std::string::npos || this->rest.find_first_not_of(" ")) {
             this->errorCode = "400";
             return;
-            // 400 Bad this->rest
         }
         this->method = this->rest.substr(0, this->rest.find(' '));
         this->rest.erase(0, this->rest.find(' '));
@@ -35,24 +50,25 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->httpVersion = this->rest.substr(0, this->rest.find(' '));
         this->rest = "";
         requestLine.erase(0, requestLine.find("\r\n") + 2);
-        if (this->requestTarget == "/")
-            this->requestTarget = "/index.html";
+        // if (this->requestTarget == "/")
+        //     this->requestTarget = "/index.html";
         while (this->requestTarget.find("%20") != std::string::npos)
         {
             size_t pos = this->requestTarget.find("%20");
             this->requestTarget.erase(pos, 3);
             this->requestTarget.insert(pos, " ");
         }
-        if ((this->method != "GET" && this->method != "POST" && this->method != "DELETE")
-            || (this->requestTarget.find("/") == std::string::npos)
-            ||  (this->httpVersion != "HTTP/1.1")) {
-            this->errorCode = "400";
+        // we call the function validate method
+        validateMethod();
+        if (this->errorCode.size())
             return ;
-        }
-        if (this->requestTarget.size() && access( ("." + this->requestTarget).c_str(), F_OK | R_OK) == -1)  {
-            this->errorCode = "404";
-            return;
-        }
+
+        // if (this->requestTarget.size() && access( ("." + this->requestTarget).c_str(), F_OK | R_OK) == -1)  {
+        //     this->errorCode = "404";
+        //     return;
+        // } 
+        if (this->requestTarget.find(".php") != std::string::npos)
+            this->isCgi = true;
         trackingRequestNumber++;
     }
     else

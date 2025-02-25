@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 11:20:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/19 15:57:49 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/23 10:57:05 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,22 @@ void Location::showLocation() {
     for (std::map<std::string, std::string>::iterator it = this->redirection.begin(); it != this->redirection.end(); it++)
         std::cout << "|" << (*it).first << "|" << (*it).second << "|" << std::endl;
     std::cout << std::endl;
+}
+
+std::vector<std::string>    &Location::getMethods() {
+    return (this->methods);
+}
+
+std::map<std::string, std::string>      &Location::getRedirection() {
+    return (this->redirection);
+}
+
+std::vector<std::string>  &Location::getIndexs() {
+    return (this->indexs);
+}
+
+std::string Location::getRoot() {
+    return this->root;
 }
 
 Location::~Location() {

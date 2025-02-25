@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/02/19 15:36:34 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/23 20:57:20 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "../include/sources.hpp"
+// #include "../include/sources.hpp"
+#include "../client/Client.hpp"
+#include "../error/Error.hpp"
 
 // This is the buffer macro that i read from the client
-#define BUFFER_SIZE 1000
+#define BUFFER_SIZE 80000
 #define NEVENTS     128
 
 class Server
@@ -40,7 +42,8 @@ class Server
         struct sockaddr_in              addressClient;
         std::vector<Socket>             sockets;
 
-        std::map<int, ConfigFile>       srvs;
+        std::map<size_t, ConfigFile>    srvs;
+        std::map<size_t, size_t>        serverClientLinks;
 
 
         // this container is for erase the clients that receives the response

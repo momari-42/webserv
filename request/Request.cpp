@@ -3,20 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/19 16:45:29 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/24 13:41:56 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request( ) : requestLine( this->errorCode ),
+Request::Request( ) : requestLine( this->errorCode, isCgi ),
                             header( this->errorCode ),
                                 body( &header, this->isRequestComplete, this->errorCode ) {
     this->trackingRequestNumber = 0;
     this->isRequestComplete     = false;
+    this->isCgi                 = false;
 }
 
 // Red     : \033[31m
@@ -27,10 +28,10 @@ Request::Request( ) : requestLine( this->errorCode ),
 // Cyan    : \033[36m
 // White   : \033[37m
 
-void Request::parseRequest ( std::string requestData ) {
+void Request::parseRequest ( std::string requestData, ConfigFile& configFile  ) {
     // std::cout << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
-        this->requestLine.setRequestLine(requestData, this->trackingRequestNumber);
+        this->requestLine.setRequestLine(requestData, this->trackingRequestNumber, configFile);
     }
     if (this->trackingRequestNumber == 1) {
         this->header.setHeader(requestData, this->trackingRequestNumber);
@@ -40,7 +41,7 @@ void Request::parseRequest ( std::string requestData ) {
             this->isRequestComplete = true;
             return;
         }
-        this->body.setBody( requestData );
+        this->body.setBody( requestData, configFile );
     }
 }
 
@@ -83,4 +84,12 @@ void Request::resetAttributes ( void ) {
 
 std::string &Request::getErrorCode() {
     return (this->errorCode);
+}
+
+std::string &Request::getFileName() {
+    return(this->body.getFileName());
+}
+
+bool Request::getIsCgi( void) {
+    return (this->isCgi);
 }

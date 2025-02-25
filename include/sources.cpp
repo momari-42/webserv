@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sources.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 11:26:19 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/19 11:48:58 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/23 08:49:06 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,14 @@ std::string cutConfigFile(std::string& configFile) {
     if (configFile.length() == index)
         return "";
     if (configFile.find("server") != index) {
-        std::cerr << "Something wrong in the config file" << std::endl;
+        std::cerr << "Something wrong in the config file2" << std::endl;
         return "";
     }
     index += 6;
     while (configFile[index] == ' ' || configFile[index] == '\n' || configFile[index] == '\t')
         index++;
     if (configFile[index] != '{') {
-        std::cerr << "Something wrong in the config file" << std::endl;
+        std::cerr << "Something wrong in the config file1" << std::endl;
         return "";
     }
     int start = index + 1;
@@ -108,11 +108,10 @@ void resolveLines(std::string &configContent) {
     }
 }
 
-std::vector<ConfigFile> parseConfigFile(std::string file) {
-    std::vector<ConfigFile> servers;
+void parseConfigFile(std::vector<ConfigFile> &servers, std::string file) {
     if (access(file.c_str(), R_OK) == -1) {
         std::cerr << "Can't access to the config file" << std::endl;
-        return servers;
+        return ;
     }
     std::fstream config(file);
     std::string configContent;
@@ -130,8 +129,7 @@ std::vector<ConfigFile> parseConfigFile(std::string file) {
             break;
         ConfigFile server;
         server.parseServerInfo(serverInfo);
-        server.showServerConfig();
+        // server.showServerConfig();
         servers.push_back(server);
     }
-    return servers;
 }
