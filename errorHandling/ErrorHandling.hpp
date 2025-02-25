@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   ErrorHandling.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 10:57:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/19 11:46:19 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/19 21:12:53 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "../include/sources.hpp"
+#include <exception>
+#include <iostream>
 
 class ErrorHandling : public std::exception
 {

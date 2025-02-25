@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 17:47:11 by momari            #+#    #+#             */
-/*   Updated: 2025/02/19 20:34:32 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/19 20:46:29 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 #include "../request/Request.hpp"
 #include "../response/Response.hpp"
-
-class Request;
 
 class Client
 {

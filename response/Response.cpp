@@ -6,114 +6,58 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/02/15 13:19:48 by momari           ###   ########.fr       */
+/*   Updated: 2025/02/25 09:59:38 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
-
-void Response::setMime() {
-    this->mime[".aac"]    = "audio/aac";
-    this->mime[".abw"]    = "application/x-abiword";
-    this->mime[".apng"]   = "image/apng";
-    this->mime[".arc"]    = "application/x-freearc";
-    this->mime[".avif"]   = "image/avif";
-    this->mime[".avi"]    = "video/x-msvideo";
-    this->mime[".azw"]    = "application/vnd.amazon.ebook";
-    this->mime[".bin"]    = "application/octet-stream";
-    this->mime[".bmp"]    = "image/bmp";
-    this->mime[".bz"]     = "application/x-bzip";
-    this->mime[".bz2"]    = "application/x-bzip2";
-    this->mime[".cda"]    = "application/x-cdf";
-    this->mime[".csh"]    = "application/x-csh";
-    this->mime[".css"]    = "text/css";
-    this->mime[".csv"]    = "text/csv";
-    this->mime[".doc"]    = "application/msword";
-    this->mime[".docx"]   = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    this->mime[".eot"]    = "application/vnd.ms-fontobject";
-    this->mime[".epub"]   = "application/epub+zip";
-    this->mime[".gz"]     = "application/gzip";
-    this->mime[".gif"]    = "image/gif";
-    this->mime[".htm"]    = "text/html";
-    this->mime[".html"]   = "text/html";
-    this->mime[".ico"]    = "image/vnd.microsoft.icon";
-    this->mime[".ics"]    = "text/calendar";
-    this->mime[".jar"]    = "application/java-archive";
-    this->mime[".jpeg"]   = "image/jpeg";
-    this->mime[".jpg"]    = "image/jpeg";
-    this->mime[".js"]     = "text/javascript";
-    this->mime[".json"]   = "application/json";
-    this->mime[".jsonld"] = "application/ld+json";
-    this->mime[".mid"]    = "audio/midi";
-    this->mime[".midi"]   = "audio/midi";
-    this->mime[".mjs"]    = "text/javascript";
-    this->mime[".mp3"]    = "audio/mpeg";
-    this->mime[".mp4"]    = "video/mp4";
-    this->mime[".mpeg"]   = "video/mpeg";
-    this->mime[".mpkg"]   = "application/vnd.apple.installer+xml";
-    this->mime[".odp"]    = "application/vnd.oasis.opendocument.presentation";
-    this->mime[".ods"]    = "application/vnd.oasis.opendocument.spreadsheet";
-    this->mime[".odt"]    = "application/vnd.oasis.opendocument.text";
-    this->mime[".oga"]    = "audio/ogg";
-    this->mime[".ogv"]    = "video/ogg";
-    this->mime[".ogx"]    = "application/ogg";
-    this->mime[".opus"]   = "audio/ogg";
-    this->mime[".otf"]    = "font/otf";
-    this->mime[".png"]    = "image/png";
-    this->mime[".pdf"]    = "application/pdf";
-    this->mime[".php"]    = "application/x-httpd-php";
-    this->mime[".ppt"]    = "application/vnd.ms-powerpoint";
-    this->mime[".pptx"]   = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-    this->mime[".rar"]    = "application/vnd.rar";
-    this->mime[".rtf"]    = "application/rtf";
-    this->mime[".sh"]     = "application/x-sh";
-    this->mime[".svg"]    = "image/svg+xml";
-    this->mime[".tar"]    = "application/x-tar";
-    this->mime[".tif"]    = "image/tiff";
-    this->mime[".tiff"]   = "image/tiff";
-    this->mime[".ts"]     = "video/mp2t";
-    this->mime[".ttf"]    = "font/ttf";
-    this->mime[".txt"]    = "text/plain";
-    this->mime[".vsd"]    = "application/vnd.visio";
-    this->mime[".wav"]    = "audio/wav";
-    this->mime[".weba"]   = "audio/webm";
-    this->mime[".webm"]   = "video/webm";
-    this->mime[".webp"]   = "image/webp";
-    this->mime[".woff"]   = "font/woff";
-    this->mime[".woff2"]  = "font/woff2";
-    this->mime[".xhtml"]  = "application/xhtml+xml";
-    this->mime[".xls"]    = "application/vnd.ms-excel";
-    this->mime[".xlsx"]   = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    this->mime[".xml"]    = "application/xml";
-    this->mime[".xul"]    = "application/vnd.mozilla.xul+xml";
-    this->mime[".zip"]    = "application/zip";
-    this->mime[".3gp"]    = "video/3gpp";
-    this->mime[".3g2"]    = "video/3gpp2";
-    this->mime[".7z"]     = "application/x-7z-compressed";
-}
 
 Response::Response ( Request *request  ) {
     this->isHeaderSent      = false;
     this->isResponseSent    = false;
     this->request = request;
     this->httpVersion = "HTTP/1.1";
-    this->description["200"] = "OK";
-    this->description["204"] = "No Content";
-    this->description["201"] = "Created";
-    Response::setMime();
-    // this->header["Server"] = "momari-zaelarb";
+
+    this->header["Server"] = "momari-zaelarb";
     this->header["Connection"] = "keep-alive";
     this->header["Transfer-Encoding"] = "chunked";
-    // std::cout << "i am here here : " << this->request->getRequestLine()->getRequestTarget() << std::endl;
 }
 
-Response::~Response (void) {
-    
+void Response::executeCGI ( size_t fd ) {
+    (void)fd;
+    std::string requestTarget = this->request->getRequestLine()->getRequestTarget();
+    std::string queryString;
+    std::string fullPathScript;
+    int         fds[2];
+
+    size_t queryPos = requestTarget.find("?");
+    if (queryPos != std::string::npos) {
+        queryString = "QUERY_STRING=";
+        queryString += requestTarget.substr(queryPos + 1);
+        requestTarget.erase(queryPos);
+    }
+    setenv("QUERY_STRING", queryString.c_str(), 1);
+    fullPathScript = "/Users/momari/cursus/webserv" + requestTarget;
+    char *argv[] = {const_cast<char *>("/usr/bin/php"), const_cast<char *>(fullPathScript.c_str()), NULL};
+    char *env[] = { const_cast<char *>(queryString.c_str()), NULL};
+    pipe(fds);
+    int pid = fork();
+    if (pid == 0) {
+        // close(fds[0]);
+        // dup2(fds[1], 1);
+        // close(fds[1]);
+        execve(argv[0], argv, env);
+    }
+    else {
+        wait(NULL);
+    }
 }
 
-void Response::makeResponse ( size_t fd ) {
-    if (this->request->getRequestLine()->getMethod() == "GET")
-        methodGet( fd );
+void Response::makeResponse ( size_t fd,  ConfigFile& configFile  ) {
+    if (this->request->getIsCgi())
+        executeCGI( fd );
+    else if (this->request->getRequestLine()->getMethod() == "GET")
+        methodGet( fd, configFile );
     else if (this->request->getRequestLine()->getMethod() == "POST")
         methodPost( fd );
     else if (this->request->getRequestLine()->getMethod() == "DELETE")
@@ -127,64 +71,128 @@ std::string convertDecimalToHexaToString ( size_t number ) {
     return (stringNumberOne.str());
 }
 
-
-
-    // if (!this->isHeaderSent) {
-    //     if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos) {
-    //         std::string extension = this->request->getRequestLine()->getRequestTarget().substr(
-    //             this->request->getRequestLine()->getRequestTarget().find_last_of("."));
-    //         std::map<std::string, std::string>::iterator it = this->mime.find(extension);
-    //         if (it != this->mime.end()) {
-    //             this->header["Content-Type"] = it->second + "; charset=UTF-8";
-    //         } else {
-    //             this->header["Content-Type"] = "application/octet-stream"; // Default MIME type
-    //         }
-    //     } else {
-    //         this->header["Content-Type"] = "text/plain; charset=UTF-8"; // Default MIME type
-    //     }
-
-    //     response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
-    //     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++) {
-    //         response += it->first + ": " + it->second + CRLF;
-    //     }
-    //     response += "Transfer-Encoding: chunked" + CRLF + CRLF; // Indicate chunked encoding
-    //     this->isHeaderSent = true;
-    //     send(fd, response.c_str(), response.size(), 0); // Send the header immediately
-    //     response.clear(); // Clear the response string to prepare for chunks
+void Response::generateHeader ( int fd, std::string &response, ConfigFile& configFile ) {
+    // if (configFile.getReturn()) {
+    //     // we should generate a return response and retun;
     // }
 
+    std::string &requestTarget = this->request->getRequestLine()->getRequestTarget();
+    validateAccessTarget(fd, configFile, requestTarget);
+    if (this->isHeaderSent || this->isResponseSent || this->errorCode.size()) {
+        return ;
+    }
+    if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos ) {
+        std::map<std::string, std::string>::iterator it = this->mime.find( \
+            this->request->getRequestLine()->getRequestTarget().substr(    \
+                this->request->getRequestLine()->getRequestTarget().find_last_of(".")));
+        if (it != this->mime.end())
+            this->header["Content-Type"] = it->second + "; charset=UTF-8";
+    }
+    response += this->httpVersion + " 200 " + this->statusCodes["200"] + CRLF;
+    for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
+        response += it->first + ": " + it->second + CRLF;
+    response += CRLF;
+    if (send(fd, response.c_str(), response.size(), 0) == -1) {
+        std::cerr << "Error sending data" << std::endl;
+        // Handle send error
+    }
+    setTargetFile();
+    this->isHeaderSent = true;
+    response.clear();
+}
 
+bool isDirectory(std::string &path) {
+    DIR *dir = opendir(path.c_str());
+    if (dir) {
+        closedir(dir);
+        return (true);
+    }
+    return (false);
+}
 
-void Response::methodGet( size_t fd ) {
+void Response::validateAccessTarget( int fd, ConfigFile& configFile, std::string &requestTarget ) {
+    bool                            isValidPath = false;
+    std::string                     response;
+    std::vector<std::string>        matchedLocations;
+    std::string                     bestMatchedLocation;
+    std::map<std::string, Location> &locations = configFile.getLocations();
+    std::cout << "this is the request target : " << requestTarget << std::endl;
+
+    for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++) {
+        if ( requestTarget.find(it->first) == 0 ) {
+            matchedLocations.push_back(it->first);
+        }
+    }
+    for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
+        if ( (*it).size() > bestMatchedLocation.size()) {
+            bestMatchedLocation = *it;
+        }
+    }
+    if (bestMatchedLocation.size()) {
+        if (locations[bestMatchedLocation].getRedirection().size()) {
+    // std::cout << "best matched location : " << bestMatchedLocation << std::endl;
+            std::map<std::string, std::string>::iterator it = locations[bestMatchedLocation].getRedirection().begin();
+            response += this->httpVersion + " " + it->first + " "  + this->statusCodes[it->first] + CRLF;
+            response += "Location: " + it->second + CRLF + CRLF;
+            if (send(fd, response.c_str(), response.size(), 0) == -1) {
+                std::cerr << "Error sending data" << std::endl; 
+            }
+            this->isHeaderSent = true;
+            this->isResponseSent = true;
+            return;
+        }
+        requestTarget.erase(0, bestMatchedLocation.size());
+        requestTarget = locations[bestMatchedLocation].getRoot() + requestTarget;
+        if (isDirectory(requestTarget)) {
+            std::string tempraryPath;
+            std::vector<std::string> &indexs = locations[bestMatchedLocation].getIndexs();
+
+            if (requestTarget.find("/") == requestTarget.size() - 1)
+                requestTarget.erase(requestTarget.size() - 1);
+            for (std::vector<std::string>::iterator it = indexs.begin(); it != indexs.end(); it++) {
+                if ((*it).find("/") != 0)
+                    (*it).insert(0, "/");
+                tempraryPath =  requestTarget + (*it);
+                if (access( tempraryPath.c_str(), F_OK ) != -1) {
+                    requestTarget = tempraryPath;
+                    isValidPath = true;
+                    break;
+                }
+            }
+            if (!isValidPath) {
+                this->errorCode = "404" ;
+                return;
+            }
+            // requestTarget += locations[bestMatchedLocation].getIndexs();
+        }
+    }
+    else {
+        if (configFile.getRoot().find("/") == configFile.getRoot().size() - 1)
+            configFile.getRoot().erase(configFile.getRoot().size() - 1);
+        requestTarget = configFile.getRoot() + requestTarget;
+    }
+    std::cout << "404 : " << requestTarget << std::endl;
+    if (access( requestTarget.c_str(), F_OK ) == -1) {
+        this->errorCode = "404";
+        return;
+    }
+    if (access( requestTarget.c_str(), R_OK ) == -1) {
+        this->errorCode = "401";
+        return;
+    }
+}
+
+void Response::methodGet( size_t fd, ConfigFile& configFile ) {
     std::string         response;
     char                buffer[BUFFER_SIZE_R];
     std::streamsize     bytesRead;
-    
-    // if ( this->isResponseSent )
-    //     return;
-    
+
     memset(buffer, 0, sizeof(buffer));
     if (!this->isHeaderSent) {
-        if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos ) {
-            std::map<std::string, std::string>::iterator it = this->mime.find( \
-                this->request->getRequestLine()->getRequestTarget().substr(    \
-                    this->request->getRequestLine()->getRequestTarget().find_last_of(".")));
-            if (it != this->mime.end())
-                this->header["Content-Type"] = it->second + "; charset=UTF-8";
-        }
-        response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
-        for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
-            response += it->first + ": " + it->second + CRLF;
-        response += CRLF;
-        if (send(fd, response.c_str(), response.size(), 0) == -1) {
-            std::cerr << "Error sending data" << std::endl;
-            // Handle send error
-        }
-        setTargetFile();
-        this->isHeaderSent = true;
-        response.clear();
+        generateHeader(fd, response, configFile);
     }
-
+    if ( this->isResponseSent || this->errorCode.size())
+        return;
     memset(buffer, 0, sizeof(buffer));
     targetFile.read(buffer, BUFFER_SIZE_R);
     bytesRead = targetFile.gcount();
@@ -199,7 +207,6 @@ void Response::methodGet( size_t fd ) {
             // Handle send error
         }
     }
-
     if (targetFile.eof()) {
         response = "0" + std::string(CRLF) + CRLF;
         send(fd, response.c_str(), response.size(), 0);
@@ -207,36 +214,7 @@ void Response::methodGet( size_t fd ) {
         targetFile.close(); // Close the file
     }
 }
-    // if (!this->isHeaderSent) {
-    //     if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos ) {
-    //         std::map<std::string, std::string>::iterator it = this->mime.find( \
-    //             this->request->getRequestLine()->getRequestTarget().substr(    \
-    //                 this->request->getRequestLine()->getRequestTarget().find_last_of(".")));
-    //         if (it != this->mime.end())
-    //             this->header["Content-Type"] = it->second + "; charset=UTF-8";
-    //     }
-    //     response += this->httpVersion + " 200 " + this->description["200"] + CRLF;
-    //     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
-    //         response += it->first + ": " + it->second + CRLF;
-    //     response += CRLF;
-    //     setTargetFile();
-    //     this->isHeaderSent = true;
-    // }
-    // targetFile.read(buffer, BUFFER_SIZE_R - 1);
-    // std::streamsize bytesRead = targetFile.gcount();
-    // std::string content(buffer, bytesRead);
-    // std::string hexaNumber = convertDecimalToHexaToString(content.size());
-    // response += hexaNumber + "\r\n";
-    // response += content + "\r\n";
-    // if ( targetFile.eof() ) {
-    //     response += "0";
-    //     response += "\r\n\r\n";
-    //     send(fd, response.c_str(), response.size(), 0);
-    //     this->isResponseSent = true;
-    //     return;
-    // }
-    // send(fd, response.c_str(), response.size(), 0);
-    // content = "";
+
 
 std::string calculateBodyLength( std::string &body ) {
     std::ostringstream size;
@@ -255,7 +233,7 @@ void Response::methodPost( size_t fd ) {
     this->header["Content-Length"] = calculateBodyLength( body );
     this->header["Content-Type"] = this->mime[".txt"];
     this->header.erase("Transfer-Encoding");
-    response += this->httpVersion + " 201 " + this->description["201"] + CRLF;
+    response += this->httpVersion + " 201 " + this->statusCodes["201"] + CRLF;
     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
         response += it->first + ": " + it->second + CRLF;
     response += CRLF;
@@ -273,12 +251,20 @@ bool Response::getIsResponseSent() {
 }
 
 void Response::setTargetFile() {
-    std::cout << "momari : " << this->request->getRequestLine()->getRequestTarget().c_str() << std::endl;
-    this->targetFile.open(("." + this->request->getRequestLine()->getRequestTarget()).c_str(), std::ios::in);
+    // std::cout << "hhhhh mari : " << this->request->getRequestLine()->getRequestTarget().c_str() << std::endl;
+    this->targetFile.open((this->request->getRequestLine()->getRequestTarget()).c_str(), std::ios::in);
+}
+
+std::string &Response::getErrorCode() {
+    return (this->errorCode);
 }
 
 void Response::resetAttributes() {
     this->isHeaderSent = false;
     this->isResponseSent = false;
     // targetFile.close();
+}
+
+Response::~Response (void) {
+    
 }

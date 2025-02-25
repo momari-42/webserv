@@ -3,17 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 11:22:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/19 15:55:35 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/22 16:38:45 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigFile.hpp"
 
 ConfigFile::ConfigFile(){
-    
+    this->URILimit = 4096;
+    std::cout << "-------------Default---------------" << std::endl;
+    std::cout << this->URILimit << std::endl;
+    std::cout << "----------------------------------" << std::endl;
 }
 
 void ConfigFile::setPorts(std::vector<std::string> args) {
@@ -87,6 +90,19 @@ void ConfigFile::setBodyLimit(std::vector<std::string> args) {
         this->bodyLimit = atoi(args[0].c_str());
 }
 
+void ConfigFile::setURILimit(std::vector<std::string> args) {
+    args.erase(args.begin());
+    if (args.size() != 1)
+        throw ErrorHandling("Wrong number of arguments in URL Limit");
+    else if(!ft_isdigits(args[0]))
+        throw ErrorHandling("URL limit is not digit");
+    else
+        this->URILimit = atoi(args[0].c_str());
+    std::cout << "-------------Config---------------" << std::endl;
+    std::cout << this->URILimit << std::endl;
+    std::cout << "----------------------------------" << std::endl;
+}
+
 void ConfigFile::setLocations(std::string &serverInfo) {
     std::string first = serverInfo.substr(0, serverInfo.find('{') + 1);
     std::vector<std::string> parts = ft_split(first);
@@ -98,6 +114,8 @@ void ConfigFile::setLocations(std::string &serverInfo) {
     location = location.substr(0, location.find('}'));
     Location loc;
     loc.parseLocationInfo(location);
+    // if (parts[1].find_last_of('/') == parts[1].length() - 1)
+    //     parts[1].erase(parts[1].find_last_of('/'));
     this->locations[parts[1]] = loc;
 }
 
@@ -136,13 +154,15 @@ void ConfigFile::parseServerInfo(std::string& serverInfo) {
                 setErrorPages(line);
             else if (line.front() == "body_limit")
                 setBodyLimit(line);
+            else if (line.front() == "uri_limit")
+                setURILimit(line);
             else
                 throw ErrorHandling("Element not found");
         }
     }
 }
 
-std::map<int, std::string> ConfigFile::getPorts() const {
+std::map<size_t, std::string> ConfigFile::getPorts() {
     return this->ports;
 }
 
@@ -160,7 +180,7 @@ void ConfigFile::showServerConfig() {
         std::cout << "|" << (*it) << "|";
     }
     std::cout << std::endl <<"Server Ports : ";
-    for (std::map<int, std::string>::iterator it = this->ports.begin(); it != this->ports.end(); it++)
+    for (std::map<size_t, std::string>::iterator it = this->ports.begin(); it != this->ports.end(); it++)
         std::cout << "|" << (*it).first << "|" << (*it).second << "|" << std::endl;
     std::cout << std::endl <<"Error Pages : \n";
     for (std::map<std::string, std::string>::iterator it = this->errorPages.begin(); it != this->errorPages.end(); it++)
@@ -177,6 +197,23 @@ void ConfigFile::showServerConfig() {
         (*it).second.showLocation();
     }
     std::cout <<  "------------------------------ End Server ------------------------" << std::endl;
+}
+
+
+size_t ConfigFile::getURILimit() {
+    return (this->URILimit);
+}
+
+size_t ConfigFile::getBodyLimit() {
+    return (this->bodyLimit);
+}
+
+std::map<std::string, Location>& ConfigFile::getLocations() {
+    return (this->locations);
+}
+
+std::string &ConfigFile::getRoot( ) {
+    return (this->root);
 }
 
 ConfigFile::~ConfigFile() {

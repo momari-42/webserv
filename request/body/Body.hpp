@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Body.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/19 19:24:39 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/02/24 13:33:36 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "../../include/sources.hpp"
 #include "../header/Header.hpp"
+#include "../../http/EmimTypes.hpp"
 
 // class Request;
 
@@ -26,7 +27,7 @@ typedef struct  boundaryData {
     bool        isBodyComplete;
 }               boundaryData_t;
 
-class Body
+class Body : public EmimTypes
 {
     private:
 
@@ -41,9 +42,10 @@ class Body
         // this is a pointer to header request
         Header                              *header;
 
+        size_t                             bodyLength;
         // this attributes is for content length parse
-        ssize_t                             contentLength;
-        std::string                         randomeContentLengthName;
+        size_t                             contentLength;
+        std::string                        randomeContentLengthName;
     
 
 
@@ -57,7 +59,9 @@ class Body
 
         std::vector<boundaryData_t>         data;
 
-        std::map<std::string, std::string>         mime;
+        
+
+        // std::map<std::string, std::string>         mime;
         
         void generateRandomeName( std::string& name );
         void setChunkedBody( std::string& body );
@@ -65,14 +69,14 @@ class Body
         void setBoundaryChunkedBody( std::string& requestData);
         void setContentLengthBody( std::string& requestData );
         void initiateBodyParams( void );
-        void setMime();
     public:
         Body( Header *header, bool &isRequestComplete, std::string &errorCode );
         void printBody( void );
-        void setBody( std::string& body );
+        void setBody( std::string& body, ConfigFile& configFile );
         void parseBoundaryHeader(const std::string& header);
 
         void resetAttributes (void);
+        std::string &getFileName();
 
 
         

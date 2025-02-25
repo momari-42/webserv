@@ -15,6 +15,8 @@
 #include "requestLine/RequestLine.hpp"
 #include "body/Body.hpp"
 #include "header/Header.hpp"
+#include "../configFile/ConfigFile.hpp"
+#include <map>
 
 class Request
 {
@@ -24,23 +26,23 @@ class Request
         std::string         errorCode;
         // this objects is for manage parse of request and response
 
-        RequestLine requestLine;
-        Header      header;
-        Body        body;
+        RequestLine         requestLine;
+        Header              header;
+        Body                body;
 
         //-----------------------------------------------------------
 
-        int         trackingRequestNumber;
-        bool        isRequestComplete;
+        int                 trackingRequestNumber;
+        bool                isRequestComplete;
+        bool                isCgi;
         
     public:
-
         // Reponse     response;
         // default  constructor and destructor
         Request( );
         ~Request();
         void print( void );
-        void parseRequest ( std::string requestData );
+        void parseRequest ( std::string requestData, ConfigFile& configFile );
         RequestLine* getRequestLine();
         Header* getHeader();
         Body* getBody();
@@ -51,4 +53,6 @@ class Request
         std::string &getErrorCode();
         // this is just for test
         bool getBodyComplete( void);
+        bool getIsCgi( void);
+        std::string &getFileName();
 };
