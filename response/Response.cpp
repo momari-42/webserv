@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/02/25 09:59:38 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 02:21:00 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-Response::Response ( Request *request  ) {
+Response::Response ( Request *request, Socket* soc  ) {
+    this->request = request;
+    // this->socket = soc;
+    this->configFile = soc->getServerConfig(request->getHeader()->getValue("Host"));
     this->isHeaderSent      = false;
     this->isResponseSent    = false;
-    this->request = request;
     this->httpVersion = "HTTP/1.1";
 
     this->header["Server"] = "momari-zaelarb";
@@ -53,11 +55,12 @@ void Response::executeCGI ( size_t fd ) {
     }
 }
 
-void Response::makeResponse ( size_t fd,  ConfigFile& configFile  ) {
+void Response::makeResponse ( size_t fd ) {
+    // if ()
     if (this->request->getIsCgi())
         executeCGI( fd );
     else if (this->request->getRequestLine()->getMethod() == "GET")
-        methodGet( fd, configFile );
+        methodGet( fd );
     else if (this->request->getRequestLine()->getMethod() == "POST")
         methodPost( fd );
     else if (this->request->getRequestLine()->getMethod() == "DELETE")
@@ -71,16 +74,15 @@ std::string convertDecimalToHexaToString ( size_t number ) {
     return (stringNumberOne.str());
 }
 
-void Response::generateHeader ( int fd, std::string &response, ConfigFile& configFile ) {
+void Response::generateHeader ( int fd, std::string &response) {
     // if (configFile.getReturn()) {
     //     // we should generate a return response and retun;
     // }
 
-    std::string &requestTarget = this->request->getRequestLine()->getRequestTarget();
-    validateAccessTarget(fd, configFile, requestTarget);
-    if (this->isHeaderSent || this->isResponseSent || this->errorCode.size()) {
+    // std::string &requestTarget = this->request->getRequestLine()->getRequestTarget();
+    // validateAccessTarget(fd, requestTarget);
+    if (this->isHeaderSent || this->isResponseSent || this->errorCode.size())
         return ;
-    }
     if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos ) {
         std::map<std::string, std::string>::iterator it = this->mime.find( \
             this->request->getRequestLine()->getRequestTarget().substr(    \
@@ -110,12 +112,12 @@ bool isDirectory(std::string &path) {
     return (false);
 }
 
-void Response::validateAccessTarget( int fd, ConfigFile& configFile, std::string &requestTarget ) {
+void Response::validateAccessTarget( int fd, std::string &requestTarget ) {
     bool                            isValidPath = false;
     std::string                     response;
     std::vector<std::string>        matchedLocations;
     std::string                     bestMatchedLocation;
-    std::map<std::string, Location> &locations = configFile.getLocations();
+    std::map<std::string, Location> &locations = this->configFile->getLocations();
     std::cout << "this is the request target : " << requestTarget << std::endl;
 
     for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++) {
@@ -182,14 +184,14 @@ void Response::validateAccessTarget( int fd, ConfigFile& configFile, std::string
     }
 }
 
-void Response::methodGet( size_t fd, ConfigFile& configFile ) {
+void Response::methodGet( size_t fd ) {
     std::string         response;
     char                buffer[BUFFER_SIZE_R];
     std::streamsize     bytesRead;
 
     memset(buffer, 0, sizeof(buffer));
     if (!this->isHeaderSent) {
-        generateHeader(fd, response, configFile);
+        generateHeader(fd, response);
     }
     if ( this->isResponseSent || this->errorCode.size())
         return;

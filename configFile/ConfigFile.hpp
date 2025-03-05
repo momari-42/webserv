@@ -3,60 +3,82 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/19 11:21:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/23 17:05:13 by momari           ###   ########.fr       */
+/*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
+/*   Updated: 2025/03/05 02:31:17 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-// #include "../socket/Socket.hpp"
-#include "Location.hpp"
-#include "../socket/Socket.hpp"
+#include <iostream>
+#include <vector>
+#include <map>
+#include "../errorHandling/ErrorHandling.hpp"
+#include "../utils/utils.hpp"
 
-
-
-class Location;
-class Socket;
-
-class ConfigFile
-{
-private:
-    std::vector <std::string> serverName;
-    std::map<size_t, std::string> ports;
-    std::map<std::string, std::string> errorPages;
-    std::vector<std::string> indexs;
-    std::vector<Socket> sockets;
-    std::string root;
-    std::map<std::string, Location> locations;
-    size_t bodyLimit;
-    size_t URILimit;
-    
+class Location {
 public:
-    ConfigFile();
+    std::string                                      path;
+    std::vector<std::string>                         index;
+    std::string                                      root;
+    std::vector<std::string>                         methods;
+    std::pair<std::string, std::string>              redirection;
+    std::vector<std::pair<std::string, std::string> > cgi;
+    bool                                             listing;
+    bool                                             upload;
 
-    void parseServerInfo(std::string& serverInfo);
-    void setLocations(std::string &serverInfo);
-    void setPorts(std::vector<std::string> args);
-    void setServerNames(std::vector<std::string> args);
-    void setErrorPages(std::vector<std::string> args);
-    void setBodyLimit(std::vector<std::string> args);
-    void setURILimit(std::vector<std::string> args);
-    void setIndex(std::vector<std::string> args);
-    void setRoot(std::vector<std::string> args);
-    std::string &getRoot( );
+    void parseLocation(std::string& config);
+    void showLocation();
+private:
+    void setPath(std::string& config);
+    void setIndex(std::vector<std::string>& parts);
+    void setRoot(std::vector<std::string>& parts);
+    void setMethods(std::vector<std::string>& parts);
+    void setListing(std::vector<std::string>& parts);
+    void setRedirection(std::vector<std::string>& parts);
+    void setCgi(std::vector<std::string>& parts);
 
-    std::map<size_t, std::string> getPorts();
-    size_t getURILimit();
-    size_t getBodyLimit();
-    std::map<std::string, Location>& getLocations();
-    
-    // Run server functions
-    // void runServer();
+    // Geters
+};
 
-    // Additional function to remove later
+class ServerConfig {
+private:
+    std::vector<std::pair<int, const std::string> > ports;
+    std::vector<std::string>                        names;
+    std::vector<std::string>                        index;
+    std::string                                     root;
+    std::map<std::string, Location>                 locations;
+    std::map<std::string, std::string>              errorPages;
+    size_t                                          bodyLimit;
+    size_t                                          URILimit;
+public:
+    ServerConfig();
+    void parse(std::string &config);
+    void checkRequirement();
     void showServerConfig();
-    ~ConfigFile();
+    bool operator==(ServerConfig& obj);
+
+    // Seters
+    void        setPorts(std::vector<std::string>& parts);
+    void        setRoot(std::vector<std::string>& parts);
+    void        setIndex(std::vector<std::string>& parts);
+    void        setBodyLimit(std::vector<std::string>& parts);
+    void        setURILimit(std::vector<std::string>& parts);
+    void        setNames(std::vector<std::string>& parts);
+    void        setErrorPage(std::vector<std::string>& parts);
+    void        setLocation(std::string& config);
+
+    bool        isExistName(const std::string& name);
+    // Geters
+
+    
+    std::vector<std::pair<int, const std::string> > getPorts();
+    std::string getRoot(const std::string& path);
+    std::string getIndex(const std::string& path);
+    // std::string getRedirection(const std::string& path);
+    // size_t      getBodyLimit();
+    // bool        getListing(const std::string& path);
+    // bool        isAllowedMethod(const std::string& path);
 };

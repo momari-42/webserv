@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/02/19 21:06:51 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 01:21:55 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,18 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <poll.h>
+#include "../configFile/ConfigFile.hpp"
 // #include "../request/Request.hpp"
 
 class Socket
 {
     private:
-        int                 sockfd;
-        int                 backlog;
-        struct sockaddr_in  addressServer;
+        std::string                 host;
+        int                         port;
+        int                         sockfd;
+        struct sockaddr_in          addressServer;
+        std::vector<ServerConfig*>  servers;
+        int                         backlog;
         void socketBinding ();
         void socketListning ();
         void setSockOption ();
@@ -35,7 +39,11 @@ class Socket
     public:
         Socket ( int port );
         ~Socket ( );
+        void setServer(ServerConfig *server);
+        int getPort();
+        std::string& getHost();
         int getSockfd();
+        ServerConfig* Socket::getServerConfig(std::string serverName);
         void initializeSocketCommunication ();
 
         // Exception class;

@@ -3,15 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/02/14 17:41:18 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 01:21:06 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Socket.hpp"
 #include <fstream>
+
+void Socket::setServer(ServerConfig *server) {
+    this->servers.push_back(server);
+}
+int Socket::getPort() {
+    return this->port;
+}
+std::string& Socket::getHost() {
+    return this->host;
+}
 
 void Socket::setSockOption (void) {
     int option; 
@@ -22,6 +32,13 @@ void Socket::setSockOption (void) {
     }
     // std::cout << "looooool" << std::endl;
 
+}
+
+ServerConfig* Socket::getServerConfig(std::string serverName) {
+    for (std::vector<ServerConfig*>::iterator it = this->servers.begin(); it != this->servers.end(); it++) {
+        if ((*it)->isExistName(serverName))
+            return *it;
+    }
 }
 
 Socket::Socket ( int port ) {

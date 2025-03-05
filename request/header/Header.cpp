@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/12 16:24:10 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 01:19:43 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
 }
 
 
-std::string Header::getValue(const std::string& key) {
+const std::string Header::getValue(const std::string& key) {
     return this->httpHeadersMap[key];
 }
 void Header::print() {

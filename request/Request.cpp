@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/24 13:41:56 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 00:26:36 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ Request::Request( ) : requestLine( this->errorCode, isCgi ),
 // Cyan    : \033[36m
 // White   : \033[37m
 
-void Request::parseRequest ( std::string requestData, ConfigFile& configFile  ) {
+void Request::parseRequest ( std::string requestData, ServerConfig& configFile  ) {
     // std::cout << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
         this->requestLine.setRequestLine(requestData, this->trackingRequestNumber, configFile);

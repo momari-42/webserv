@@ -3,20 +3,61 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/02/23 21:49:42 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 00:52:18 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Server.hpp"
 
-Server::Server ( std::vector<ConfigFile> vec ) {
+int endOfServer(std::string& content) {
+    size_t index = 0;
+    size_t count = 1;
+    while ((unsigned long)index < content.length()) {
+        if (content[index] == '}')
+         count--;
+        else if (content[index] == '{')
+         count++;
+        if (count == 0)
+            return index;
+        index++;
+    }
+    return -1;
+}
+
+Server::Server ( std::string& config ) {
+    std::string line;
+    std::string serverInfo;
+    std::vector<std::string> parts;
+    while (config.size()) {
+        parts.clear();
+        line = config.substr(0, config.find('\n'));
+        config.erase(0, config.find('\n') + 1);
+        ft_split(line, parts);
+        if (!parts.size())
+            continue;
+        if (parts.size() != 2 || parts[0].compare("server") || parts[1].compare("{"))
+            throw ErrorHandling("Syntax Error ");
+        if (endOfServer(config) == -1)
+            throw ErrorHandling("Syntax Error");
+        serverInfo = config.substr(0, endOfServer(config));
+        config.erase(0, endOfServer(config) + 2);
+        ServerConfig server;
+        server.parse(serverInfo);
+        this->configs.push_back(server);
+        server.showServerConfig();
+    }
+    checkServersConflict();
+    
+    // The old part
     this->lenSocket = sizeof(this->addressClient);
-    for (std::vector<ConfigFile>::iterator it = vec.begin(); it != vec.end(); it++) {
-        std::map<size_t, std::string> ports = (*it).getPorts();
-        for (std::map<size_t, std::string>::iterator iter = ports.begin(); iter != ports.end(); iter++) {
+    for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it != this->configs.end(); it++) {
+        std::vector<std::pair<int, const std::string> > ports = (*it).getPorts();
+        for (std::vector<std::pair<int, const std::string> >::iterator iter = ports.begin(); iter != ports.end(); iter++) {
+            if (checkSockets((*iter).second, (*iter).first, &(*it)))
+                continue;
             Socket soc((*iter).first);
             this->srvs[soc.getSockfd()] = *it;
             this->sockets.push_back(soc);
@@ -28,6 +69,26 @@ Server::Server ( std::vector<ConfigFile> vec ) {
     memset(&this->addressClient, 0, sizeof(this->addressClient));
     // this just for delete
     this->numberOfRequest = 0;
+}
+
+bool Server::checkSockets(std::string host, int port, ServerConfig* server) {
+    for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
+        if ((*it).getHost() == host && (*it).getPort() == port) {
+            (*it).setServer(server);
+            return false;
+        }
+    }
+    return true;
+}
+
+void Server::checkServersConflict() {
+    for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it < this->configs.end() - 1; it++)
+    {
+        for (std::vector<ServerConfig>::iterator iter = this->configs.begin() + 1; iter < this->configs.end(); iter++) {
+            if (*it == *iter)
+                throw ErrorHandling("Server Conflict Error");
+        }
+    }
 }
 
 bool Server::findFdSocket ( int sockfd ) {
@@ -107,6 +168,7 @@ void Server::startServer() {
                     of.write(buffer, bytesRead);
                     this->buffer.append(buffer, this->bytesRead);
                     // std::cout << "lol : " << this->readyEvents[i].ident << std::endl;
+                    this->clients[this->readyFd].setConfig(this->readyFd, this->sockets);
                     this->clients[this->readyFd].getRequest().parseRequest(this->buffer, this->srvs[this->serverClientLinks[this->readyEvents[i].ident]]);
                     memset(buffer, 0, BUFFER_SIZE);
                     this->buffer = "";
@@ -136,7 +198,7 @@ void Server::startServer() {
                     }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
-                    this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident, this->srvs[this->serverClientLinks[this->readyEvents[i].ident]] );
+                    this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident );
                     if ( this->clients[this->readyEvents[i].ident].getResponse().getErrorCode().size() ) {                        
                         struct kevent clientEvent;
 

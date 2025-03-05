@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/02/25 08:56:39 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 01:27:29 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "../configFile/ConfigFile.hpp"
 #include "../request/Request.hpp"
 #include "../http/MimeTypes.hpp"
 #include "../http/HttpResponse.hpp"
@@ -32,6 +33,8 @@
 class Response : public MimeTypes, public HttpResponse
 {
     private:
+        // Socket*                                     socket;
+        ServerConfig*                               configFile;
         // this for error Code
         std::string                                 errorCode;
         // RequestLine *requestLine;
@@ -47,15 +50,15 @@ class Response : public MimeTypes, public HttpResponse
         bool                                        isHeaderSent;
         bool                                        isResponseSent;
 
-        void validateAccessTarget( int fd, ConfigFile& configFile, std::string &requestTarget );
-        void generateHeader ( int fd, std::string &response, ConfigFile& configFile );
+        void validateAccessTarget( int fd, std::string &requestTarget );
+        void generateHeader ( int fd, std::string &response );
 
     public:
         
-        Response( Request *request );
+        Response( Request *request, Socket *soc );
         ~Response();
-        void makeResponse ( size_t fd, ConfigFile& configFile  );
-        void methodGet( size_t fd,   ConfigFile& configFile  );
+        void makeResponse ( size_t fd );
+        void methodGet( size_t fd );
         void methodPost( size_t fd );
         void executeCGI ( size_t fd );
         void methodDelete( size_t fd );

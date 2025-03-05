@@ -42,7 +42,7 @@ class Request
         Request( );
         ~Request();
         void print( void );
-        void parseRequest ( std::string requestData, ConfigFile& configFile );
+        void parseRequest ( std::string requestData, ServerConfig& configFile );
         RequestLine* getRequestLine();
         Header* getHeader();
         Body* getBody();

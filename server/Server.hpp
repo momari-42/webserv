@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/02/23 20:57:20 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/05 00:25:08 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 // #include "../include/sources.hpp"
 #include "../client/Client.hpp"
 #include "../error/Error.hpp"
+#include "../configFile/ConfigFile.hpp"
 
 // This is the buffer macro that i read from the client
 #define BUFFER_SIZE 80000
@@ -23,6 +24,9 @@
 class Server
 {
     private:
+        
+        // Config file for all the servers
+        std::vector<ServerConfig> configs;
         
         // this variable is just for test how many request i get
         int                             numberOfRequest;
@@ -42,7 +46,7 @@ class Server
         struct sockaddr_in              addressClient;
         std::vector<Socket>             sockets;
 
-        std::map<size_t, ConfigFile>    srvs;
+        std::map<size_t, ServerConfig>   srvs;
         std::map<size_t, size_t>        serverClientLinks;
 
 
@@ -52,10 +56,11 @@ class Server
 
         // this function check if sockfd exist in sockets container
         bool findFdSocket ( int sockfd );
-
+        void checkServersConflict();
+        bool checkSockets(std::string host, int port, ServerConfig* server);
     public:
         void startServer();
-        Server ( std::vector<ConfigFile> vec );
+        Server ( std::string& config );
         ~Server ( );
         class ServerExceptions : public std::exception
         {
