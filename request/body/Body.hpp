@@ -6,15 +6,17 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/24 13:33:36 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/06 13:29:03 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "../../include/sources.hpp"
+#include "../../utils/utils.hpp"
 #include "../header/Header.hpp"
 #include "../../http/EmimTypes.hpp"
+#include "../../configFile/ConfigFile.hpp"
+#include <fstream>
 
 // class Request;
 
@@ -59,6 +61,7 @@ class Body : public EmimTypes
 
         std::vector<boundaryData_t>         data;
 
+        ServerConfig                        *configFile;
         
 
         // std::map<std::string, std::string>         mime;
@@ -72,12 +75,12 @@ class Body : public EmimTypes
     public:
         Body( Header *header, bool &isRequestComplete, std::string &errorCode );
         void printBody( void );
-        void setBody( std::string& body, ConfigFile& configFile );
+        void setBody( std::string& body );
         void parseBoundaryHeader(const std::string& header);
 
         void resetAttributes (void);
         std::string &getFileName();
-
+        void setConfigFile(ServerConfig* configFile);
 
         
         ~Body();

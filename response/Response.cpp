@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/05 02:21:00 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/07 10:41:09 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-Response::Response ( Request *request, Socket* soc  ) {
+Response::Response ( Request *request ) {
     this->request = request;
     // this->socket = soc;
-    this->configFile = soc->getServerConfig(request->getHeader()->getValue("Host"));
+    // this->configFile = soc->getServerConfig(request->getHeader()->getValue("Host"));
     this->isHeaderSent      = false;
     this->isResponseSent    = false;
     this->httpVersion = "HTTP/1.1";
@@ -76,9 +76,16 @@ std::string convertDecimalToHexaToString ( size_t number ) {
 
 void Response::generateHeader ( int fd, std::string &response) {
     // if (configFile.getReturn()) {
-    //     // we should generate a return response and retun;
+    //     // we should generate a return response and return;
     // }
-
+    std::string path = this->request->getRequestLine()->getRequestTarget();
+    std::string root = this->configFile->getRoot(path, this->errorCode);
+    if (root.size() && root.at(root.size() - 1) != '/')
+        root += '/';
+    if (path.size() && path.at(0) == '/')
+        path.erase(0, 1);
+    this->requestTarget = root + path;
+    // std::cout << this->requestTarget << std::endl;
     // std::string &requestTarget = this->request->getRequestLine()->getRequestTarget();
     // validateAccessTarget(fd, requestTarget);
     if (this->isHeaderSent || this->isResponseSent || this->errorCode.size())
@@ -112,77 +119,81 @@ bool isDirectory(std::string &path) {
     return (false);
 }
 
-void Response::validateAccessTarget( int fd, std::string &requestTarget ) {
-    bool                            isValidPath = false;
-    std::string                     response;
-    std::vector<std::string>        matchedLocations;
-    std::string                     bestMatchedLocation;
-    std::map<std::string, Location> &locations = this->configFile->getLocations();
-    std::cout << "this is the request target : " << requestTarget << std::endl;
-
-    for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++) {
-        if ( requestTarget.find(it->first) == 0 ) {
-            matchedLocations.push_back(it->first);
-        }
-    }
-    for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
-        if ( (*it).size() > bestMatchedLocation.size()) {
-            bestMatchedLocation = *it;
-        }
-    }
-    if (bestMatchedLocation.size()) {
-        if (locations[bestMatchedLocation].getRedirection().size()) {
-    // std::cout << "best matched location : " << bestMatchedLocation << std::endl;
-            std::map<std::string, std::string>::iterator it = locations[bestMatchedLocation].getRedirection().begin();
-            response += this->httpVersion + " " + it->first + " "  + this->statusCodes[it->first] + CRLF;
-            response += "Location: " + it->second + CRLF + CRLF;
-            if (send(fd, response.c_str(), response.size(), 0) == -1) {
-                std::cerr << "Error sending data" << std::endl; 
-            }
-            this->isHeaderSent = true;
-            this->isResponseSent = true;
-            return;
-        }
-        requestTarget.erase(0, bestMatchedLocation.size());
-        requestTarget = locations[bestMatchedLocation].getRoot() + requestTarget;
-        if (isDirectory(requestTarget)) {
-            std::string tempraryPath;
-            std::vector<std::string> &indexs = locations[bestMatchedLocation].getIndexs();
-
-            if (requestTarget.find("/") == requestTarget.size() - 1)
-                requestTarget.erase(requestTarget.size() - 1);
-            for (std::vector<std::string>::iterator it = indexs.begin(); it != indexs.end(); it++) {
-                if ((*it).find("/") != 0)
-                    (*it).insert(0, "/");
-                tempraryPath =  requestTarget + (*it);
-                if (access( tempraryPath.c_str(), F_OK ) != -1) {
-                    requestTarget = tempraryPath;
-                    isValidPath = true;
-                    break;
-                }
-            }
-            if (!isValidPath) {
-                this->errorCode = "404" ;
-                return;
-            }
-            // requestTarget += locations[bestMatchedLocation].getIndexs();
-        }
-    }
-    else {
-        if (configFile.getRoot().find("/") == configFile.getRoot().size() - 1)
-            configFile.getRoot().erase(configFile.getRoot().size() - 1);
-        requestTarget = configFile.getRoot() + requestTarget;
-    }
-    std::cout << "404 : " << requestTarget << std::endl;
-    if (access( requestTarget.c_str(), F_OK ) == -1) {
-        this->errorCode = "404";
-        return;
-    }
-    if (access( requestTarget.c_str(), R_OK ) == -1) {
-        this->errorCode = "401";
-        return;
-    }
+void Response::setConfigFile(ServerConfig* configFile) {
+    this->configFile = configFile;
 }
+
+// void Response::validateAccessTarget( int fd, std::string &requestTarget ) {
+//     bool                            isValidPath = false;
+//     std::string                     response;
+//     std::vector<std::string>        matchedLocations;
+//     std::string                     bestMatchedLocation;
+//     std::map<std::string, Location> &locations = this->configFile->getLocations();
+//     std::cout << "this is the request target : " << requestTarget << std::endl;
+
+//     for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++) {
+//         if ( requestTarget.find(it->first) == 0 ) {
+//             matchedLocations.push_back(it->first);
+//         }
+//     }
+//     for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
+//         if ( (*it).size() > bestMatchedLocation.size()) {
+//             bestMatchedLocation = *it;
+//         }
+//     }
+//     if (bestMatchedLocation.size()) {
+//         if (locations[bestMatchedLocation].getRedirection().size()) {
+//     // std::cout << "best matched location : " << bestMatchedLocation << std::endl;
+//             std::map<std::string, std::string>::iterator it = locations[bestMatchedLocation].getRedirection().begin();
+//             response += this->httpVersion + " " + it->first + " "  + this->statusCodes[it->first] + CRLF;
+//             response += "Location: " + it->second + CRLF + CRLF;
+//             if (send(fd, response.c_str(), response.size(), 0) == -1) {
+//                 std::cerr << "Error sending data" << std::endl; 
+//             }
+//             this->isHeaderSent = true;
+//             this->isResponseSent = true;
+//             return;
+//         }
+//         requestTarget.erase(0, bestMatchedLocation.size());
+//         requestTarget = locations[bestMatchedLocation].getRoot() + requestTarget;
+//         if (isDirectory(requestTarget)) {
+//             std::string tempraryPath;
+//             std::vector<std::string> &indexs = locations[bestMatchedLocation].getIndexs();
+
+//             if (requestTarget.find("/") == requestTarget.size() - 1)
+//                 requestTarget.erase(requestTarget.size() - 1);
+//             for (std::vector<std::string>::iterator it = indexs.begin(); it != indexs.end(); it++) {
+//                 if ((*it).find("/") != 0)
+//                     (*it).insert(0, "/");
+//                 tempraryPath =  requestTarget + (*it);
+//                 if (access( tempraryPath.c_str(), F_OK ) != -1) {
+//                     requestTarget = tempraryPath;
+//                     isValidPath = true;
+//                     break;
+//                 }
+//             }
+//             if (!isValidPath) {
+//                 this->errorCode = "404" ;
+//                 return;
+//             }
+//             // requestTarget += locations[bestMatchedLocation].getIndexs();
+//         }
+//     }
+//     else {
+//         if (configFile.getRoot().find("/") == configFile.getRoot().size() - 1)
+//             configFile.getRoot().erase(configFile.getRoot().size() - 1);
+//         requestTarget = configFile.getRoot() + requestTarget;
+//     }
+//     std::cout << "404 : " << requestTarget << std::endl;
+//     if (access( requestTarget.c_str(), F_OK ) == -1) {
+//         this->errorCode = "404";
+//         return;
+//     }
+//     if (access( requestTarget.c_str(), R_OK ) == -1) {
+//         this->errorCode = "401";
+//         return;
+//     }
+// }
 
 void Response::methodGet( size_t fd ) {
     std::string         response;
@@ -253,8 +264,7 @@ bool Response::getIsResponseSent() {
 }
 
 void Response::setTargetFile() {
-    // std::cout << "hhhhh mari : " << this->request->getRequestLine()->getRequestTarget().c_str() << std::endl;
-    this->targetFile.open((this->request->getRequestLine()->getRequestTarget()).c_str(), std::ios::in);
+    this->targetFile.open(this->requestTarget, std::ios::in);
 }
 
 std::string &Response::getErrorCode() {

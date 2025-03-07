@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/05 01:21:06 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:17:48 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <fstream>
 
 void Socket::setServer(ServerConfig *server) {
+    std::cout << "Push One Server" << std::endl;
     this->servers.push_back(server);
 }
 int Socket::getPort() {
@@ -35,20 +36,27 @@ void Socket::setSockOption (void) {
 }
 
 ServerConfig* Socket::getServerConfig(std::string serverName) {
+    std::cout << "get Server config " << std::endl;
+    std::cout << "Hi " << this->servers.size() << std::endl;
     for (std::vector<ServerConfig*>::iterator it = this->servers.begin(); it != this->servers.end(); it++) {
-        if ((*it)->isExistName(serverName))
+        // std::cout << "loool" << std::endl;
+        if ((*it)->isExistName(serverName)) {
+            std::cout << "loool222222" << std::endl;
             return *it;
+            
+        }
     }
+    return ((*this->servers.begin()));
 }
 
-Socket::Socket ( int port ) {
+Socket::Socket ( int port, const std::string& host , ServerConfig *server) {
     // close(this->sockfd);
+    (void) host;
     this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->sockfd == -1) {
         std::cout << "Problem in socket function" << std::endl;
         throw (SocketExceptions(strerror(errno)));
     }
-
     this->backlog = 5;
 
     // Init client and server struct with 0;
@@ -61,6 +69,7 @@ Socket::Socket ( int port ) {
     // Specific IP address in this case htonl(INADDR_LOOPBACK) = 127.0.0.1
     this->addressServer.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     Socket::setSockOption();
+    this->servers.push_back(server);
 }
 
 Socket::~Socket ( void ) {
@@ -87,7 +96,7 @@ void Socket::socketListning ( void ) {
     }
 }
 
-int Socket::getSockfd ( void ) {
+size_t Socket::getSockfd ( void ) {
     return (this->sockfd);
 }
 

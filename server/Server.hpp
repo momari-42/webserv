@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/05 00:25:08 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:32:39 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@
 #include "../client/Client.hpp"
 #include "../error/Error.hpp"
 #include "../configFile/ConfigFile.hpp"
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+#include <fcntl.h>
 
 // This is the buffer macro that i read from the client
 #define BUFFER_SIZE 80000
@@ -46,7 +50,7 @@ class Server
         struct sockaddr_in              addressClient;
         std::vector<Socket>             sockets;
 
-        std::map<size_t, ServerConfig>   srvs;
+        // std::map<size_t, ServerConfig>   srvs;
         std::map<size_t, size_t>        serverClientLinks;
 
 
@@ -55,7 +59,7 @@ class Server
 
 
         // this function check if sockfd exist in sockets container
-        bool findFdSocket ( int sockfd );
+        bool findFdSocket ( size_t sockfd );
         void checkServersConflict();
         bool checkSockets(std::string host, int port, ServerConfig* server);
     public:

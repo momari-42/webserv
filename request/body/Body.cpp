@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/02/24 13:34:19 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/06 13:33:23 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 #include <unistd.h>
 
 
-Body::Body( Header *header, bool &isRequestComplete, std::string &errorCode ) : errorCode(errorCode), isRequestComplete(isRequestComplete) {
-    this->header = header;
-    this->bodyTrackingNumber = 0;
-    this->isBodyInitiates = false;
-    this->bodyLength          = 0;
+Body::Body( Header *header, bool &isRequestComplete, std::string &errorCode ) : errorCode(errorCode), isRequestComplete(isRequestComplete){
+    this->header                = header;
+    this->bodyTrackingNumber    = 0;
+    this->isBodyInitiates       = false;
+    this->bodyLength            = 0;
     // setMime();
     (void) this->errorCode;
 }
@@ -127,13 +127,13 @@ void Body::initiateBodyParams( void ) {
     }
 }
 
-void Body::setBody( std::string& body, ConfigFile& configFile ) {
+void Body::setBody( std::string& body ) {
     if (!this->isBodyInitiates) {
         initiateBodyParams();
         this->isBodyInitiates = true;
     }
     this->bodyLength += body.size();
-    if (this->bodyLength > configFile.getBodyLimit()) {
+    if (this->bodyLength > this->configFile->getBodyLimit()) {
         this->errorCode = "413";
         return;
     }
@@ -147,7 +147,7 @@ void Body::setBody( std::string& body, ConfigFile& configFile ) {
         Body::setBoundaryChunkedBody( body );
     }
     else if (this->bodyRequestType == "Content-Length") {
-        if ( this->contentLength > configFile.getBodyLimit() ) {
+        if ( this->contentLength > this->configFile->getBodyLimit() ) {
             this->errorCode = "413";
             return;
         }
@@ -253,4 +253,8 @@ void Body::setChunkedBody( std::string& body ) {
 
 std::string &Body::getFileName() {
     return (this->randomeContentLengthName);
+}
+
+void Body::setConfigFile(ServerConfig* configFile) {
+    this->configFile = configFile;
 }
