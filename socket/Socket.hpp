@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/05 01:21:55 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/06 14:33:15 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,20 @@ class Socket
         int                         port;
         int                         sockfd;
         struct sockaddr_in          addressServer;
-        std::vector<ServerConfig*>  servers;
         int                         backlog;
         void socketBinding ();
         void socketListning ();
         void setSockOption ();
 
     public:
-        Socket ( int port );
+        std::vector<ServerConfig*>  servers;
+        Socket ( int port, const std::string& host , ServerConfig *server);
         ~Socket ( );
         void setServer(ServerConfig *server);
         int getPort();
         std::string& getHost();
-        int getSockfd();
-        ServerConfig* Socket::getServerConfig(std::string serverName);
+        size_t getSockfd();
+        ServerConfig* getServerConfig(std::string serverName);
         void initializeSocketCommunication ();
 
         // Exception class;

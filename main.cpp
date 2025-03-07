@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/04 22:27:09 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/06 11:20:39 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ int main(int ac, char **av) {
         std::string config;
         readConfigFile(configFile, config);
         Server server(config);
+        server.startServer();
 
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;

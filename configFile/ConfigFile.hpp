@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/05 02:31:17 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/07 10:07:38 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,10 +75,11 @@ public:
 
     
     std::vector<std::pair<int, const std::string> > getPorts();
-    std::string getRoot(const std::string& path);
+    std::string getRoot( std::string& path, std::string &errorCode);
     std::string getIndex(const std::string& path);
     // std::string getRedirection(const std::string& path);
-    // size_t      getBodyLimit();
+    size_t      getBodyLimit();
+    size_t      getURILimit();
     // bool        getListing(const std::string& path);
     // bool        isAllowedMethod(const std::string& path);
 };

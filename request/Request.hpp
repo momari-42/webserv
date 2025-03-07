@@ -22,6 +22,8 @@ class Request
 {
     private:
 
+        // this is for initiate the config file and validate request line
+        bool                checkRequestLine;
         // if any error occure this integer will hold the error code for generate the respose of the error
         std::string         errorCode;
         // this objects is for manage parse of request and response
@@ -29,6 +31,8 @@ class Request
         RequestLine         requestLine;
         Header              header;
         Body                body;
+        
+        ServerConfig        *configFile;
 
         //-----------------------------------------------------------
 
@@ -42,7 +46,7 @@ class Request
         Request( );
         ~Request();
         void print( void );
-        void parseRequest ( std::string requestData, ServerConfig& configFile );
+        void parseRequest ( std::string requestData );
         RequestLine* getRequestLine();
         Header* getHeader();
         Body* getBody();
@@ -54,5 +58,7 @@ class Request
         // this is just for test
         bool getBodyComplete( void);
         bool getIsCgi( void);
+        size_t getTrackingRequestNumber( void );
+        void setConfigFile(ServerConfig* configFile);
         std::string &getFileName();
 };

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/05 00:26:36 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/07 08:33:45 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 Request::Request( ) : requestLine( this->errorCode, isCgi ),
                             header( this->errorCode ),
                                 body( &header, this->isRequestComplete, this->errorCode ) {
-    this->trackingRequestNumber = 0;
-    this->isRequestComplete     = false;
-    this->isCgi                 = false;
+    this->trackingRequestNumber     = 0;
+    this->isRequestComplete         = false;
+    this->isCgi                     = false;
+    this->checkRequestLine          = false;
 }
 
 // Red     : \033[31m
@@ -28,26 +29,40 @@ Request::Request( ) : requestLine( this->errorCode, isCgi ),
 // Cyan    : \033[36m
 // White   : \033[37m
 
-void Request::parseRequest ( std::string requestData, ServerConfig& configFile  ) {
+void Request::parseRequest ( std::string requestData ) {
     // std::cout << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
-        this->requestLine.setRequestLine(requestData, this->trackingRequestNumber, configFile);
+        this->requestLine.setRequestLine(requestData, this->trackingRequestNumber );
     }
     if (this->trackingRequestNumber == 1) {
         this->header.setHeader(requestData, this->trackingRequestNumber);
     }
     if (this->trackingRequestNumber == 2) {
+        if (!this->checkRequestLine) {
+            // if (this->requestLine.getTempraryRequestLine().size() > this->configFile->getURILimit()) {
+            //     this->errorCode = "414";
+            //     return ;
+            // }
+            this->checkRequestLine = true;
+        }
         if (this->requestLine.getMethod() == "GET") {
             this->isRequestComplete = true;
             return;
         }
-        this->body.setBody( requestData, configFile );
+        this->body.setBody( requestData );
     }
 }
 
+void Request::setConfigFile(ServerConfig* configFile) {
+    this->configFile = configFile;
+}
 
 bool Request::getBodyComplete( void) {
     return (this->isRequestComplete);
+}
+
+size_t Request::getTrackingRequestNumber( void ) {
+    return (this->trackingRequestNumber);
 }
 
 
@@ -73,9 +88,12 @@ Body* Request::getBody() {
 }
 
 void Request::resetAttributes ( void ) {
-    this->trackingRequestNumber = 0;
-    this->isRequestComplete = false;
-    this->errorCode = "";
+    this->trackingRequestNumber     = 0;
+    this->isRequestComplete         = false;
+    // this->isConfigFileInitialized   = false;
+    this->isCgi                     = false;
+    this->checkRequestLine          = false;
+    this->errorCode                 = "";
 
     this->requestLine.resetAttributes();
     this->header.resetAttributes();

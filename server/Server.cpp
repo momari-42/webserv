@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/05 00:52:18 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:52:11 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,10 @@ Server::Server ( std::string& config ) {
     for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it != this->configs.end(); it++) {
         std::vector<std::pair<int, const std::string> > ports = (*it).getPorts();
         for (std::vector<std::pair<int, const std::string> >::iterator iter = ports.begin(); iter != ports.end(); iter++) {
-            if (checkSockets((*iter).second, (*iter).first, &(*it)))
+            if (!checkSockets((*iter).second, (*iter).first, &(*it)))
                 continue;
-            Socket soc((*iter).first);
-            this->srvs[soc.getSockfd()] = *it;
+            Socket soc((*iter).first, (*iter).second, &(*it));
+            // this->srvs[soc.getSockfd()] = *it;
             this->sockets.push_back(soc);
         }
     }
@@ -91,7 +91,7 @@ void Server::checkServersConflict() {
     }
 }
 
-bool Server::findFdSocket ( int sockfd ) {
+bool Server::findFdSocket ( size_t sockfd ) {
     for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
         if ((*it).getSockfd() == sockfd)
             return (true);
@@ -146,6 +146,7 @@ void Server::startServer() {
 
                     fcntl(this->readyFd, F_SETFL, O_NONBLOCK);
                     this->sockfdClient = accept(this->readyFd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
+
                     if (this->sockfdClient == -1) {
                         std::cout << "Problem in accept function" << std::endl; 
                         throw (ServerExceptions(strerror(errno)));
@@ -153,9 +154,11 @@ void Server::startServer() {
                     EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
                     if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
                         throw (Server::ServerExceptions(strerror(errno)));
-                    this->serverClientLinks[this->sockfdClient] = this->readyFd;
+                    // this->serverClientLinks[this->sockfdClient] = this->readyFd;
+                    this->clients[this->sockfdClient].setConfig(this->readyFd, this->sockets);
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_READ ) {
+
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
                     if (bytesRead <= 0) {
                         std::cout << "Client disconnected" << std::endl;
@@ -168,13 +171,13 @@ void Server::startServer() {
                     of.write(buffer, bytesRead);
                     this->buffer.append(buffer, this->bytesRead);
                     // std::cout << "lol : " << this->readyEvents[i].ident << std::endl;
-                    this->clients[this->readyFd].setConfig(this->readyFd, this->sockets);
-                    this->clients[this->readyFd].getRequest().parseRequest(this->buffer, this->srvs[this->serverClientLinks[this->readyEvents[i].ident]]);
+                    // this->clients[this->readyFd].setConfig(this->readyFd, this->sockets);
+                    // , *this->sockets[0].getServerConfig("localhost")
+                    this->clients[this->readyFd].getRequest().parseRequest(this->buffer);
                     memset(buffer, 0, BUFFER_SIZE);
                     this->buffer = "";
-                    if ( this->clients[this->readyEvents[i].ident].getRequest().getErrorCode().size() ) {                        
+                    if ( this->clients[this->readyEvents[i].ident].getRequest().getErrorCode().size() ) {
                         struct kevent clientEvent;
-
                         std::cout << "\033[1;31mthis is and error hap88pend with code : " << this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
                         Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() );
                         error.sendErrorPage();

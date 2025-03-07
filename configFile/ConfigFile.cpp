@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/05 02:32:23 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/07 10:12:05 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,8 +185,8 @@ void ServerConfig::setLocation(std::string &serverInfo) {
     // std::cout << parts[0] << " " << parts[1] << " " << parts[2] << std::endl;
     if (parts.size() != 3)
         throw ErrorHandling("Syntax Error in location args");
-    else if (parts[1][parts[1].size() - 1] != '/')
-        throw ErrorHandling("Location path should be ended with [/]");
+    // else if (parts[1][parts[1].size() - 1] != '/')
+    //     throw ErrorHandling("Location path should be ended with [/]");
     std::string location = serverInfo.substr(0, serverInfo.find('}') + 1);
     serverInfo.erase(0, serverInfo.find('}') + 2);
     // location.erase(0, location.find('{') + 1);
@@ -355,7 +355,7 @@ std::vector<std::pair<int, const std::string> > ServerConfig::getPorts() {
     return ports;
 }
 
-std::string ServerConfig::getRoot(const std::string& path) {
+std::string ServerConfig::getRoot( std::string& path, std::string &errorCode ) {
     std::vector<std::string>        matchedLocations;
     std::string                     bestMatchedLocation;
 
@@ -369,26 +369,42 @@ std::string ServerConfig::getRoot(const std::string& path) {
         }
     }
     if (bestMatchedLocation.size()) {
-        return this->locations[bestMatchedLocation].root;
+        path.erase(0, bestMatchedLocation.size());
+        if (this->locations[bestMatchedLocation].root.size())
+            return this->locations[bestMatchedLocation].root;
+        else
+            return this->root;
     }
-    return this->root;
+    else
+        errorCode = "404";
+    return "";
 }
 
 std::string ServerConfig::getIndex(const std::string& path) {
-    std::vector<std::string>        matchedLocations;
-    std::string                     bestMatchedLocation;
+    (void)path;
+    // std::vector<std::string>        matchedLocations;
+    // std::string                     bestMatchedLocation;
 
-    for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
-        if ( path.find(it->first) == 0 )
-            matchedLocations.push_back(it->first);
-    }
-    for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
-        if ( (*it).size() > bestMatchedLocation.size()) {
-            bestMatchedLocation = *it;
-        }
-    }
-    if (bestMatchedLocation.size()) {
+    // for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
+    //     if ( path.find(it->first) == 0 )
+    //         matchedLocations.push_back(it->first);
+    // }
+    // for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
+    //     if ( (*it).size() > bestMatchedLocation.size()) {
+    //         bestMatchedLocation = *it;
+    //     }
+    // }
+    // if (bestMatchedLocation.size()) {
         
-    }
-    return this->root;
+    // }
+    // return this->root;
+    return ("");
+}
+
+size_t  ServerConfig::getBodyLimit() {
+    return (this->bodyLimit);
+}
+
+size_t      ServerConfig::getURILimit() {
+    return (this->URILimit);
 }

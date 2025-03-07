@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/05 01:27:29 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/07 10:32:26 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <cstring>
+#include <fstream>
+#include <unistd.h>
 
 #define BUFFER_SIZE_R 8182
 
@@ -45,7 +47,9 @@ class Response : public MimeTypes, public HttpResponse
         std::map<std::string, std::string>          description;
         std::map<std::string, std::string>          header;
         // std::map<std::string, std::string>          mime;
+        // ServerConfig                                *configFile;
 
+        std::string                                 requestTarget;
         std::fstream                                targetFile;
         bool                                        isHeaderSent;
         bool                                        isResponseSent;
@@ -55,7 +59,7 @@ class Response : public MimeTypes, public HttpResponse
 
     public:
         
-        Response( Request *request, Socket *soc );
+        Response( Request *request );
         ~Response();
         void makeResponse ( size_t fd );
         void methodGet( size_t fd );
@@ -65,5 +69,7 @@ class Response : public MimeTypes, public HttpResponse
         bool getIsResponseSent();
         void resetAttributes();
         void setTargetFile();
+        void validateRequestTarget();
         std::string &getErrorCode();
+        void setConfigFile(ServerConfig* configFile);
 };
