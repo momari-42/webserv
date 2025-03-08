@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 17:47:09 by momari            #+#    #+#             */
-/*   Updated: 2025/03/07 08:43:18 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/08 12:19:56 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void Client::setConfig(size_t fd, std::vector<Socket>& sockets) {
         std::cout << i << " - fd sock " << sockets[i].getSockfd() << " fd param " << fd << std::endl;
         if (sockets[i].getSockfd() == fd) {
             this->socket = &(sockets[i]);
+            this->request.setSocket(&(sockets[i]));
             break;
         }
     }
@@ -40,13 +41,12 @@ void Client::setConfig(size_t fd, std::vector<Socket>& sockets) {
 }
 
 Request &Client::getRequest() {
-    if (this->request.getTrackingRequestNumber() == 2 && !this->isConfigFileInitialized) {
-        std::cout << "The name of clieant is " << this->name << std::endl;
-        this->request.setConfigFile(this->socket->getServerConfig(this->request.getHeader()->getValue("Host")));
-        this->request.getBody()->setConfigFile(this->socket->getServerConfig(this->request.getHeader()->getValue("Host")));
-        this->response.setConfigFile(this->socket->getServerConfig(this->request.getHeader()->getValue("Host")));
-        this->isConfigFileInitialized = true;
-    }
+
+
+    // if (!this->isConfigFileInitialized) {
+    //     this->response.setConfigFile(this->socket->getServerConfig(this->request.getHeader()->getValue("Host")));
+    //     this->isConfigFileInitialized = true;
+    // }
     return (this->request);
 }
 

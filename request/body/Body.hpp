@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/06 13:29:03 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/08 14:36:47 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "../../http/EmimTypes.hpp"
 #include "../../configFile/ConfigFile.hpp"
 #include <fstream>
-
+#include <dirent.h>
 // class Request;
 
 typedef struct  boundaryData {
@@ -81,7 +81,7 @@ class Body : public EmimTypes
         void resetAttributes (void);
         std::string &getFileName();
         void setConfigFile(ServerConfig* configFile);
-
+        void checkAccess( std::string &requestTarget );
         
         ~Body();
 };

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/06 13:33:23 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/08 14:36:41 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ Body::Body( Header *header, bool &isRequestComplete, std::string &errorCode ) : 
     this->bodyTrackingNumber    = 0;
     this->isBodyInitiates       = false;
     this->bodyLength            = 0;
-    // setMime();
     (void) this->errorCode;
 }
 
@@ -137,15 +136,12 @@ void Body::setBody( std::string& body ) {
         this->errorCode = "413";
         return;
     }
-    if (this->bodyRequestType == "chunked") {
+    if (this->bodyRequestType == "chunked")
         Body::setChunkedBody(body);
-    }
-    else if (this->bodyRequestType == "boundry") {
+    else if (this->bodyRequestType == "boundry")
         Body::setBoundaryBody(body, "--" + this->header->getValue("Content-Type").substr(this->header->getValue("Content-Type").find("boundary=") + 9));
-    }
-    else if (this->bodyRequestType == "chunkedboundry") {
+    else if (this->bodyRequestType == "chunkedboundry")
         Body::setBoundaryChunkedBody( body );
-    }
     else if (this->bodyRequestType == "Content-Length") {
         if ( this->contentLength > this->configFile->getBodyLimit() ) {
             this->errorCode = "413";
@@ -177,6 +173,7 @@ void Body::generateRandomeName( std::string& name ) {
 
 void Body::resetAttributes (void) {
     std::vector<boundaryData_t>     tmp;
+
     this->bodyTrackingNumber        = 0;
     this->isBodyInitiates           = false;
 
@@ -186,9 +183,9 @@ void Body::resetAttributes (void) {
     this->body                      = "";
     this->rest                      = "";
     this->bodyRequestType           = "";
-    this->data                      = tmp;
-    this->contentLength             = 0;
     this->bodyLength                = 0;
+    this->contentLength             = 0;
+    this->data                      = tmp;
 }
 
 
@@ -239,15 +236,12 @@ void Body::setChunkedBody( std::string& body ) {
         else if ( this->bodyTrackingNumber ) {
             if (this->bodyRequestType == "chunked")
                 manageFile(this->randomeChunkedName, this->restChunked.substr(0, this->bodyTrackingNumber));
-            else {
-                // std::cout << "woooooooow " << std::endl;
+            else
                 this->body += this->restChunked.substr(0, this->bodyTrackingNumber);
-            }
             this->restChunked.erase(0, this->bodyTrackingNumber + 2);
             this->bodyTrackingNumber = 0;
         }
     }
-    // std::cout << this->body << std::endl;
     body = "";
 }
 
@@ -257,4 +251,46 @@ std::string &Body::getFileName() {
 
 void Body::setConfigFile(ServerConfig* configFile) {
     this->configFile = configFile;
+}
+
+static bool isDirectory(std::string &path) {
+    DIR *dir = opendir(path.c_str());
+    if (dir) {
+        closedir(dir);
+        return (true);
+    }
+    return (false);
+}
+
+void Body::checkAccess( std::string &requestTarget ) {
+    if (isDirectory(requestTarget)) {
+        bool isValidPath = false;
+        std::vector<std::string> &index = this->configFile->getIndex();
+        std::string tempraryRequestTarget;
+
+        if (requestTarget.size() && requestTarget.at(requestTarget.size() - 1) != '/')
+            requestTarget += '/';
+        for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); it++) {
+            tempraryRequestTarget = requestTarget + *it;
+            if (access( tempraryRequestTarget.c_str(), F_OK ) != -1) {
+                requestTarget = tempraryRequestTarget;
+                isValidPath = true;
+                break;
+            }
+        }
+        if (!isValidPath) {
+            this->errorCode = "404";
+            return ;
+        }
+    }
+    else {
+        if (access( requestTarget.c_str(), F_OK ) == -1) {
+            this->errorCode = "404";
+            return;
+        }   
+        if (access( requestTarget.c_str(), R_OK ) == -1) {
+            this->errorCode = "401";
+            return;
+        }
+    }
 }
