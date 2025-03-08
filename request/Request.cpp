@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/07 08:33:45 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/08 14:35:22 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,21 @@ Request::Request( ) : requestLine( this->errorCode, isCgi ),
 // Cyan    : \033[36m
 // White   : \033[37m
 
+void Request::validateMethod(std::string &method, std::vector<std::string> &methods) {
+    std::vector<std::string>::iterator it = std::find(methods.begin(), methods.end(), method);
+    if (it == methods.end())
+        this->errorCode = "405";
+}
+
+static bool isDirectory(std::string &path) {
+    DIR *dir = opendir(path.c_str());
+    if (dir) {
+        closedir(dir);
+        return (true);
+    }
+    return (false);
+}
+
 void Request::parseRequest ( std::string requestData ) {
     // std::cout << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
@@ -39,10 +54,27 @@ void Request::parseRequest ( std::string requestData ) {
     }
     if (this->trackingRequestNumber == 2) {
         if (!this->checkRequestLine) {
-            // if (this->requestLine.getTempraryRequestLine().size() > this->configFile->getURILimit()) {
-            //     this->errorCode = "414";
-            //     return ;
-            // }
+            this->configFile =  this->socket->getServerConfig(this->header.getValue("Host"));
+            this->body.setConfigFile(this->socket->getServerConfig(this->header.getValue("Host")));
+            this->path = this->requestLine.getRequestTarget();
+            this->root = this->configFile->getRoot(this->path, this->errorCode);
+            this->location =  this->configFile->getLocations()[this->configFile->getMatchedLocation()];
+            if (this->requestLine.getTempraryRequestLine().size() > this->configFile->getURILimit()) {
+                this->errorCode = "414";
+                return ;
+            }
+            validateMethod( this->requestLine.getMethod() , location.methods);
+            if (this->root.size() && this->root.at(this->root.size() - 1) != '/')
+                this->root += '/';
+            if (this->path.size() && this->path.at(0) == '/')
+                this->path.erase(0, 1);
+            this->requestTarget = this->root + this->path;
+            if (this->requestLine.getMethod() == "POST") {
+                if (!isDirectory(this->requestTarget)) {
+                    this->errorCode = "404";
+                    return;
+                }
+            }
             this->checkRequestLine = true;
         }
         if (this->requestLine.getMethod() == "GET") {
@@ -110,4 +142,24 @@ std::string &Request::getFileName() {
 
 bool Request::getIsCgi( void) {
     return (this->isCgi);
+}
+
+
+void Request::setSocket( Socket *socket ) {
+    this->socket = socket;
+}
+
+std::string &Request::getPath() {
+    return (this->path);
+}
+
+std::string &Request::getRoot() {
+    return (this->root);
+}
+std::string &Request::getRequestTarget() {
+    return (this->requestTarget);
+}
+
+Location &Request::getLocation() {
+    return (this->location);
 }

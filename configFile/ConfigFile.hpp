@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/07 10:07:38 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/07 12:00:35 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,9 @@ private:
     std::map<std::string, std::string>              errorPages;
     size_t                                          bodyLimit;
     size_t                                          URILimit;
+
+    // this for the return of indexes
+    std::string                                     matchedLocation;
 public:
     ServerConfig();
     void parse(std::string &config);
@@ -76,10 +79,12 @@ public:
     
     std::vector<std::pair<int, const std::string> > getPorts();
     std::string getRoot( std::string& path, std::string &errorCode);
-    std::string getIndex(const std::string& path);
+    std::vector<std::string> &getIndex();
     // std::string getRedirection(const std::string& path);
     size_t      getBodyLimit();
     size_t      getURILimit();
+    std::string &getMatchedLocation();
+    std::map<std::string, Location> &getLocations();
     // bool        getListing(const std::string& path);
     // bool        isAllowedMethod(const std::string& path);
 };

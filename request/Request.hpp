@@ -16,12 +16,17 @@
 #include "body/Body.hpp"
 #include "header/Header.hpp"
 #include "../configFile/ConfigFile.hpp"
+#include "../socket/Socket.hpp"
 #include <map>
 
 class Request
 {
     private:
 
+        std::string         path;
+        std::string         root;
+        Location            location;
+        std::string         requestTarget;
         // this is for initiate the config file and validate request line
         bool                checkRequestLine;
         // if any error occure this integer will hold the error code for generate the respose of the error
@@ -31,7 +36,6 @@ class Request
         RequestLine         requestLine;
         Header              header;
         Body                body;
-        
         ServerConfig        *configFile;
 
         //-----------------------------------------------------------
@@ -40,6 +44,8 @@ class Request
         bool                isRequestComplete;
         bool                isCgi;
         
+        Socket              *socket;
+
     public:
         // Reponse     response;
         // default  constructor and destructor
@@ -53,6 +59,7 @@ class Request
 
         
         void resetAttributes (void);
+        void setSocket( Socket *socket );
 
         std::string &getErrorCode();
         // this is just for test
@@ -61,4 +68,9 @@ class Request
         size_t getTrackingRequestNumber( void );
         void setConfigFile(ServerConfig* configFile);
         std::string &getFileName();
+        void validateMethod(std::string &method, std::vector<std::string> &methods);
+        std::string &getPath();
+        std::string &getRoot();
+        std::string &getRequestTarget();
+        Location &getLocation();
 };

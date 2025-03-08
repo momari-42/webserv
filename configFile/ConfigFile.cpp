@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/07 10:12:05 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/08 13:33:18 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,10 +355,11 @@ std::vector<std::pair<int, const std::string> > ServerConfig::getPorts() {
     return ports;
 }
 
-std::string ServerConfig::getRoot( std::string& path, std::string &errorCode ) {
+std::string ServerConfig::getRoot( std::string& path, std::string &errorCode) {
     std::vector<std::string>        matchedLocations;
     std::string                     bestMatchedLocation;
 
+    this->matchedLocation = "";
     for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
         if ( path.find(it->first) == 0 )
             matchedLocations.push_back(it->first);
@@ -369,6 +370,7 @@ std::string ServerConfig::getRoot( std::string& path, std::string &errorCode ) {
         }
     }
     if (bestMatchedLocation.size()) {
+        this->matchedLocation = bestMatchedLocation;
         path.erase(0, bestMatchedLocation.size());
         if (this->locations[bestMatchedLocation].root.size())
             return this->locations[bestMatchedLocation].root;
@@ -380,25 +382,10 @@ std::string ServerConfig::getRoot( std::string& path, std::string &errorCode ) {
     return "";
 }
 
-std::string ServerConfig::getIndex(const std::string& path) {
-    (void)path;
-    // std::vector<std::string>        matchedLocations;
-    // std::string                     bestMatchedLocation;
-
-    // for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
-    //     if ( path.find(it->first) == 0 )
-    //         matchedLocations.push_back(it->first);
-    // }
-    // for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
-    //     if ( (*it).size() > bestMatchedLocation.size()) {
-    //         bestMatchedLocation = *it;
-    //     }
-    // }
-    // if (bestMatchedLocation.size()) {
-        
-    // }
-    // return this->root;
-    return ("");
+std::vector<std::string> &ServerConfig::getIndex() {
+    if (this->locations[this->matchedLocation].index.size())
+        return this->locations[this->matchedLocation].index;
+    return (this->index);
 }
 
 size_t  ServerConfig::getBodyLimit() {
@@ -407,4 +394,12 @@ size_t  ServerConfig::getBodyLimit() {
 
 size_t      ServerConfig::getURILimit() {
     return (this->URILimit);
+}
+
+std::string &ServerConfig::getMatchedLocation() {
+    return (this->matchedLocation);
+}
+
+std::map<std::string, Location> &ServerConfig::getLocations() {
+    return (this->locations);
 }

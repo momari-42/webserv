@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/07 10:32:26 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/08 14:23:10 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 class Response : public MimeTypes, public HttpResponse
 {
     private:
-        // Socket*                                     socket;
+        Socket*                                     socket;
         ServerConfig*                               configFile;
         // this for error Code
         std::string                                 errorCode;
@@ -49,7 +49,6 @@ class Response : public MimeTypes, public HttpResponse
         // std::map<std::string, std::string>          mime;
         // ServerConfig                                *configFile;
 
-        std::string                                 requestTarget;
         std::fstream                                targetFile;
         bool                                        isHeaderSent;
         bool                                        isResponseSent;
@@ -72,4 +71,9 @@ class Response : public MimeTypes, public HttpResponse
         void validateRequestTarget();
         std::string &getErrorCode();
         void setConfigFile(ServerConfig* configFile);
+        void setSocket( Socket *socket );
+
+        void sendRedirectionResponse( size_t fd, Location &location );
 };
+
+bool isDirectory(std::string &path);

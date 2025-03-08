@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/07 10:41:09 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/08 14:35:58 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,21 +74,64 @@ std::string convertDecimalToHexaToString ( size_t number ) {
     return (stringNumberOne.str());
 }
 
+void Response::validateRequestTarget() {
+    if (isDirectory(this->request->getRequestTarget())) {
+        bool isValidPath = false;
+        std::vector<std::string> &index = this->configFile->getIndex();
+        std::string tempraryRequestTarget;
+
+        if (this->request->getRequestTarget().size() && this->request->getRequestTarget().at(this->request->getRequestTarget().size() - 1) != '/')
+            this->request->getRequestTarget() += '/';
+        for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); it++) {
+            tempraryRequestTarget = this->request->getRequestTarget() + *it;
+            if (access( tempraryRequestTarget.c_str(), F_OK ) != -1) {
+                this->request->getRequestTarget() = tempraryRequestTarget;
+                isValidPath = true;
+                break;
+            }
+        }
+        if (!isValidPath) {
+            this->errorCode = "404";
+            return ;
+        }
+    }
+    else {
+        if (access( this->request->getRequestTarget().c_str(), F_OK ) == -1) {
+            this->errorCode = "404";
+            return;
+        }   
+        if (access( this->request->getRequestTarget().c_str(), R_OK ) == -1) {
+            this->errorCode = "401";
+            return;
+        }
+    }
+}
+
+
+
+void Response::sendRedirectionResponse( size_t fd, Location &location ) {
+    std::string response;
+
+    response += this->httpVersion + " " + location.redirection.first + " "  + this->statusCodes[location.redirection.first] + CRLF;
+    response += "Location: " + location.redirection.second + CRLF + CRLF;
+    if (send(fd, response.c_str(), response.size(), 0) == -1) {
+        std::cerr << "Error sending data" << std::endl; 
+    }
+}
+
 void Response::generateHeader ( int fd, std::string &response) {
     // if (configFile.getReturn()) {
     //     // we should generate a return response and return;
     // }
-    std::string path = this->request->getRequestLine()->getRequestTarget();
-    std::string root = this->configFile->getRoot(path, this->errorCode);
-    if (root.size() && root.at(root.size() - 1) != '/')
-        root += '/';
-    if (path.size() && path.at(0) == '/')
-        path.erase(0, 1);
-    this->requestTarget = root + path;
-    // std::cout << this->requestTarget << std::endl;
-    // std::string &requestTarget = this->request->getRequestLine()->getRequestTarget();
-    // validateAccessTarget(fd, requestTarget);
-    if (this->isHeaderSent || this->isResponseSent || this->errorCode.size())
+    Location &location =  this->request->getLocation();
+    if (!location.redirection.first.empty() && !location.redirection.second.empty()) {
+        sendRedirectionResponse(fd, location);
+        this->isHeaderSent = true;
+        this->isResponseSent = true;
+        return;
+    }
+    validateRequestTarget();
+    if (this->errorCode.size())
         return ;
     if (this->request->getRequestLine()->getRequestTarget().find(".") != std::string::npos ) {
         std::map<std::string, std::string>::iterator it = this->mime.find( \
@@ -200,7 +243,7 @@ void Response::methodGet( size_t fd ) {
     char                buffer[BUFFER_SIZE_R];
     std::streamsize     bytesRead;
 
-    memset(buffer, 0, sizeof(buffer));
+    // if (this->configFile.getr)
     if (!this->isHeaderSent) {
         generateHeader(fd, response);
     }
@@ -264,7 +307,7 @@ bool Response::getIsResponseSent() {
 }
 
 void Response::setTargetFile() {
-    this->targetFile.open(this->requestTarget, std::ios::in);
+    this->targetFile.open(this->request->getRequestTarget(), std::ios::in);
 }
 
 std::string &Response::getErrorCode() {
@@ -275,6 +318,10 @@ void Response::resetAttributes() {
     this->isHeaderSent = false;
     this->isResponseSent = false;
     // targetFile.close();
+}
+
+void Response::setSocket( Socket *socket ) {
+    this->socket = socket;
 }
 
 Response::~Response (void) {
