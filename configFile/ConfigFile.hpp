@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/07 12:00:35 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/09 22:54:34 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ public:
     std::string                                      root;
     std::vector<std::string>                         methods;
     std::pair<std::string, std::string>              redirection;
-    std::vector<std::pair<std::string, std::string> > cgi;
+    std::vector<std::string>                         cgi;
     bool                                             listing;
     bool                                             upload;
 

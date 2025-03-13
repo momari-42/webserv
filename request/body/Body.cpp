@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/08 14:36:41 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/13 14:33:09 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Body::Body( Header *header, bool &isRequestComplete, std::string &errorCode ) : 
     this->header                = header;
     this->bodyTrackingNumber    = 0;
     this->isBodyInitiates       = false;
+    this->isShunked             = false;
     this->bodyLength            = 0;
     (void) this->errorCode;
 }
@@ -61,17 +62,25 @@ void Body::parseBoundaryHeader(const std::string& header) {
     this->data.push_back(part);
 }
 
-void manageFile(const std::string fileName, const std::string data ) {
-    // std::cout << fileName << std::endl;
-    std::ofstream outputFile( "/Users/momari/goinfre/" + fileName, std::ios::binary | std::ios::app);
+void Body::manageFile(const std::string fileName, const std::string data ) {
+    std::ofstream outputFile( this->requestTarget + fileName, std::ios::binary | std::ios::app);
     outputFile.write(data.data(), data.size());
+}
+
+void Body::validateFileName( void ) {
+    if ( this->data.back().contenet.empty() ) {
+        for ( std::vector<boundaryData_t>::iterator it = this->data.begin(); it != this->data.end() - 1; it++ ) {
+            unlink(( this->requestTarget + it->contenet).c_str());
+        }
+        std::cout << "from validateFileName" << std::endl;
+        this->errorCode = "400";
+    }
 }
 
 void Body::setBoundaryBody( std::string& requestData, const std::string& token ) {
     this->rest += requestData;
 
     while (this->rest.size() && !this->isRequestComplete) {
-        // std::cout <<  "momari" << std::endl;
         if (this->rest.find(token + "--") != std::string::npos && this->rest.find(token) == this->rest.find(token + "--")) {
             if (!this->data.back().isBodyComplete)
                 manageFile(this->data.back().contenet, this->rest.substr(0, this->rest.find(token + "--") - 2));
@@ -88,6 +97,11 @@ void Body::setBoundaryBody( std::string& requestData, const std::string& token )
             if (this->rest.find(token) == 0 && this->rest.find("\r\n\r\n") != std::string::npos) {
                 this->rest.erase(0, token.size() + 2);
                 Body::parseBoundaryHeader(this->rest.substr(0, this->rest.find("\r\n\r\n")));
+                // this is for validate each file it has file name or not 
+                validateFileName();
+                if ( this->errorCode.size() )
+                    return ;
+
                 this->data.back().isHeaderComplete = true;
                 this->rest.erase(0, this->rest.find("\r\n\r\n") + 4);
             }
@@ -126,9 +140,22 @@ void Body::initiateBodyParams( void ) {
     }
 }
 
-void Body::setBody( std::string& body ) {
+void Body::setCgi( std::string& requestData ) {
+    if (this->randomeFileName.empty()) {
+        this->isShunked = this->bodyRequestType.find("chunked") != std::string::npos;
+        generateRandomeName( this->randomeFileName );
+        this->randomeFileName = "/tmp/." + this->randomeFileName;
+    }
+    if ( this->isShunked )
+        setChunkedCgiBody( requestData );
+    else
+        manageFile(this->randomeFileName, requestData);
+}
+
+void Body::setBody( std::string& body, bool &cgi ) {
     if (!this->isBodyInitiates) {
         initiateBodyParams();
+        this->cgi = cgi;
         this->isBodyInitiates = true;
     }
     this->bodyLength += body.size();
@@ -136,6 +163,8 @@ void Body::setBody( std::string& body ) {
         this->errorCode = "413";
         return;
     }
+    if ( cgi )
+        Body::setCgi(body);
     if (this->bodyRequestType == "chunked")
         Body::setChunkedBody(body);
     else if (this->bodyRequestType == "boundry")
@@ -176,8 +205,9 @@ void Body::resetAttributes (void) {
 
     this->bodyTrackingNumber        = 0;
     this->isBodyInitiates           = false;
+    this->isShunked                 = false;
 
-    this->randomeChunkedName        = "";
+    this->randomeFileName           = "";
     this->randomeContentLengthName  = "";
     this->restChunked               = "";
     this->body                      = "";
@@ -195,19 +225,54 @@ void Body::setContentLengthBody( std::string& requestData ) {
         generateRandomeName ( this->randomeContentLengthName );
     }
     if ( this->contentLength - requestData.size() < 0 )
-        manageFile(this->randomeChunkedName, requestData.substr(0, this->contentLength));
+        manageFile(this->randomeFileName, requestData.substr(0, this->contentLength));
     else
-        manageFile(this->randomeChunkedName, requestData);
+        manageFile(this->randomeFileName, requestData);
     this->contentLength -= requestData.size();
     if ( this->contentLength <= 0 ) {
         this->isRequestComplete = true;
     }
 }
 
+void Body::setChunkedCgiBody( std::string& body ) {
+    this->restChunked += body;
+    while ( this->restChunked.size() )
+    {
+        if ( !this->bodyTrackingNumber  && this->restChunked.find("\r\n") == std::string::npos ) {
+            break;
+        }
+        if ( !this->bodyTrackingNumber  && this->restChunked.find("\r\n") != std::string::npos ) {
+            this->bodyTrackingNumber = strtol(this->restChunked.substr(0, this->restChunked.find("\r\n")).c_str(), NULL, 16);
+            this->restChunked.erase(0, this->restChunked.find("\r\n") + 2);
+            if (this->bodyTrackingNumber == 0) {
+                this->isRequestComplete = true;
+                this->restChunked = "";
+                break;
+            }
+        }
+        if ( this->bodyTrackingNumber && this->restChunked.size() <= this->bodyTrackingNumber ) {
+            manageFile(this->randomeFileName, this->restChunked);
+            this->bodyTrackingNumber -= this->restChunked.size();
+            this->restChunked.clear();
+        }
+        else if ( this->bodyTrackingNumber ) {
+            manageFile(this->randomeFileName, this->restChunked.substr(0, this->bodyTrackingNumber));
+            this->restChunked.erase(0, this->bodyTrackingNumber + 2);
+            this->bodyTrackingNumber = 0;
+        }
+    }
+    body = "";
+}
+
 void Body::setChunkedBody( std::string& body ) {
 
-    if (this->bodyRequestType == "chunked" && !this->randomeChunkedName.size())
-        generateRandomeName( this->randomeChunkedName );
+    // if ( this->bodyRequestType == "chunked" && !this->cgi ) {
+    //     std::cout << "hahahahahahahah im here :" << body << std::endl;
+    //     this->errorCode = "204";
+    //     return ;
+    // }
+    if (this->bodyRequestType == "chunked" && !this->randomeFileName.size())
+        generateRandomeName( this->randomeFileName );
     this->restChunked += body;
     while ( this->restChunked.size() )
     {
@@ -226,7 +291,7 @@ void Body::setChunkedBody( std::string& body ) {
         }
         if ( this->bodyTrackingNumber && this->restChunked.size() <= this->bodyTrackingNumber ) {
             if (this->bodyRequestType == "chunked")
-                manageFile(this->randomeChunkedName, this->restChunked);
+                manageFile(this->randomeFileName, this->restChunked);
             else {
                 this->body += this->restChunked;
             }
@@ -235,7 +300,7 @@ void Body::setChunkedBody( std::string& body ) {
         }
         else if ( this->bodyTrackingNumber ) {
             if (this->bodyRequestType == "chunked")
-                manageFile(this->randomeChunkedName, this->restChunked.substr(0, this->bodyTrackingNumber));
+                manageFile(this->randomeFileName, this->restChunked.substr(0, this->bodyTrackingNumber));
             else
                 this->body += this->restChunked.substr(0, this->bodyTrackingNumber);
             this->restChunked.erase(0, this->bodyTrackingNumber + 2);
@@ -245,8 +310,8 @@ void Body::setChunkedBody( std::string& body ) {
     body = "";
 }
 
-std::string &Body::getFileName() {
-    return (this->randomeContentLengthName);
+std::string &Body::getRandomeFileName() {
+    return (this->randomeFileName);
 }
 
 void Body::setConfigFile(ServerConfig* configFile) {
@@ -293,4 +358,15 @@ void Body::checkAccess( std::string &requestTarget ) {
             return;
         }
     }
+}
+
+void Body::setRequestTarget(std::string &requestTarget) {
+    this->requestTarget = requestTarget;
+}
+
+std::string Body::getBodyRequestType() {
+    return ( this->bodyRequestType );
+}
+size_t Body::getBodyLength() {
+    return ( this->bodyLength );
 }

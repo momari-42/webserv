@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/06 15:52:11 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/13 14:21:24 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,31 +154,25 @@ void Server::startServer() {
                     EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
                     if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
                         throw (Server::ServerExceptions(strerror(errno)));
-                    // this->serverClientLinks[this->sockfdClient] = this->readyFd;
                     this->clients[this->sockfdClient].setConfig(this->readyFd, this->sockets);
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_READ ) {
-
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
                     if (bytesRead <= 0) {
                         std::cout << "Client disconnected" << std::endl;
                         close(this->readyFd);
                         this->clients.erase(this->readyFd);
-                        this->serverClientLinks.erase(this->readyEvents[i].ident);
                         continue;
                     }
                     buffer[this->bytesRead] = '\0';
                     of.write(buffer, bytesRead);
                     this->buffer.append(buffer, this->bytesRead);
-                    // std::cout << "lol : " << this->readyEvents[i].ident << std::endl;
-                    // this->clients[this->readyFd].setConfig(this->readyFd, this->sockets);
-                    // , *this->sockets[0].getServerConfig("localhost")
                     this->clients[this->readyFd].getRequest().parseRequest(this->buffer);
                     memset(buffer, 0, BUFFER_SIZE);
                     this->buffer = "";
                     if ( this->clients[this->readyEvents[i].ident].getRequest().getErrorCode().size() ) {
                         struct kevent clientEvent;
-                        std::cout << "\033[1;31mthis is and error hap88pend with code : " << this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
+                        std::cout << "\033[1;31mthis is and error hap*****pend with code : " << this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
                         Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() );
                         error.sendErrorPage();
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
@@ -186,7 +180,6 @@ void Server::startServer() {
                             throw (Server::ServerExceptions(strerror(errno)));
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
-                        this->serverClientLinks.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getRequest().getBodyComplete() == true) {
                         struct kevent clientEvent;
@@ -201,7 +194,7 @@ void Server::startServer() {
                     }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
-                    this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident );
+                    this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident, kq );
                     if ( this->clients[this->readyEvents[i].ident].getResponse().getErrorCode().size() ) {                        
                         struct kevent clientEvent;
 
@@ -213,7 +206,6 @@ void Server::startServer() {
                             throw (Server::ServerExceptions(strerror(errno)));
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
-                        this->serverClientLinks.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
                         if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("Connection") == "close") {
@@ -225,7 +217,6 @@ void Server::startServer() {
                                 throw (Server::ServerExceptions(strerror(errno)));
                             close(this->readyEvents[i].ident);
                             this->clients.erase(this->readyEvents[i].ident);
-                            this->serverClientLinks.erase(this->readyEvents[i].ident);
                         }
                         else {
                             std::cout << "\033[32mreqeust keep-alive : " << this->numberOfRequest++  << "\033[0m" << std::endl;
@@ -242,9 +233,30 @@ void Server::startServer() {
                         }
                     }
                 }
-                // else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
-                    
-                // }
+                else if ( this->readyEvents[i].filter == EVFILT_PROC && (this->readyEvents[i].fflags & NOTE_EXIT)) {
+                    struct kevent   clientEvent;
+                    int             *fdClient = static_cast<int *>(this->readyEvents[i].udata);
+
+                    EV_SET(&clientEvent, *fdClient, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        throw (Server::ServerExceptions(strerror(errno)));
+                }
+                else if ( this->readyEvents[i].filter == EVFILT_TIMER ) {
+                    struct kevent   clientEvent;
+                    int             *fdClient = static_cast<int *>(this->readyEvents[i].udata);
+
+                    EV_SET(&clientEvent, this->readyFd, EVFILT_PROC, EV_DELETE, 0, 0, NULL);
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        throw (Server::ServerExceptions(strerror(errno)));
+                    EV_SET(&clientEvent, this->readyFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        throw (Server::ServerExceptions(strerror(errno)));
+                    kill(this->readyFd, SIGKILL);
+                    Error error( *fdClient, "504" );
+                    error.sendErrorPage();
+                    close(*fdClient);
+                    this->clients.erase(*fdClient);
+                }
             }
         }
     }

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/08 14:36:47 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/12 23:50:00 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class Body : public EmimTypes
     private:
 
         std::string                         &errorCode;
+        std::string                         requestTarget;
         // this boolen is for request complete it point to a boolen in Reqeust class
         bool                                &isRequestComplete;
         
@@ -51,7 +52,7 @@ class Body : public EmimTypes
     
 
 
-        std::string                         randomeChunkedName;
+        std::string                         randomeFileName;
         std::string                         restChunked;
         std::string                         body;
 
@@ -63,7 +64,9 @@ class Body : public EmimTypes
 
         ServerConfig                        *configFile;
         
-
+        // this variables are all for cgi http request
+        bool                                cgi;
+        bool                                isShunked;
         // std::map<std::string, std::string>         mime;
         
         void generateRandomeName( std::string& name );
@@ -71,17 +74,24 @@ class Body : public EmimTypes
         void setBoundaryBody( std::string& requestData, const std::string& token );
         void setBoundaryChunkedBody( std::string& requestData);
         void setContentLengthBody( std::string& requestData );
+        void setCgi( std::string& requestData );
+        void setChunkedCgiBody( std::string& requestData );
         void initiateBodyParams( void );
+        void validateFileName( void );
     public:
         Body( Header *header, bool &isRequestComplete, std::string &errorCode );
         void printBody( void );
-        void setBody( std::string& body );
+        void setBody( std::string& body, bool &cgi );
         void parseBoundaryHeader(const std::string& header);
 
         void resetAttributes (void);
-        std::string &getFileName();
+        std::string &getRandomeFileName();
         void setConfigFile(ServerConfig* configFile);
+        void setRequestTarget(std::string &requestTarget);
         void checkAccess( std::string &requestTarget );
+        void manageFile(const std::string fileName, const std::string data );
+        std::string getBodyRequestType();
+        size_t getBodyLength();
         
         ~Body();
 };

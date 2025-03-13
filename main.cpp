@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/06 11:20:39 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/12 22:20:16 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ void readConfigFile(std::fstream& configFile, std::string& file) {
     }
     if (!areClosed(file))
         throw ErrorHandling("Syntax Error");
-    // std::cout << file << std::endl;
 }
 
 int main(int ac, char **av) {

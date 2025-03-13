@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/08 13:33:18 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/09 22:57:13 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void Location::showLocation() {
     // for (std::map<std::string, std::string>::iterator it = this->redirection.begin(); it != this->redirection.end(); it++)
     //     std::cout << "|" << (*it).first << "|" << (*it).second << "|" << std::endl;
     std::cout << std::endl;
+    // std::cout << "the cgi is : " << cgi[0].first << cgi[0].second << std::endl;
 }
 
 void ServerConfig::setPorts(std::vector<std::string>& parts) {
@@ -158,7 +159,7 @@ void ServerConfig::setBodyLimit(std::vector<std::string>& parts) {
         this->bodyLimit = atol(parts[1].c_str());
     if (this->bodyLimit == 0 && parts[1].compare("0"))
         throw ErrorHandling("Wrong Number in body limit");
-    else if (this->bodyLimit > INT32_MAX)
+    else if (this->bodyLimit > LONG_MAX)
         throw ErrorHandling("Number in body limit to large");
 }
 
@@ -306,8 +307,10 @@ void Location::setCgi(std::vector<std::string>& parts) {
         throw ErrorHandling("Wrong number of arguments in cgi of Location " + this->path);
     if (parts[1][0] != '.' || parts[1].size() < 2)
         throw ErrorHandling("Cgi Extention invalid of Location " + this->path);
-    else
-        this->cgi.push_back(std::make_pair(parts[1], parts[2]));
+    else {
+        this->cgi.push_back(parts[1]);
+        this->cgi.push_back(parts[2]);
+    }
 }
 
 void Location::parseLocation(std::string& config) {
@@ -383,8 +386,10 @@ std::string ServerConfig::getRoot( std::string& path, std::string &errorCode) {
 }
 
 std::vector<std::string> &ServerConfig::getIndex() {
-    if (this->locations[this->matchedLocation].index.size())
+    std::map<std::string, Location>::iterator it = this->locations.find(this->matchedLocation);
+    if (it != this->locations.end() && it->second.index.size()) {
         return this->locations[this->matchedLocation].index;
+    }
     return (this->index);
 }
 

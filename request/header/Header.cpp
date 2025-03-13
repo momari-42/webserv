@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/06 10:55:04 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/13 14:33:30 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             portion = this->rest.substr(0, this->rest.find("\r\n"));
             firstPortion = portion.substr(0, portion.find(":"));
             if (firstPortion.find(" ") != std::string::npos || firstPortion.find("\t") != std::string::npos) {
+                std::cout << "from setHeader" << std::endl;
                 this->errorCode = "400";
                 return ;
             }
@@ -48,6 +49,7 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             this->rest.erase(0, this->rest.find("\r\n") + 2);
         }
         else {
+            std::cout << "from setHeader" << std::endl;
             this->errorCode = "400";
             return ;
         }
