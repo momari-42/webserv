@@ -6,15 +6,18 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 17:47:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/06 15:34:17 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/11 22:29:51 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "../request/Request.hpp"
+
 #include "../response/Response.hpp"
+#include "../request/Request.hpp"
 #include "../socket/Socket.hpp"
+
+class Response;
 
 class Client
 {

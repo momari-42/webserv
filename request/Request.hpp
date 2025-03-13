@@ -22,11 +22,12 @@
 class Request
 {
     private:
-
+        bool                cgi;
         std::string         path;
         std::string         root;
         Location            location;
         std::string         requestTarget;
+        std::vector<std::string> index;
         // this is for initiate the config file and validate request line
         bool                checkRequestLine;
         // if any error occure this integer will hold the error code for generate the respose of the error
@@ -42,7 +43,6 @@ class Request
 
         int                 trackingRequestNumber;
         bool                isRequestComplete;
-        bool                isCgi;
         
         Socket              *socket;
 
@@ -63,14 +63,15 @@ class Request
 
         std::string &getErrorCode();
         // this is just for test
-        bool getBodyComplete( void);
-        bool getIsCgi( void);
-        size_t getTrackingRequestNumber( void );
-        void setConfigFile(ServerConfig* configFile);
-        std::string &getFileName();
-        void validateMethod(std::string &method, std::vector<std::string> &methods);
         std::string &getPath();
+        std::string &getRandomeFileName();
         std::string &getRoot();
         std::string &getRequestTarget();
-        Location &getLocation();
+        Location    &getLocation();
+        bool        getCgi();
+
+        bool        getBodyComplete( void);
+        size_t      getTrackingRequestNumber( void );
+        void        setConfigFile(ServerConfig* configFile);
+        void        validateMethod(std::string &method, std::vector<std::string> &methods);
 };

@@ -6,19 +6,19 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/08 14:35:22 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/13 14:29:05 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request( ) : requestLine( this->errorCode, isCgi ),
+Request::Request( ) : requestLine( this->errorCode ),
                             header( this->errorCode ),
                                 body( &header, this->isRequestComplete, this->errorCode ) {
     this->trackingRequestNumber     = 0;
     this->isRequestComplete         = false;
-    this->isCgi                     = false;
     this->checkRequestLine          = false;
+    this->cgi                       = false;
 }
 
 // Red     : \033[31m
@@ -45,7 +45,6 @@ static bool isDirectory(std::string &path) {
 }
 
 void Request::parseRequest ( std::string requestData ) {
-    // std::cout << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
         this->requestLine.setRequestLine(requestData, this->trackingRequestNumber );
     }
@@ -53,6 +52,7 @@ void Request::parseRequest ( std::string requestData ) {
         this->header.setHeader(requestData, this->trackingRequestNumber);
     }
     if (this->trackingRequestNumber == 2) {
+
         if (!this->checkRequestLine) {
             this->configFile =  this->socket->getServerConfig(this->header.getValue("Host"));
             this->body.setConfigFile(this->socket->getServerConfig(this->header.getValue("Host")));
@@ -64,24 +64,33 @@ void Request::parseRequest ( std::string requestData ) {
                 return ;
             }
             validateMethod( this->requestLine.getMethod() , location.methods);
+            if (this->errorCode.size())
+                return ;
             if (this->root.size() && this->root.at(this->root.size() - 1) != '/')
                 this->root += '/';
             if (this->path.size() && this->path.at(0) == '/')
                 this->path.erase(0, 1);
             this->requestTarget = this->root + this->path;
+            this->body.setRequestTarget(this->requestTarget);
             if (this->requestLine.getMethod() == "POST") {
                 if (!isDirectory(this->requestTarget)) {
                     this->errorCode = "404";
                     return;
                 }
             }
+            this->index = this->configFile->getIndex();
+            if (this->requestTarget.find(".php") != std::string::npos || this->requestTarget.find(".py") != std::string::npos) {
+                std::vector<std::string>::iterator it = std::find(this->location.cgi.begin(), this->location.cgi.end(), this->requestTarget.substr(this->requestTarget.find(".php"), 4));
+                if (it != this->location.cgi.end())
+                    this->cgi = true;
+            }
             this->checkRequestLine = true;
         }
-        if (this->requestLine.getMethod() == "GET") {
+        if (this->requestLine.getMethod() == "GET" || this->requestLine.getMethod() == "DELETE") {
             this->isRequestComplete = true;
             return;
         }
-        this->body.setBody( requestData );
+        this->body.setBody( requestData, this->cgi );
     }
 }
 
@@ -122,10 +131,11 @@ Body* Request::getBody() {
 void Request::resetAttributes ( void ) {
     this->trackingRequestNumber     = 0;
     this->isRequestComplete         = false;
-    // this->isConfigFileInitialized   = false;
-    this->isCgi                     = false;
     this->checkRequestLine          = false;
+    this->cgi                       = false;
     this->errorCode                 = "";
+    this->path                      = "";
+    this->root                      = "";
 
     this->requestLine.resetAttributes();
     this->header.resetAttributes();
@@ -136,14 +146,9 @@ std::string &Request::getErrorCode() {
     return (this->errorCode);
 }
 
-std::string &Request::getFileName() {
-    return(this->body.getFileName());
+std::string &Request::getRandomeFileName() {
+    return(this->body.getRandomeFileName());
 }
-
-bool Request::getIsCgi( void) {
-    return (this->isCgi);
-}
-
 
 void Request::setSocket( Socket *socket ) {
     this->socket = socket;
@@ -162,4 +167,8 @@ std::string &Request::getRequestTarget() {
 
 Location &Request::getLocation() {
     return (this->location);
+}
+
+bool Request::getCgi() {
+    return (this->cgi);
 }

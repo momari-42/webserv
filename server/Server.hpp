@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/06 15:32:39 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/12 14:01:50 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <sys/event.h>
 #include <sys/time.h>
 #include <fcntl.h>
+#include <signal.h>
 
 // This is the buffer macro that i read from the client
 #define BUFFER_SIZE 80000
@@ -50,8 +51,6 @@ class Server
         struct sockaddr_in              addressClient;
         std::vector<Socket>             sockets;
 
-        // std::map<size_t, ServerConfig>   srvs;
-        std::map<size_t, size_t>        serverClientLinks;
 
 
         // this container is for erase the clients that receives the response

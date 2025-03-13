@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/02/24 09:35:50 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/12 13:55:57 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ Error::Error ( int fd, std::string statusCode ) {
 
     // initiate the header of the error response 
 
-    std::cout << "we are here in error class" << std::endl;
     this->header["Content-Type"] = "text/html; charset=UTF-8";
     this->header["Server"] = "momari-zaelarb";
     this->header["Connection"] = "close";

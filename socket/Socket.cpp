@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/06 15:17:48 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/09 11:05:12 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,12 @@ void Socket::setSockOption (void) {
 }
 
 ServerConfig* Socket::getServerConfig(std::string serverName) {
-    std::cout << "get Server config " << std::endl;
-    std::cout << "Hi " << this->servers.size() << std::endl;
+    // std::cout << "get Server config " << std::endl;
+    // std::cout << "Hi " << this->servers.size() << std::endl;
     for (std::vector<ServerConfig*>::iterator it = this->servers.begin(); it != this->servers.end(); it++) {
         // std::cout << "loool" << std::endl;
         if ((*it)->isExistName(serverName)) {
-            std::cout << "loool222222" << std::endl;
+            // std::cout << "loool222222" << std::endl;
             return *it;
             
         }
