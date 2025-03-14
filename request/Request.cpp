@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/14 10:53:02 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 15:17:42 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,9 @@ void Request::parseRequest ( std::string requestData ) {
                 }
             }
             this->index = this->configFile->getIndex();
-            if (this->requestTarget.find(".php") != std::string::npos || this->requestTarget.find(".py") != std::string::npos) {
+            if ( this->requestLine.getMethod() != "DELETE" &&
+                    (this->requestTarget.find(".php") != std::string::npos
+                    || this->requestTarget.find(".py") != std::string::npos)) {
                 this->cgiExtention = ".php";
                 if (this->requestTarget.find(".py") != std::string::npos)
                     this->cgiExtention = ".py";
@@ -89,6 +91,7 @@ void Request::parseRequest ( std::string requestData ) {
             this->checkRequestLine = true;
         }
         if (this->requestLine.getMethod() == "GET" || this->requestLine.getMethod() == "DELETE") {
+            requestData.clear();
             this->isRequestComplete = true;
             return;
         }

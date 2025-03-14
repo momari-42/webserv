@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/12 22:53:10 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 14:12:17 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ class Response : public MimeTypes, public HttpResponse
         int                                         fd[2];
         int                                         inout[2];
         int                                         fdClient;
+        // int                                         exitStatus;
 
     public:
         

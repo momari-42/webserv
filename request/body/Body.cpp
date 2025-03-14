@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/13 22:55:03 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 14:52:29 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,6 +267,7 @@ void Body::setChunkedCgiBody( std::string& body ) {
 void Body::setChunkedBody( std::string& body ) {
 
     if ( this->bodyRequestType == "chunked" && !this->cgi ) {
+        std::cout << "from chunked" << std::endl;
         this->errorCode = "400";
         return ;
     }

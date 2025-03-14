@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 11:20:16 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 15:03:19 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,13 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
         close(this->fd[0]);
         dup2(this->fd[1], 1);
         close(this->fd[1]);
-        if (execve(argv[0], argv, env) == -1)
-            exit(1);
+        if (execve(argv[0], argv, env) == -1) {
+            std::cout << "we are here " << std::endl;
+            exit(10);
+        }
     }
+    // else
+    //     waitpid(this->pid, &this->exitStatus, 0);
     struct kevent eventForDelete;
     struct kevent events[2];
 
@@ -150,9 +154,6 @@ void Response::sendRedirectionResponse( size_t fd, Location &location ) {
 }
 
 void Response::generateHeader ( int fd, std::string &response) {
-    // if (configFile.getReturn()) {
-    //     // we should generate a return response and return;
-    // }
     Location &location =  this->request->getLocation();
     if (!location.redirection.first.empty() && !location.redirection.second.empty()) {
         sendRedirectionResponse(fd, location);

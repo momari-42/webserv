@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 11:32:25 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 14:27:04 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,24 +257,26 @@ void Server::startServer() {
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_PROC && (this->readyEvents[i].fflags & NOTE_EXIT)) {
                     struct kevent   clientEvent;
-                    int             *fdClient = static_cast<int *>(this->readyEvents[i].udata);
+                    int             exitStatus = 0;
+                    int             *fdClient  = static_cast<int *>(this->readyEvents[i].udata);
 
-                    // this is for delete event proc
-                    std::cout << this->readyFd<< std::endl;
-                    // EV_SET(&clientEvent, this->readyFd, EVFILT_PROC, EV_DELETE, 0, 0, NULL);
-                    // if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
-                    //     // std::cout << "lolllllsdfdklsjfldjfldj     88 " << std::endl;
-                    //     throw (Server::ServerExceptions(strerror(errno)));
-                    // }
+                    waitpid(this->readyEvents[i].ident, &exitStatus, WNOHANG);
                     EV_SET(&clientEvent, this->readyFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
                     if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
                         std::cout << "lolllllsdfdklsjfldjfldj    99" << std::endl;
                         throw (Server::ServerExceptions(strerror(errno)));
                     }
-                    EV_SET(&clientEvent, *fdClient, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
-                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
-                        std::cout << "lolllllsdfdklsjfldjfldj" << std::endl;
-                        throw (Server::ServerExceptions(strerror(errno)));
+                    if (exitStatus) {
+                        Error error( *fdClient, "500" );
+                        error.sendErrorPage();
+                        close(*fdClient);
+                        this->clients.erase(*fdClient);
+                    } else {
+                        EV_SET(&clientEvent, *fdClient, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                            std::cout << "lolllllsdfdklsjfldjfldj" << std::endl;
+                            throw (Server::ServerExceptions(strerror(errno)));
+                        }
                     }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_TIMER ) {
