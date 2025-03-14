@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/09 22:57:13 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/13 15:54:28 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,6 +392,33 @@ std::vector<std::string> &ServerConfig::getIndex() {
     }
     return (this->index);
 }
+
+// bool        ServerConfig::isAllowedMethod(const std::string& path, const std::string& method) {
+//     std::vector<std::string>        matchedLocations;
+//     std::string                     bestMatchedLocation;
+
+//     this->matchedLocation = "";
+//     for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
+//         if ( path.find(it->first) == 0 )
+//             matchedLocations.push_back(it->first);
+//     }
+//     for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
+//         if ( (*it).size() > bestMatchedLocation.size()) {
+//             bestMatchedLocation = *it;
+//         }
+//     }
+//     if (bestMatchedLocation.size()) {
+//         this->matchedLocation = bestMatchedLocation;
+//         for (size_t i = 0; i < this->locations[this->matchedLocation].methods.size(); i++)
+//         {
+//             if (this->locations[this->matchedLocation].methods[i] == method)
+//                 return true;
+//         }
+//         return false;
+        
+//     }
+//     return false;
+// }
 
 size_t  ServerConfig::getBodyLimit() {
     return (this->bodyLimit);

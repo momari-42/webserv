@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/09 22:54:34 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/13 15:54:31 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,5 @@ public:
     std::string &getMatchedLocation();
     std::map<std::string, Location> &getLocations();
     // bool        getListing(const std::string& path);
-    // bool        isAllowedMethod(const std::string& path);
+    // bool        isAllowedMethod(const std::string& path, const std::string& method);
 };

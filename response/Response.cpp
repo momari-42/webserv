@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/13 14:34:21 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 10:59:48 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,7 +311,47 @@ void Response::methodPost( size_t fd ) {
 }
 
 void Response::methodDelete( size_t fd ) {
-    (void)fd;
+    std::string path = this->request->getRequestTarget();
+    if (access( path.c_str(), R_OK ) == -1 || isDirectory(path)) {
+        sendNoContentResponse(fd);
+        return;
+    }
+    if (unlink(path.c_str()) == -1) {
+        std::string response;
+        std::string body = "The file will delete by server later !!";
+
+        if (this->request->getHeader()->getValue("Connection") == "close") {
+            this->header["Connection"] = "close";
+        }
+        this->header["Content-Length"] = calculateBodyLength( body );
+        this->header["Content-Type"] = this->mime[".txt"];
+        this->header.erase("Transfer-Encoding");
+        response += this->httpVersion + " 202 " + this->statusCodes["202"] + CRLF;
+        for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
+            response += it->first + ": " + it->second + CRLF;
+        response += CRLF;
+        response += body;
+        write(fd, response.c_str(), response.size());
+        this->isResponseSent = true;
+        return;
+    } else {
+        std::string response;
+        std::string body = "File is deleted. !!";
+
+        if (this->request->getHeader()->getValue("Connection") == "close") {
+            this->header["Connection"] = "close";
+        }
+        this->header["Content-Length"] = calculateBodyLength( body );
+        this->header["Content-Type"] = this->mime[".txt"];
+        this->header.erase("Transfer-Encoding");
+        response += this->httpVersion + " 200 " + this->statusCodes["200"] + CRLF;
+        for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
+            response += it->first + ": " + it->second + CRLF;
+        response += CRLF;
+        response += body;
+        write(fd, response.c_str(), response.size());
+        this->isResponseSent = true;
+    }
 }
 
 bool Response::getIsResponseSent() {
