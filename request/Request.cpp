@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/13 14:29:05 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 10:53:02 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,10 @@ void Request::parseRequest ( std::string requestData ) {
             }
             this->index = this->configFile->getIndex();
             if (this->requestTarget.find(".php") != std::string::npos || this->requestTarget.find(".py") != std::string::npos) {
-                std::vector<std::string>::iterator it = std::find(this->location.cgi.begin(), this->location.cgi.end(), this->requestTarget.substr(this->requestTarget.find(".php"), 4));
-                if (it != this->location.cgi.end())
+                this->cgiExtention = ".php";
+                if (this->requestTarget.find(".py") != std::string::npos)
+                    this->cgiExtention = ".py";
+                if (this->location.cgi.count(this->cgiExtention))
                     this->cgi = true;
             }
             this->checkRequestLine = true;
@@ -171,4 +173,8 @@ Location &Request::getLocation() {
 
 bool Request::getCgi() {
     return (this->cgi);
+}
+
+std::string Request::getCgiExtention() {
+    return (this->cgiExtention);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/13 15:12:21 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/14 11:20:43 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ class Server
         int                             numberOfRequest;
 
         std::map<size_t, size_t>        timeout;
+
+
         
         // this is the attributte of the starting server;
         int                             kq;

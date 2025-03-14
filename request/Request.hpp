@@ -23,6 +23,10 @@ class Request
 {
     private:
         bool                cgi;
+        std::string         cgiExtention;
+
+
+
         std::string         path;
         std::string         root;
         Location            location;
@@ -68,6 +72,7 @@ class Request
         std::string &getRoot();
         std::string &getRequestTarget();
         Location    &getLocation();
+        std::string getCgiExtention();
         bool        getCgi();
 
         bool        getBodyComplete( void);

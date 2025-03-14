@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/13 15:54:31 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/13 22:34:31 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ public:
     std::string                                      root;
     std::vector<std::string>                         methods;
     std::pair<std::string, std::string>              redirection;
-    std::vector<std::string>                         cgi;
+    std::map<std::string, std::string>               cgi;
     bool                                             listing;
     bool                                             upload;
 
@@ -86,5 +86,5 @@ public:
     std::string &getMatchedLocation();
     std::map<std::string, Location> &getLocations();
     // bool        getListing(const std::string& path);
-    // bool        isAllowedMethod(const std::string& path, const std::string& method);
+    // bool        isAllowedMethod(const std::string& path);
 };

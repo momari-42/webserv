@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/13 15:54:28 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/13 22:34:52 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,10 +307,8 @@ void Location::setCgi(std::vector<std::string>& parts) {
         throw ErrorHandling("Wrong number of arguments in cgi of Location " + this->path);
     if (parts[1][0] != '.' || parts[1].size() < 2)
         throw ErrorHandling("Cgi Extention invalid of Location " + this->path);
-    else {
-        this->cgi.push_back(parts[1]);
-        this->cgi.push_back(parts[2]);
-    }
+    else
+        this->cgi[parts[1]] = parts[2];
 }
 
 void Location::parseLocation(std::string& config) {
@@ -392,33 +390,6 @@ std::vector<std::string> &ServerConfig::getIndex() {
     }
     return (this->index);
 }
-
-// bool        ServerConfig::isAllowedMethod(const std::string& path, const std::string& method) {
-//     std::vector<std::string>        matchedLocations;
-//     std::string                     bestMatchedLocation;
-
-//     this->matchedLocation = "";
-//     for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
-//         if ( path.find(it->first) == 0 )
-//             matchedLocations.push_back(it->first);
-//     }
-//     for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
-//         if ( (*it).size() > bestMatchedLocation.size()) {
-//             bestMatchedLocation = *it;
-//         }
-//     }
-//     if (bestMatchedLocation.size()) {
-//         this->matchedLocation = bestMatchedLocation;
-//         for (size_t i = 0; i < this->locations[this->matchedLocation].methods.size(); i++)
-//         {
-//             if (this->locations[this->matchedLocation].methods[i] == method)
-//                 return true;
-//         }
-//         return false;
-        
-//     }
-//     return false;
-// }
 
 size_t  ServerConfig::getBodyLimit() {
     return (this->bodyLimit);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/13 15:33:15 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/14 11:32:25 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,26 +99,6 @@ bool Server::findFdSocket ( size_t sockfd ) {
     return (false);
 }
 
-// void Server::addPollFd(int fd, short events) {
-//     struct pollfd po;
-//     po.fd = fd;
-//     po.events = events;
-//     po.revents = 0;
-    
-//     this->poll_fds.push_back(po);
-// }
-
-// void Server::removeClient(int fd) {
-//     close(fd);
-//     this->clients.erase(fd);
-//     for (size_t i = 0; i < this->poll_fds.size(); i++) {
-//         if (this->poll_fds[i].fd == fd)
-//             this->poll_fds.erase(this->poll_fds.begin() + i);
-//     }
-//     this->timeout.erase(fd);
-// }
-
-
 void Server::startServer() {
     int             number = 0;
     struct kevent   events[this->sockets.size()];
@@ -139,11 +119,11 @@ void Server::startServer() {
     
     //----------------------------------------------//
     //----------------------------------------------//
-    
+
     struct timespec time;
     time.tv_sec = 1;
     time.tv_nsec = 0;
-    
+
     kq = kqueue();
     if ( kq == -1 )
         throw (Server::ServerExceptions(strerror(errno)));
@@ -168,21 +148,23 @@ void Server::startServer() {
                 if ( findFdSocket(this->readyFd) ) {
                     struct kevent clientEvent;
 
+                    fcntl(this->readyFd, F_SETFL, O_NONBLOCK);
                     this->sockfdClient = accept(this->readyFd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
-                    fcntl(this->sockfdClient, F_SETFL, O_NONBLOCK);
 
                     if (this->sockfdClient == -1) {
                         std::cout << "Problem in accept function" << std::endl; 
                         throw (ServerExceptions(strerror(errno)));
                     }
                     EV_SET(&clientEvent, this->sockfdClient, EVFILT_READ, EV_ADD, 0, 0, NULL);
-                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                        std::cout << "lolllllsdfdklsjfldjfldj" << std::endl;
                         throw (Server::ServerExceptions(strerror(errno)));
+                    }
                     this->clients[this->sockfdClient].setConfig(this->readyFd, this->sockets);
                     this->timeout[this->sockfdClient] = std::time(NULL);
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_READ ) {
-                    this->timeout[this->sockfdClient] = std::time(NULL);
+                    this->timeout[this->readyFd] = std::time(NULL);
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
                     if (bytesRead <= 0) {
                         std::cout << "Client disconnected" << std::endl;
@@ -202,8 +184,10 @@ void Server::startServer() {
                         Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() );
                         error.sendErrorPage();
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                            std::cout << "lolllllsdfdklsjfldjf    1" << std::endl;
                             throw (Server::ServerExceptions(strerror(errno)));
+                        }
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
                     }
@@ -211,15 +195,20 @@ void Server::startServer() {
                         struct kevent clientEvent;
 
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
-                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                            std::cout << "lolllllsdfdklsjfldjfldj   2" << std::endl;
                             throw (Server::ServerExceptions(strerror(errno)));
+                        }
 
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                            std::cout << "lolllllsdfdklsjfldjfldj   3" << std::endl;
                             throw (Server::ServerExceptions(strerror(errno)));
+                        }
                     }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
+                    this->timeout[this->readyFd] = std::time(NULL);
                     this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident, kq );
                     if ( this->clients[this->readyEvents[i].ident].getResponse().getErrorCode().size() ) {                        
                         struct kevent clientEvent;
@@ -228,8 +217,9 @@ void Server::startServer() {
                         Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getResponse().getErrorCode() );
                         error.sendErrorPage();
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                        if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
                             throw (Server::ServerExceptions(strerror(errno)));
+                        }
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
                     }
@@ -239,8 +229,10 @@ void Server::startServer() {
                             struct kevent clientEvent;
 
                             EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                                std::cout << "lolllllsdfdklsjfldjfldj       5" << std::endl;
                                 throw (Server::ServerExceptions(strerror(errno)));
+                            }
                             close(this->readyEvents[i].ident);
                             this->clients.erase(this->readyEvents[i].ident);
                         }
@@ -249,11 +241,15 @@ void Server::startServer() {
                             struct kevent clientEvent;
 
                             EV_SET(&clientEvent, this->readyFd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                                std::cout << "lolllllsdfdklsjfldjfldj    6" << std::endl;
                                 throw (Server::ServerExceptions(strerror(errno)));
+                            }
                             EV_SET(&clientEvent, this->readyFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                            if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                                std::cout << "lolllllsdfdklsjfldjfldj    7" << std::endl;
                                 throw (Server::ServerExceptions(strerror(errno)));
+                            }
                             this->clients[this->readyFd].getRequest().resetAttributes();
                             this->clients[this->readyFd].getResponse().resetAttributes();
                         }
@@ -263,20 +259,38 @@ void Server::startServer() {
                     struct kevent   clientEvent;
                     int             *fdClient = static_cast<int *>(this->readyEvents[i].udata);
 
-                    EV_SET(&clientEvent, *fdClient, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
-                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                    // this is for delete event proc
+                    std::cout << this->readyFd<< std::endl;
+                    // EV_SET(&clientEvent, this->readyFd, EVFILT_PROC, EV_DELETE, 0, 0, NULL);
+                    // if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                    //     // std::cout << "lolllllsdfdklsjfldjfldj     88 " << std::endl;
+                    //     throw (Server::ServerExceptions(strerror(errno)));
+                    // }
+                    EV_SET(&clientEvent, this->readyFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                        std::cout << "lolllllsdfdklsjfldjfldj    99" << std::endl;
                         throw (Server::ServerExceptions(strerror(errno)));
+                    }
+                    EV_SET(&clientEvent, *fdClient, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                        std::cout << "lolllllsdfdklsjfldjfldj" << std::endl;
+                        throw (Server::ServerExceptions(strerror(errno)));
+                    }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_TIMER ) {
                     struct kevent   clientEvent;
                     int             *fdClient = static_cast<int *>(this->readyEvents[i].udata);
 
                     EV_SET(&clientEvent, this->readyFd, EVFILT_PROC, EV_DELETE, 0, 0, NULL);
-                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                        std::cout << "lolllllsdfdklsjfldjfldj     8 " << std::endl;
                         throw (Server::ServerExceptions(strerror(errno)));
+                    }
                     EV_SET(&clientEvent, this->readyFd, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
-                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1)
+                    if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
+                        std::cout << "lolllllsdfdklsjfldjfldj    9" << std::endl;
                         throw (Server::ServerExceptions(strerror(errno)));
+                    }
                     kill(this->readyFd, SIGKILL);
                     Error error( *fdClient, "504" );
                     error.sendErrorPage();

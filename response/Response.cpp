@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 10:59:48 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/14 11:20:16 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,10 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
         requestTarget.erase(queryPos);
     }
     setenv("QUERY_STRING", queryString.c_str(), 1);
-    char *argv[] = {const_cast<char *>("/usr/bin/php"), const_cast<char *>(requestTarget.c_str()), NULL};
+    char *argv[3];
+    argv[0] = const_cast<char *>( this->request->getLocation().cgi[this->request->getCgiExtention()].c_str());
+    argv[1] = const_cast<char *>( requestTarget.c_str());
+    argv[2] = NULL;
     char *env[] = { const_cast<char *>(queryString.c_str()), NULL};
     pipe(this->fd);
     this->pid = fork();
@@ -217,13 +220,14 @@ void Response::methodGet( size_t fd ) {
     if ( this->isResponseSent || this->errorCode.size())
         return;
     memset(buffer, 0, sizeof(buffer));
-    if (this->request->getCgi())
+    if (this->request->getCgi()) {
+        std::cout << "hohhohohohohhoooh : " << this->fd[0] << std::endl;
         bytesRead = read(this->fd[0], buffer, BUFFER_SIZE_R);
+    }
     else {
         targetFile.read(buffer, BUFFER_SIZE_R);
         bytesRead = targetFile.gcount();
     }
-
     if (bytesRead > 0) {
         std::string content(buffer, bytesRead);
         std::string hexaNumber = convertDecimalToHexaToString(bytesRead); 
@@ -294,7 +298,6 @@ void Response::sendSuccessResponse( size_t fd ) {
 }
 
 void Response::methodPost( size_t fd ) {
-    std::cout << "the content lenght is " << this->request->getHeader()->getValue("Content-Length") << ", and the body contnent is " << this->request->getBody()->getBodyLength() << std::endl;
     if (this->request->getHeader()->getValue("Content-Length").size()) {
         size_t contentLength = strtod(this->request->getHeader()->getValue("Content-Length").c_str(), NULL);
         if (contentLength != this->request->getBody()->getBodyLength()) {
@@ -306,8 +309,12 @@ void Response::methodPost( size_t fd ) {
             return ;
         }
     }
-    sendSuccessResponse(fd);
-    this->isResponseSent = true;
+    if (this->request->getCgi())
+        methodGet(fd);
+    else
+        sendSuccessResponse(fd);
+    if (!this->request->getCgi())
+        this->isResponseSent = true;
 }
 
 void Response::methodDelete( size_t fd ) {
