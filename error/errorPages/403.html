@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 120px;
+            margin: 0;
+            color: #666;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #ff5733;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 20px 0;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .red-pill {
+            background-color: red;
+            color: white;
+            box-shadow: 0px 0px 10px red;
+        }
+
+        .red-pill:hover {
+            background-color: darkred;
+            box-shadow: 0px 0px 15px darkred;
+        }
+
+        .blue-pill {
+            background-color: blue;
+            color: white;
+            box-shadow: 0px 0px 10px blue;
+        }
+
+        .blue-pill:hover {
+            background-color: darkblue;
+            box-shadow: 0px 0px 15px darkblue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>403</h1>
+        <h2>OOPS! FORBIDDEN.</h2>
+        <p>
+            You take the blue pill, the story ends, you end up on our homepage, and believe whatever you want to believe.
+            You take the red pill, you stay in wonderland, and I show you how deep the rabbit hole goes.
+        </p>
+        <div class="buttons">
+            <a href="/" class="btn red-pill">Get Prepared</a>
+            <a href="/" class="btn blue-pill">Home Page</a>
+        </div>
+    </div>
+</body>
+</html>

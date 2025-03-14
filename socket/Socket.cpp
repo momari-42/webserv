@@ -1,0 +1,117 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Socket.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
+/*   Updated: 2025/03/09 11:05:12 by momari           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include  "Socket.hpp"
+#include <fstream>
+
+void Socket::setServer(ServerConfig *server) {
+    std::cout << "Push One Server" << std::endl;
+    this->servers.push_back(server);
+}
+int Socket::getPort() {
+    return this->port;
+}
+std::string& Socket::getHost() {
+    return this->host;
+}
+
+void Socket::setSockOption (void) {
+    int option; 
+    
+    option = setsockopt(this->sockfd, SOL_SOCKET, SO_REUSEADDR, &this->addressServer, sizeof(this->addressServer));
+    if (option == -1) {
+        throw (SocketExceptions(strerror(errno)));
+    }
+    // std::cout << "looooool" << std::endl;
+
+}
+
+ServerConfig* Socket::getServerConfig(std::string serverName) {
+    // std::cout << "get Server config " << std::endl;
+    // std::cout << "Hi " << this->servers.size() << std::endl;
+    for (std::vector<ServerConfig*>::iterator it = this->servers.begin(); it != this->servers.end(); it++) {
+        // std::cout << "loool" << std::endl;
+        if ((*it)->isExistName(serverName)) {
+            // std::cout << "loool222222" << std::endl;
+            return *it;
+            
+        }
+    }
+    return ((*this->servers.begin()));
+}
+
+Socket::Socket ( int port, const std::string& host , ServerConfig *server) {
+    // close(this->sockfd);
+    (void) host;
+    this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->sockfd == -1) {
+        std::cout << "Problem in socket function" << std::endl;
+        throw (SocketExceptions(strerror(errno)));
+    }
+    this->backlog = 5;
+
+    // Init client and server struct with 0;
+    memset(&this->addressServer, 0, sizeof(this->addressServer));
+
+    // Specifies that the socket will use IPv4 addresses
+    this->addressServer.sin_family = AF_INET;
+    // Specifies the port number
+    this->addressServer.sin_port = htons(port);
+    // Specific IP address in this case htonl(INADDR_LOOPBACK) = 127.0.0.1
+    this->addressServer.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    Socket::setSockOption();
+    this->servers.push_back(server);
+}
+
+Socket::~Socket ( void ) {
+}
+
+void Socket::socketBinding ( void ) {
+    int status;
+
+    // The bind function link the socket file descriptor with a specific socket address (IP Adress and Port Number)
+    status = bind(this->sockfd, reinterpret_cast<const sockaddr *>(&this->addressServer), sizeof(this->addressServer));
+    if (status == -1) {
+        std::cout << "Problem in bind function" << std::endl;
+        throw (SocketExceptions(strerror(errno)));
+    }
+}
+
+void Socket::socketListning ( void ) {
+    int status;
+
+    status = listen(this->sockfd, this->backlog);
+    if (status == -1) {
+        std::cout << "Problem in listen function" << std::endl;
+        throw (SocketExceptions(strerror(errno)));
+    }
+}
+
+size_t Socket::getSockfd ( void ) {
+    return (this->sockfd);
+}
+
+void Socket::initializeSocketCommunication ( void ) {
+    Socket::socketBinding() ;
+    Socket::socketListning();
+}
+
+
+
+Socket::SocketExceptions::SocketExceptions ( const std::string& errorMsg ) {
+    this->errorMsg = errorMsg;
+}
+
+const char* Socket::SocketExceptions::what() const throw() {
+    return (this->errorMsg.c_str());
+}
+
