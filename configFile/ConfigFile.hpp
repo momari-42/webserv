@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/13 22:34:31 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/15 10:32:35 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ private:
 
 class ServerConfig {
 private:
-    std::vector<std::pair<int, const std::string> > ports;
+    std::vector<std::pair<const std::string, const std::string> > ports;
     std::vector<std::string>                        names;
     std::vector<std::string>                        index;
     std::string                                     root;
@@ -77,7 +77,7 @@ public:
     // Geters
 
     
-    std::vector<std::pair<int, const std::string> > getPorts();
+    std::vector<std::pair<const std::string, const std::string> > getPorts();
     std::string getRoot( std::string& path, std::string &errorCode);
     std::vector<std::string> &getIndex();
     // std::string getRedirection(const std::string& path);

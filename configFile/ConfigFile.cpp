@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/13 22:34:52 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/15 10:33:43 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@ ServerConfig::ServerConfig() {
 }
 
 bool ServerConfig::operator==(ServerConfig& obj) {
-    for (std::vector<std::pair<int, const std::string> >::iterator it = this->ports.begin(); it != this->ports.end(); it++) {
-        for (std::vector<std::pair<int, const std::string> >::iterator iter = obj.ports.begin(); iter != obj.ports.end(); iter++) {
+    for (std::vector<std::pair<const std::string, const std::string> >::iterator it = this->ports.begin(); it != this->ports.end(); it++) {
+        for (std::vector<std::pair<const std::string, const std::string> >::iterator iter = obj.ports.begin(); iter != obj.ports.end(); iter++) {
             if (it->first == iter->first && it->second == iter->second) {
                 for (std::vector<std::string>::iterator name = this->names.begin(); name != this->names.end(); name++) {
                     for (std::vector<std::string>::iterator name1 = obj.names.begin(); name1 != obj.names.end(); name1++) {
@@ -48,7 +48,7 @@ void ServerConfig::showServerConfig() {
         std::cout << "|" << (*it) << "|";
     }
     std::cout << std::endl <<"Server Ports : " << std::endl;
-    for (std::vector<std::pair<int, const std::string> >::iterator it = this->ports.begin(); it != this->ports.end(); it++)
+    for (std::vector<std::pair<const std::string, const std::string> >::iterator it = this->ports.begin(); it != this->ports.end(); it++)
         std::cout << "|" << it->first << "|" << it->second << "|" << std::endl;
     std::cout <<"Error Pages : \n";
     for (std::map<std::string, std::string>::iterator it = this->errorPages.begin(); it != this->errorPages.end(); it++)
@@ -107,7 +107,7 @@ void ServerConfig::setPorts(std::vector<std::string>& parts) {
         if(!ft_isdigits(port) || port.size() > 5)
             throw ErrorHandling("listen port is not digit or too long");
         else
-            this->ports.push_back(std::make_pair(atoi(port.c_str()), host));
+            this->ports.push_back(std::make_pair(port, host));
         if (atoi(port.c_str()) < 0 || atoi(port.c_str()) > 65535)
             throw ErrorHandling("One of the ports is out of range");
     } 
@@ -237,7 +237,7 @@ void ServerConfig::parse(std::string& config) {
 
 void ServerConfig::checkRequirement() {
     if (!this->ports.size())
-        this->ports.push_back(std::make_pair(8080, "127.0.0.1"));
+        this->ports.push_back(std::make_pair("8080", "127.0.0.1"));
     if (!this->names.size())
         this->names.push_back("localhost");
     if (!this->index.size())
@@ -352,7 +352,7 @@ void Location::parseLocation(std::string& config) {
 
 // ============================ Geters ================================
 
-std::vector<std::pair<int, const std::string> > ServerConfig::getPorts() {
+std::vector<std::pair<const std::string, const std::string> > ServerConfig::getPorts() {
     return ports;
 }
 

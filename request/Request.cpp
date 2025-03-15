@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/14 15:17:42 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/14 15:56:18 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,12 @@ void Request::parseRequest ( std::string requestData ) {
     }
     if (this->trackingRequestNumber == 2) {
 
+        if (this->requestLine.getMethod() == "GET" || this->requestLine.getMethod() == "DELETE") {
+            requestData.clear();
+            // requestData = "";
+            this->isRequestComplete = true;
+            return;
+        }
         if (!this->checkRequestLine) {
             this->configFile =  this->socket->getServerConfig(this->header.getValue("Host"));
             this->body.setConfigFile(this->socket->getServerConfig(this->header.getValue("Host")));
@@ -89,11 +95,6 @@ void Request::parseRequest ( std::string requestData ) {
                     this->cgi = true;
             }
             this->checkRequestLine = true;
-        }
-        if (this->requestLine.getMethod() == "GET" || this->requestLine.getMethod() == "DELETE") {
-            requestData.clear();
-            this->isRequestComplete = true;
-            return;
         }
         this->body.setBody( requestData, this->cgi );
     }

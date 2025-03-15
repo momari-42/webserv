@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 15:03:19 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/15 11:09:54 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,6 +392,7 @@ void Response::resetAttributes() {
 }
 
 void Response::setSocket( Socket *socket ) {
+    std::cout << "I'm here body if YOU NEED ME!!" << std::endl;
     this->socket = socket;
 }
 

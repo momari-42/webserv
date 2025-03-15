@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 14:27:04 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/15 11:04:17 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,8 @@ Server::Server ( std::string& config ) {
     // The old part
     this->lenSocket = sizeof(this->addressClient);
     for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it != this->configs.end(); it++) {
-        std::vector<std::pair<int, const std::string> > ports = (*it).getPorts();
-        for (std::vector<std::pair<int, const std::string> >::iterator iter = ports.begin(); iter != ports.end(); iter++) {
+        std::vector<std::pair<const std::string, const std::string> > ports = (*it).getPorts();
+        for (std::vector<std::pair<const std::string, const std::string> >::iterator iter = ports.begin(); iter != ports.end(); iter++) {
             if (!checkSockets((*iter).second, (*iter).first, &(*it)))
                 continue;
             Socket soc((*iter).first, (*iter).second, &(*it));
@@ -71,7 +71,7 @@ Server::Server ( std::string& config ) {
     this->numberOfRequest = 0;
 }
 
-bool Server::checkSockets(std::string host, int port, ServerConfig* server) {
+bool Server::checkSockets(std::string host, std::string port, ServerConfig* server) {
     for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
         if ((*it).getHost() == host && (*it).getPort() == port) {
             (*it).setServer(server);

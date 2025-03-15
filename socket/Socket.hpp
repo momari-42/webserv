@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/06 14:33:15 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/15 10:39:03 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class Socket
 {
     private:
         std::string                 host;
-        int                         port;
+        std::string                 port;
         int                         sockfd;
         struct sockaddr_in          addressServer;
         int                         backlog;
@@ -37,10 +37,10 @@ class Socket
 
     public:
         std::vector<ServerConfig*>  servers;
-        Socket ( int port, const std::string& host , ServerConfig *server);
+        Socket ( const std::string& port, const std::string& host , ServerConfig *server);
         ~Socket ( );
         void setServer(ServerConfig *server);
-        int getPort();
+        std::string& getPort();
         std::string& getHost();
         size_t getSockfd();
         ServerConfig* getServerConfig(std::string serverName);

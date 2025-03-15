@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 11:20:43 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/15 10:38:09 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ class Server
         // this function check if sockfd exist in sockets container
         bool findFdSocket ( size_t sockfd );
         void checkServersConflict();
-        bool checkSockets(std::string host, int port, ServerConfig* server);
+        bool checkSockets(std::string host, std::string port, ServerConfig* server);
     public:
         void startServer();
         Server ( std::string& config );
