@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/15 10:33:43 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/16 22:46:35 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 ServerConfig::ServerConfig() {
     this->URILimit = 4096;
-    this->bodyLimit = 133742;
+    this->bodyLimit = 2147483647;
 }
 
 bool ServerConfig::operator==(ServerConfig& obj) {
@@ -62,9 +62,9 @@ void ServerConfig::showServerConfig() {
     std::cout << "Locations"<< std::endl;
     for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
         std::cout << (*it).first << std::endl;
-        (*it).second.showLocation();
+        // (*it).second.showLocation();
     }
-    std::cout <<  "------------------------------ End Server ------------------------" << std::endl;
+    // std::cout <<  "------------------------------ End Server ------------------------" << std::endl;
 }
 
 void Location::showLocation() {
@@ -204,8 +204,10 @@ void ServerConfig::parse(std::string& config) {
         parts.clear();
         line = config.substr(0, config.find('\n'));
         line.erase(0, line.find_first_not_of(" \t\n"));
-        if (!line.size())
+        if (!line.size()) {
+            config.erase(0, config.find('\n') + 1);
             continue;
+        }
         if (line.compare(0, 9, "location ") && line.find(';') == std::string::npos)
             throw (ErrorHandling("Syntax Error: Line not closed with [;]"));
         ft_split(line, parts);
@@ -329,8 +331,10 @@ void Location::parseLocation(std::string& config) {
         }
         line = config.substr(0, config.find('\n') + 1);
         line.erase(0, line.find_first_not_of(" \t\n"));
-        if (!line.size())
+        if (!line.size()) {
+            config.erase(0, config.find('\n') + 1);
             continue;
+        }
         ft_split(line, parts);
         if (parts[0] == "index")
             setIndex(parts);

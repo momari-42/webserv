@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/15 11:23:12 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/16 22:43:35 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,9 @@ ServerConfig* Socket::getServerConfig(std::string serverName) {
             
     //     }
     // }
-    std::cout << "Before all the things " << this->servers.size() << std::endl;
+    // std::cout << "Before all the things " << this->servers.size() << std::endl;
     for (size_t i = 0; i < this->servers.size(); i++) {
-        std::cout << "This the server number : " << i << std::endl;
+        // std::cout << "This the server number : " << i << std::endl;
         if(this->servers[i]->isExistName(serverName))
             return (this->servers[i]);
     }

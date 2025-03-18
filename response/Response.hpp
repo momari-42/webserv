@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 14:12:17 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/18 02:32:15 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ class Response : public MimeTypes, public HttpResponse
     private:
         Socket*                                     socket;
         ServerConfig*                               configFile;
+        Location                                    location;
         bool                                        initiatConfigFile;
         // this for error Code
         std::string                                 errorCode;

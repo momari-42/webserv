@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/14 15:56:18 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/16 23:43:54 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,14 @@ void Request::validateMethod(std::string &method, std::vector<std::string> &meth
         this->errorCode = "405";
 }
 
-static bool isDirectory(std::string &path) {
-    DIR *dir = opendir(path.c_str());
-    if (dir) {
-        closedir(dir);
-        return (true);
-    }
-    return (false);
-}
+// static bool isDirectory(std::string &path) {
+//     DIR *dir = opendir(path.c_str());
+//     if (dir) {
+//         closedir(dir);
+//         return (true);
+//     }
+//     return (false);
+// }
 
 void Request::parseRequest ( std::string requestData ) {
     if (this->trackingRequestNumber == 0) {
@@ -52,13 +52,6 @@ void Request::parseRequest ( std::string requestData ) {
         this->header.setHeader(requestData, this->trackingRequestNumber);
     }
     if (this->trackingRequestNumber == 2) {
-
-        if (this->requestLine.getMethod() == "GET" || this->requestLine.getMethod() == "DELETE") {
-            requestData.clear();
-            // requestData = "";
-            this->isRequestComplete = true;
-            return;
-        }
         if (!this->checkRequestLine) {
             this->configFile =  this->socket->getServerConfig(this->header.getValue("Host"));
             this->body.setConfigFile(this->socket->getServerConfig(this->header.getValue("Host")));
@@ -76,14 +69,11 @@ void Request::parseRequest ( std::string requestData ) {
                 this->root += '/';
             if (this->path.size() && this->path.at(0) == '/')
                 this->path.erase(0, 1);
-            this->requestTarget = this->root + this->path;
+            if (this->requestLine.getMethod() == "POST" && this->path.find(".php") != std::string::npos && this->path.find(".py") != std::string::npos) 
+                this->requestTarget = this->root;
+            else
+                this->requestTarget = this->root + this->path;
             this->body.setRequestTarget(this->requestTarget);
-            if (this->requestLine.getMethod() == "POST") {
-                if (!isDirectory(this->requestTarget)) {
-                    this->errorCode = "404";
-                    return;
-                }
-            }
             this->index = this->configFile->getIndex();
             if ( this->requestLine.getMethod() != "DELETE" &&
                     (this->requestTarget.find(".php") != std::string::npos
@@ -96,7 +86,7 @@ void Request::parseRequest ( std::string requestData ) {
             }
             this->checkRequestLine = true;
         }
-        this->body.setBody( requestData, this->cgi );
+        this->body.setBody( requestData, this->cgi, this->requestLine.getMethod() );
     }
 }
 

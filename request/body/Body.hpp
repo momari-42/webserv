@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/12 23:50:00 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/16 13:20:45 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,7 @@
 
 typedef struct  boundaryData {
     std::string name;
-    std::string filename;
-    std::string contenet;
+    std::string content;
     bool        isFile;
     bool        isHeaderComplete;
     bool        isBodyComplete;
@@ -45,7 +44,7 @@ class Body : public EmimTypes
         // this is a pointer to header request
         Header                              *header;
 
-        size_t                             bodyLength;
+        // size_t                             bodyLength;
         // this attributes is for content length parse
         size_t                             contentLength;
         std::string                        randomeContentLengthName;
@@ -64,10 +63,12 @@ class Body : public EmimTypes
 
         ServerConfig                        *configFile;
         
+        std::string                         method;
         // this variables are all for cgi http request
         bool                                cgi;
         bool                                isShunked;
         // std::map<std::string, std::string>         mime;
+        std::string                         boundryToken;
         
         void generateRandomeName( std::string& name );
         void setChunkedBody( std::string& body );
@@ -81,7 +82,7 @@ class Body : public EmimTypes
     public:
         Body( Header *header, bool &isRequestComplete, std::string &errorCode );
         void printBody( void );
-        void setBody( std::string& body, bool &cgi );
+        void setBody( std::string& body, bool &cgi, std::string &method );
         void parseBoundaryHeader(const std::string& header);
 
         void resetAttributes (void);
@@ -90,6 +91,7 @@ class Body : public EmimTypes
         void setRequestTarget(std::string &requestTarget);
         void checkAccess( std::string &requestTarget );
         void manageFile(const std::string fileName, const std::string data );
+        void manageExistinceFile(std::string &fileName);
         std::string getBodyRequestType();
         size_t getBodyLength();
         

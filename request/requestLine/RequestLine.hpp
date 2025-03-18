@@ -6,13 +6,14 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:10:34 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/09 21:34:23 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/18 00:43:08 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "../../utils/utils.hpp"
+#include <sstream>
 
 class RequestLine
 {

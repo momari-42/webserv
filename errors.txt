@@ -1,0 +1,10 @@
+1 - two file descriptors one for la7ya and one for momari.py
+2 - i must set all the headers in the env and pass it to execve.
+3 - active listing on off
+
+
+
+
+
+4 - resinsing
+6 - request get or delete max body

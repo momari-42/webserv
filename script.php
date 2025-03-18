@@ -5,7 +5,6 @@ header("Content-Type: text/html");
 
 // Get the query string
 $query_string = getenv("QUERY_STRING");
-
 // Parse query parameters
 parse_str($query_string, $params);
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/15 11:04:17 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/17 23:05:08 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ Server::Server ( std::string& config ) {
         ServerConfig server;
         server.parse(serverInfo);
         this->configs.push_back(server);
-        server.showServerConfig();
+        // server.showServerConfig();
     }
     checkServersConflict();
     
@@ -185,7 +185,7 @@ void Server::startServer() {
                         error.sendErrorPage();
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
                         if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
-                            std::cout << "lolllllsdfdklsjfldjf    1" << std::endl;
+                            // std::cout << "lolllllsdfdklsjfldjf    1" << std::endl;
                             throw (Server::ServerExceptions(strerror(errno)));
                         }
                         close(this->readyEvents[i].ident);
@@ -194,6 +194,7 @@ void Server::startServer() {
                     else if (this->clients[this->readyEvents[i].ident].getRequest().getBodyComplete() == true) {
                         struct kevent clientEvent;
 
+                        // std::cout << "the Read event for the request target << " << this->clients[this->readyEvents[i].ident].getRequest().getRequestLine()->getRequestTarget() << " >> is completed;"  << std::endl;
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
                         if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
                             std::cout << "lolllllsdfdklsjfldjfldj   2" << std::endl;
@@ -202,7 +203,7 @@ void Server::startServer() {
 
                         EV_SET(&clientEvent, this->readyEvents[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
                         if (kevent(kq, &clientEvent, 1, NULL, 0, NULL) == -1) {
-                            std::cout << "lolllllsdfdklsjfldjfldj   3" << std::endl;
+                            // std::cout << "lolllllsdfdklsjfldjfldj   3" << std::endl;
                             throw (Server::ServerExceptions(strerror(errno)));
                         }
                     }
@@ -224,7 +225,7 @@ void Server::startServer() {
                         this->clients.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
-                        if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("Connection") == "close") {
+                        if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("CONNECTION") == "close") {
                             std::cout << "\033[32mreqeust  closed : " << this->numberOfRequest++  << "\033[0m" << std::endl;
                             struct kevent clientEvent;
 
@@ -267,6 +268,7 @@ void Server::startServer() {
                         throw (Server::ServerExceptions(strerror(errno)));
                     }
                     if (exitStatus) {
+                        std::cout << "lolllllsdfdklsjfldjfldj    99 : " << WEXITSTATUS(exitStatus)  << std::endl;
                         Error error( *fdClient, "500" );
                         error.sendErrorPage();
                         close(*fdClient);

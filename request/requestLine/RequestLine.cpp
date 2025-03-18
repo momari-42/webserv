@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestLine.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/14 15:47:40 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/18 01:57:17 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,33 +17,70 @@ RequestLine::RequestLine( std::string &errorCode ) : errorCode(errorCode) {
 } 
 
 void RequestLine::validateMethod( ) {
-    std::cout << "the method is : " << this->method << std::endl;
+    // std::cout << "the method is : " << this->method << std::endl;
     if ((this->method != "GET" && this->method != "POST" && this->method != "DELETE")
         || (this->requestTarget.find("/") == std::string::npos)
         ||  (this->httpVersion != "HTTP/1.1")) {
-        std::cout <<  "from validateMethod" << std::endl;
+        // std::cout <<  "from validateMethod" << std::endl;
         this->errorCode = "400";
         return ;
     }
 }
 
 
+static char hexToChar(const std::string hexString) {
+    int result = 0;
+    std::istringstream iss(hexString);
+    iss >> std::hex >> result;
+    return static_cast<char>(result);
+}
+
+static bool isHexadecimal( std::string &hexString ) {
+    for (size_t n = 1; n < hexString.size(); n++ ){
+        if ( !std::isxdigit(hexString.at(n)) )
+            return (false);
+    }
+    return (true);
+}
+
+static void  decodeUrlEncodedCharacters( std::string &requestTarget ) {
+    std::string portion;
+    char        sCharacter;
+
+    while ( requestTarget.find("%") != std::string::npos ) {
+        portion = requestTarget.substr(requestTarget.find("%"));
+        size_t pos = requestTarget.find("%");    
+        if (portion.size() < 3)
+            break;
+        portion = portion.substr(0, 3);
+        if ( isHexadecimal( portion) ) {
+            sCharacter = hexToChar(portion.substr(1, 2));
+            requestTarget.erase(pos, 3);
+            requestTarget.insert(pos, 1, sCharacter);
+        } else {
+            requestTarget.erase(pos, 1);
+            requestTarget.insert(pos, 1, '\x15');
+        }
+    }
+    while ( requestTarget.find('\x15') != std::string::npos ) {
+        size_t pos = requestTarget.find('\x15');
+        requestTarget.erase(pos, 1);
+        requestTarget.insert(pos, 1, '%');
+    }
+}
+
 void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequestNumber ) {
     this->rest += requestLine;
-    std::cout << "---------------------------------------------------------------------------------" << std::endl;
-    std::cout << requestLine << std::endl;
-    std::cout << "---------------------------------------------------------------------------------" << std::endl;
     if (this->rest.find("\r\n") != std::string::npos) {
         this->tempraryRequestLine = this->rest.substr(0, this->rest.find("\r\n"));
-        // std::cout << this->rest.find("\r\n") <<  " : this is the rest |" << this->tempraryRequestLine << "|" << std::endl;
+        // std::cout << "-->" << this->tempraryRequestLine << "<--" << std::endl;
         this->rest.erase(this->rest.find("\r\n"));
         if (this->rest.find('\t') != std::string::npos || this->rest.find_first_not_of(" ")) {
-            std::cout <<  "from setRequestLine" << std::endl;
             this->errorCode = "400";
             return;
         }
         std::vector<std::string> parts;
-        ft_split(this->rest, parts);
+        ft_split(this->tempraryRequestLine, parts);
         if (parts.size() != 3) {
             this->errorCode = "400";
             return;
@@ -51,22 +88,12 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->method = parts[0];
         this->requestTarget = parts[1];
         this->httpVersion = parts[2];
-        // this->method = this->rest.substr(0, this->rest.find(' '));
-        // this->rest.erase(0, this->rest.find(' '));
-        // this->rest.erase(0, this->rest.find_first_not_of(" "));
-        // this->requestTarget = this->rest.substr(0, this->rest.find(' '));
-        // this->rest.erase(0, this->rest.find(' '));
-        // this->rest.erase(0, this->rest.find_first_not_of(" "));
-        // this->httpVersion = this->rest.substr(0, this->rest.find(' '));
         this->rest = "";
         this->tempraryRequestLine = "";
         requestLine.erase(0, requestLine.find("\r\n") + 2);
-        while (this->requestTarget.find("%20") != std::string::npos)
-        {
-            size_t pos = this->requestTarget.find("%20");
-            this->requestTarget.erase(pos, 3);
-            this->requestTarget.insert(pos, " ");
-        }
+        std::cout << "  This is the request target before the changes : ." << this->requestTarget << std::endl;
+        decodeUrlEncodedCharacters(this->requestTarget);
+        std::cout << "  This is the request target after  the changes : ." << this->requestTarget << std::endl;
         validateMethod();
         if (this->errorCode.size())
             return ;

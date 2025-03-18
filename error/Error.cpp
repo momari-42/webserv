@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/03/12 13:55:57 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/16 22:44:29 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void Error::sendErrorPage ( void ) {
     response += CRLF;
     response += this->content;
     write(this->fd, response.c_str(), response.size());
-    std::cout << "we are here in the end of  class error" << std::endl;
+    // std::cout << "we are here in the end of  class error" << std::endl;
 
 }
 
