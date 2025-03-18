@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/15 10:39:03 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/18 10:37:16 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <poll.h>
+#include <fcntl.h>
 #include "../configFile/ConfigFile.hpp"
 // #include "../request/Request.hpp"
 

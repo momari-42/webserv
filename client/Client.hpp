@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 17:47:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/11 22:29:51 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/18 10:55:27 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class Client
         Response    response;
         Socket*     socket;
         bool        isConfigFileInitialized;
-        std::string name;
+        std::string sessionID;
 
     public:
         Client();
