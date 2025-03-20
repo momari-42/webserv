@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/19 15:53:04 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 14:13:39 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,17 @@ void Request::parseRequest ( std::string requestData ) {
                 this->cgiExtention = ".php";
                 if (this->requestTarget.find(".py") != std::string::npos)
                     this->cgiExtention = ".py";
-                if (this->location.cgi.count(this->cgiExtention))
+                
+                std::map<std::string, std::string> mapcgi = this->location.cgi;
+
+                std::cout << "----------------------------------------------------------" << this->location.index[0] << std::endl;
+                for (std::map<std::string, std::string>::iterator it = mapcgi.begin(); it != mapcgi.end(); it++) {
+                    std::cout << it->first << "-" << it->second << std::endl;
+                }
+                std::cout << "----------------------------------------------------------" << std::endl;
+                if (this->location.cgi.count(this->cgiExtention)) {
                     this->cgi = true;
+                }
             }
             this->checkRequestLine = true;
         }

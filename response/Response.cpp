@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 02:09:48 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 14:25:40 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     if (this->request->getRequestLine()->getMethod() == "POST") {
         std::string inFile = this->request->getRandomeFileName();
         int fd = open(inFile.c_str(), O_RDONLY);
+        unlink(inFile.c_str());
         dup2(fd, 0);
         close(fd);
     }
@@ -88,13 +89,13 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
         dup2(this->fd[1], 1);
         close(this->fd[1]);
         if (execve(argv[0], argv, env) == -1) {
-            // freeEnvSpaces(env);
+            freeEnvSpaces(env);
             std::cerr << "lolo" << std::endl;
             exit(1);
         }
     }
     // usleep(200);
-    // freeEnvSpaces(env);
+    freeEnvSpaces(env);
     struct kevent eventForDelete;
     struct kevent events[2];
 

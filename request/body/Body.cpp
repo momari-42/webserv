@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 02:16:52 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 02:49:27 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void Body::manageFile(const std::string fileName, const std::string data ) {
             path = fileName;
         else
             path = this->requestTarget + fileName;
-        std::cout << "this is the request target : " << this->requestTarget << std::endl;
+        // std::cout << "this is the request target : " << this->requestTarget << std::endl;
         std::ofstream outputFile( path, std::ios::binary | std::ios::app);
         outputFile.write(data.data(), data.size());
         this->created               = true;
@@ -213,8 +213,8 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
             this->errorCode = "413";
             return;
         }
-        if ( this->method == "POST" && !isDirectory(this->requestTarget) ) {
-            std::cout << "from set body" << std::endl;
+        if ( !this->cgi && this->method == "POST" && !isDirectory(this->requestTarget) ) {
+            std::cout << "from set body" << this->cgi << std::endl;
             this->errorCode = "400";
             return;
         }
