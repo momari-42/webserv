@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/14 11:45:12 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 15:38:39 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,11 +64,6 @@ void readConfigFile(std::fstream& configFile, std::string& file) {
 int main(int ac, char **av) {
 
     if (ac != 2) {
-        std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
-        std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
-        std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
-        std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
-        std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
         std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
         return 1;
     }
