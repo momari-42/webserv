@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 15:27:52 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 15:36:48 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,6 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         std::vector<std::string> parts;
         ft_split(this->tempraryRequestLine, parts);
         if (parts.size() != 3) {
-            // std::cout << "from three" << std::endl;
             this->errorCode = "400";
             return;
         }
