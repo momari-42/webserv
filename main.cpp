@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 15:38:39 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 15:41:16 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void readConfigFile(std::fstream& configFile, std::string& file) {
         line.erase(line.find('\n'), line.find_first_not_of(" \t"));
         file.append(line);
     }
-    if (!areClosed(file))
+    if (!areClosed(file) || !file.size())
         throw ErrorHandling("Syntax Error");
 }
 
