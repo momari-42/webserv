@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:16:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/06 11:16:07 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 00:10:48 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class Header
         Header( std::string &errorCode );
         void setHeader( std::string &header, int& trackingRequestNumber );
         std::string getValue(const std::string& key);
+        std::map<std::string, std::string> &getHttpHeadersMap( void );
         ~Header();
 
         void resetAttributes (void);

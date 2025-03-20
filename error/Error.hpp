@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:50 by momari            #+#    #+#             */
-/*   Updated: 2025/02/24 08:35:24 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 15:24:24 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,6 @@ class Error : public HttpResponse
 
     public:
         void sendErrorPage ( void );
-        Error(  int fd, std::string statusCode );
+        Error(  int fd, std::string statusCode, std::map<std::string, std::string> errorPages );
         ~Error();
 };

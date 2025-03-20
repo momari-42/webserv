@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/19 11:52:40 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 15:06:42 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,21 +120,6 @@ void Server::startServer() {
     ssize_t         nevents;
     struct timespec time;
 
-
-    //----------------------------------------------//
-    //----------------------------------------------//
-
-
-
-    std::ofstream of("momari.py", std::ios::binary);
-    if (!of.is_open()) {
-        std::cerr << "Error" << std::endl;
-        exit(1);
-    }
-    
-    //----------------------------------------------//
-    //----------------------------------------------//
-
     time.tv_sec = 1;
     time.tv_nsec = 0;
 
@@ -167,29 +152,31 @@ void Server::startServer() {
                     
                     this->clients[this->sockfdClient].setConfig(this->readyFd, this->sockets);
                     this->timeout[this->sockfdClient] = std::time(NULL);
+                    std::cout << "\033[32mNew client Connected :)"  << "\033[0m" << std::endl;
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_READ ) {
                     this->timeout[this->readyFd] = std::time(NULL);
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
                     if (bytesRead <= 0) {
-                        std::cout << "Client disconnected" << std::endl;
+                        std::cout << "  Client disconnected" << std::endl;
                         close(this->readyFd);
                         this->clients.erase(this->readyFd);
+                        this->timeout.erase(this->readyFd);
                         continue;
                     }
                     buffer[this->bytesRead] = '\0';
-                    of.write(buffer, bytesRead);
                     this->buffer.append(buffer, this->bytesRead);
                     this->clients[this->readyFd].getRequest().parseRequest(this->buffer);
                     memset(buffer, 0, BUFFER_SIZE);
                     this->buffer = "";
                     if ( this->clients[this->readyEvents[i].ident].getRequest().getErrorCode().size() ) {
-                        std::cout << "\033[1;31mthis is and error hap*****pend with code : " << this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
-                        Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() );
+                        std::cout << "\033[1;31m    this is and error happend with code : " << this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
+                        Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode(), this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
                         error.sendErrorPage();
                         removeFdFromKqueue(kq, this->readyEvents[i].ident, EVFILT_READ);
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
+                        this->timeout.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getRequest().getBodyComplete() == true) {
                         addFdToKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
@@ -200,26 +187,29 @@ void Server::startServer() {
                     this->timeout[this->readyFd] = std::time(NULL);
                     this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident, kq );
                     if ( this->clients[this->readyEvents[i].ident].getResponse().getErrorCode().size() ) {                        
-                        std::cout << "\033[1;31mthis is and error hap00pend with code : " << this->clients[this->readyEvents[i].ident].getResponse().getErrorCode() <<  "!\033[0m" << std::endl;
-                        Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getResponse().getErrorCode() );
+                        std::cout << "\033[1;31m    this is and error happend with code : " << this->clients[this->readyEvents[i].ident].getResponse().getErrorCode() <<  "!\033[0m" << std::endl;
+                        Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getResponse().getErrorCode(), this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
                         error.sendErrorPage();
                         removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
+                        this->timeout.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
                         if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("CONNECTION") == "close") {
-                            std::cout << "\033[32mreqeust  closed : " << this->numberOfRequest++  << "\033[0m" << std::endl;
+                            std::cout << "\033[32m  reqeust  closed : " << this->numberOfRequest++ << " Done!!"  << "\033[0m" << std::endl;
                             removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
                             close(this->readyEvents[i].ident);
                             this->clients.erase(this->readyEvents[i].ident);
+                            this->timeout.erase(this->readyEvents[i].ident);
                         }
                         else {
-                            std::cout << "\033[32mreqeust keep-alive : " << this->numberOfRequest++  << "\033[0m" << std::endl;
+                            std::cout << "\033[32m  reqeust keep-alive : " << this->numberOfRequest++  << " Done!!"  << "\033[0m" << std::endl;
                             removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
                             addFdToKqueue(this->kq, this->readyEvents[i].ident, EVFILT_READ);
                             this->clients[this->readyFd].getRequest().resetAttributes();
                             this->clients[this->readyFd].getResponse().resetAttributes();
+                            this->clients[this->readyFd].getResponse().setIsReadyForNextRequest(true);
                         }
                     }
                 }
@@ -229,9 +219,10 @@ void Server::startServer() {
 
                     waitpid(this->readyEvents[i].ident, &exitStatus, WNOHANG);
                     removeFdFromKqueue(this->kq, this->readyFd, EVFILT_TIMER);
-                    if (exitStatus) {
-                        std::cout << "lolllllsdfdklsjfldjfldj    99 : " << WEXITSTATUS(exitStatus)  << std::endl;
-                        Error error( *fdClient, "500" );
+                    std::cout << WEXITSTATUS(exitStatus) << std::endl;
+                    // WEXITSTATUS(&exitStatus);
+                    if (WEXITSTATUS(exitStatus)) {
+                        Error error( *fdClient, "500", this->clients[*fdClient].getRequest().getConfigFile()->getErrorPages() );
                         error.sendErrorPage();
                         close(*fdClient);
                         this->clients.erase(*fdClient);
@@ -244,11 +235,34 @@ void Server::startServer() {
                     removeFdFromKqueue(this->kq, this->readyFd, EVFILT_PROC);
                     removeFdFromKqueue(this->kq, this->readyFd, EVFILT_TIMER);
                     kill(this->readyFd, SIGKILL);
-                    Error error( *fdClient, "504" );
+                    Error error( *fdClient, "504", this->clients[*fdClient].getRequest().getConfigFile()->getErrorPages() );
                     error.sendErrorPage();
                     close(*fdClient);
                     this->clients.erase(*fdClient);
                 }
+            }
+        }
+        for ( std::map<size_t, Client>::iterator it = this->clients.begin(); it != this->clients.end(); it++) {
+            if ( !it->second.getRequest().getBody()->getNextRequest().empty() && it->second.getIsReadyForNextRequest() ) {
+                // std::cerr << "this is what i hold in next request : " << std::endl;
+                // std::cerr << "." << it->second.getRequest().getBody()->getNextRequest() << "." << std::endl;
+                it->second.getRequest().parseRequest(it->second.getRequest().getBody()->getNextRequest());
+                it->second.getRequest().getBody()->setNextRequest("");
+                //----------------------------------------------------------------------------------------------------------------------------------------------
+                if ( it->second.getRequest().getErrorCode().size() ) {
+                    std::cout << "\033[1;31mthis is and error hap*****pend with code : " <<it->second.getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
+                    Error error( it->first, it->second.getRequest().getErrorCode(), it->second.getRequest().getConfigFile()->getErrorPages() );
+                    error.sendErrorPage();
+                    removeFdFromKqueue(kq, it->first, EVFILT_READ);
+                    close(it->first);
+                    this->clients.erase(it->first);
+                    this->timeout.erase(it->first);
+                }
+                else if (it->second.getRequest().getBodyComplete() == true) {
+                    addFdToKqueue(this->kq, it->first, EVFILT_WRITE);
+                    removeFdFromKqueue(this->kq, it->first, EVFILT_READ);
+                }
+                //----------------------------------------------------------------------------------------------------------------------------------------------
             }
         }
         for (std::map<size_t, size_t>::iterator it = this->timeout.begin(); it != this->timeout.end();) {

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/16 22:46:35 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 22:55:49 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 ServerConfig::ServerConfig() {
     this->URILimit = 4096;
-    this->bodyLimit = 2147483647;
+    this->bodyLimit = 42944454;
 }
 
 bool ServerConfig::operator==(ServerConfig& obj) {
@@ -242,8 +242,8 @@ void ServerConfig::checkRequirement() {
         this->ports.push_back(std::make_pair("8080", "127.0.0.1"));
     if (!this->names.size())
         this->names.push_back("localhost");
-    if (!this->index.size())
-        throw (ErrorHandling("You need at least a default Index"));
+    // if (!this->index.size())
+    //     throw (ErrorHandling("You need at least a default Index"));
     if (!this->root.size())
         throw(ErrorHandling("You need a default Root"));
 }
@@ -409,4 +409,8 @@ std::string &ServerConfig::getMatchedLocation() {
 
 std::map<std::string, Location> &ServerConfig::getLocations() {
     return (this->locations);
+}
+
+std::map<std::string, std::string> &ServerConfig::getErrorPages() {
+    return (this->errorPages);
 }

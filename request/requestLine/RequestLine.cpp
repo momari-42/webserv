@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/19 13:27:15 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 15:06:19 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,15 +73,16 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
     this->rest += requestLine;
     if (this->rest.find("\r\n") != std::string::npos) {
         this->tempraryRequestLine = this->rest.substr(0, this->rest.find("\r\n"));
-        // std::cout << "-->" << this->tempraryRequestLine << "<--" << std::endl;
         this->rest.erase(this->rest.find("\r\n"));
         if (this->rest.find('\t') != std::string::npos || this->rest.find_first_not_of(" ")) {
+            // std::cout << "from set request line" << std::endl;
             this->errorCode = "400";
             return;
         }
         std::vector<std::string> parts;
         ft_split(this->tempraryRequestLine, parts);
         if (parts.size() != 3) {
+            // std::cout << "from three" << std::endl;
             this->errorCode = "400";
             return;
         }
@@ -97,9 +98,9 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->rest = "";
         this->tempraryRequestLine = "";
         requestLine.erase(0, requestLine.find("\r\n") + 2);
-        std::cout << "  This is the request target before the changes : ." << this->requestTarget << std::endl;
+        // std::cout << "  This is the request target before the changes :" << this->requestTarget << std::endl;
         decodeUrlEncodedCharacters(this->requestTarget);
-        std::cout << "  This is the request target after  the changes : ." << this->requestTarget << std::endl;
+        // std::cout << "  This is the request target after  the changes :" << this->requestTarget << std::endl;
         validateMethod();
         if (this->errorCode.size())
             return ;

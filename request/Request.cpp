@@ -6,19 +6,21 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 01:20:51 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 15:05:53 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request( ) : requestLine( this->errorCode ),
+Request::Request( bool &isReadyForNextRequest ) : isReadyForNextRequest(isReadyForNextRequest) , requestLine( this->errorCode ),
                             header( this->errorCode ),
                                 body( &header, this->isRequestComplete, this->errorCode ) {
+    // this->isReadyForNextRequest     = isReadyForNextRequest;
     this->trackingRequestNumber     = 0;
     this->isRequestComplete         = false;
     this->checkRequestLine          = false;
     this->cgi                       = false;
+    (void)this->isReadyForNextRequest;
 }
 
 // Red     : \033[31m
@@ -68,7 +70,10 @@ void Request::setCookies() {
 }
 
 void Request::parseRequest ( std::string requestData ) {
+    // std::cerr << "the request data is :" << std::endl;
+    // std::cerr << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
+        this->isReadyForNextRequest = false;
         this->requestLine.setRequestLine(requestData, this->trackingRequestNumber );
     }
     if (this->trackingRequestNumber == 1) {
@@ -105,8 +110,17 @@ void Request::parseRequest ( std::string requestData ) {
                 this->cgiExtention = ".php";
                 if (this->requestTarget.find(".py") != std::string::npos)
                     this->cgiExtention = ".py";
-                if (this->location.cgi.count(this->cgiExtention))
+                
+                std::map<std::string, std::string> mapcgi = this->location.cgi;
+
+                std::cout << "----------------------------------------------------------" << this->location.index[0] << std::endl;
+                for (std::map<std::string, std::string>::iterator it = mapcgi.begin(); it != mapcgi.end(); it++) {
+                    std::cout << it->first << "-" << it->second << std::endl;
+                }
+                std::cout << "----------------------------------------------------------" << std::endl;
+                if (this->location.cgi.count(this->cgiExtention)) {
                     this->cgi = true;
+                }
             }
             this->checkRequestLine = true;
         }
@@ -195,4 +209,7 @@ bool Request::getCgi() {
 
 std::string Request::getCgiExtention() {
     return (this->cgiExtention);
+}
+ServerConfig *Request::getConfigFile( void ) {
+    return (this->configFile);
 }

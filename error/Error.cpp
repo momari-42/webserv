@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/03/16 22:44:29 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 15:34:50 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 // Content-Length: 1256
 // Date: Fri, 28 Jun 2024 11:40:58 GMT
  
-Error::Error ( int fd, std::string statusCode ) {
+Error::Error ( int fd, std::string statusCode, std::map<std::string, std::string> errorPages ) {
     char                buffer[BUFFER_E];
     std::ostringstream  contentLength;
     size_t              bytesRead;
@@ -35,7 +35,13 @@ Error::Error ( int fd, std::string statusCode ) {
     this->header["Server"] = "momari-zaelarb";
     this->header["Connection"] = "close";
 
-    std::fstream errorFile( "error/errorPages/" + this->statusCode + ".html");
+    std::fstream errorFile;
+    if (errorPages.count(this->statusCode) && !access(errorPages[this->statusCode].c_str(), R_OK)) {
+        errorFile.open(errorPages[this->statusCode]);
+    }
+    else {
+        errorFile.open("error/errorPages/" + this->statusCode + ".html");
+    }
     if (!errorFile.is_open()) {
         std::cout << "we are hirring error here " << std::endl;
     }

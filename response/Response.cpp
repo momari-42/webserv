@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 01:26:42 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 15:03:44 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,13 @@ std::string generateSessionID() {
     return ss.str();
 }
 
-Response::Response ( Request *request ) {
+Response::Response ( Request *request, bool &isReadyForNextRequest ) : isReadyForNextRequest(isReadyForNextRequest) {
     this->request = request;
     initiatConfigFile = false;
     this->isHeaderSent      = false;
     this->isResponseSent    = false;
     this->isCgiComplet      = false;
+    this->listingDirectory  = false;
     this->httpVersion       = "HTTP/1.1";
     this->fd[0]             = -2;
     this->fd[1]             = -2;
@@ -37,38 +38,59 @@ Response::Response ( Request *request ) {
 
     srand(time(NULL));
     this->sessionID = generateSessionID();
+    (void)this->isReadyForNextRequest;
+}
+
+void freeEnvSpaces(char **env) {
+    int index = 0;
+    while (env[index]) {
+        if (index >= 3)
+            free(env[index]);
+        index++;
+    }
 }
 
 void Response::executeCGI ( size_t fd, size_t kq ) {
+    std::map<std::string, std::string> httpHeadersMap = this->request->getHeader()->getHttpHeadersMap();
+    char                               *env[httpHeadersMap.size() + 4];
+    char                               *argv[3];
     std::string varValue        = this->request->getRoot();
+    std::string method          = this->request->getRequestLine()->getMethod();
     std::string requestTarget   = this->request->getRequestTarget();
-    std::string contentType     = this->request->getHeader()->getValue("CONTENT_TYPE");
-    size_t      queryPos        = requestTarget.find("?");
     std::string queryString;
-
-    // std::cerr << "CGI environment variables: " << requestTarget << std::endl;
+    
     this->fdClient = fd;
     if (this->request->getRequestLine()->getMethod() == "POST") {
         std::string inFile = this->request->getRandomeFileName();
         int fd = open(inFile.c_str(), O_RDONLY);
+        unlink(inFile.c_str());
         dup2(fd, 0);
         close(fd);
     }
-    if (queryPos != std::string::npos) {
-        queryString = "QUERY_STRING=";
-        queryString += requestTarget.substr(queryPos + 1);
-        requestTarget.erase(queryPos);
-    }
-    contentType = "CONTENT_TYPE=" + contentType;
-    varValue    = "UPLOAD_TMP_DIR=" + varValue;
-    setenv("QUERY_STRING", queryString.c_str(), 1);
-    setenv("CONTENT_TYPE", contentType.c_str(), 1);
-    setenv("UPLOAD_TMP_DIR", varValue.c_str(), 1);
-    char *argv[3];
+    queryString = "QUERY_STRING=";
+    queryString += this->queryString;
     argv[0] = const_cast<char *>( this->request->getLocation().cgi[this->request->getCgiExtention()].c_str());
     argv[1] = const_cast<char *>( requestTarget.c_str());
     argv[2] = NULL;
-    char *env[] = { const_cast<char *>(queryString.c_str()), const_cast<char *>(contentType.c_str()), const_cast<char *>(varValue.c_str()), NULL};
+    // this where i init the env;
+    varValue = "UPLOAD_TMP_DIR=" + varValue;
+    method   = "METHOD=" + method;
+    setenv("QUERY_STRING", queryString.c_str(), 1);
+    setenv("UPLOAD_TMP_DIR", varValue.c_str(), 1);
+    setenv("METHOD", method.c_str(), 1);
+    for (std::map<std::string, std::string>::iterator it = httpHeadersMap.begin(); it != httpHeadersMap.end(); it++ ) {
+        setenv(it->first.c_str(), (std::string(it->first + "=" + it->second)).c_str(), 1);
+    }
+    env[0] = const_cast<char *>(queryString.c_str());
+    env[1] = const_cast<char *>(varValue.c_str());
+    env[2] = const_cast<char *>(method.c_str());
+    size_t index = 3;
+    for (std::map<std::string, std::string>::iterator it = httpHeadersMap.begin(); it != httpHeadersMap.end(); it++ ) {
+        std::string tmp = it->first + "=" + it->second;
+        env[index]= strdup(const_cast<char *>(tmp.c_str()));
+        index++;
+    }
+    env[index] = 0;
     pipe(this->fd);
     this->pid = fork();
     if (pid == 0) {
@@ -76,9 +98,13 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
         dup2(this->fd[1], 1);
         close(this->fd[1]);
         if (execve(argv[0], argv, env) == -1) {
+            freeEnvSpaces(env);
+            std::cerr << "lolo" << std::endl;
             exit(1);
         }
     }
+    // usleep(200);
+    freeEnvSpaces(env);
     struct kevent eventForDelete;
     struct kevent events[2];
 
@@ -150,6 +176,13 @@ void Response::makeResponse ( size_t fd, size_t kq ) {
             this->inout[0] = dup(0);
             this->inout[1] = dup(1);
         }
+        size_t      queryPos        = this->request->getRequestTarget().find("?");
+        if (queryPos != std::string::npos) {
+            std::cout << "before : " << this->request->getRequestTarget()<< std::endl;
+            this->queryString = this->request->getRequestTarget().substr(queryPos + 1);
+            this->request->getRequestTarget().erase(queryPos);
+            std::cout << "after  : " << this->queryString<< std::endl;
+        }
         initiatConfigFile = true;
     }
     if (this->request->getCgi() && !this->isCgiComplet)
@@ -170,7 +203,24 @@ std::string convertDecimalToHexaToString ( size_t number ) {
 }
 
 void Response::validateRequestTarget() {
-    if (isDirectory(this->request->getRequestTarget())) {
+    if ( this->location.listing ) {
+        std::string tmp = this->request->getRequestTarget();
+        std::string toFind = this->request->getRoot();
+        if (toFind.size() && toFind.at(toFind.size() - 1) == '/')
+            toFind.erase(toFind.size() - 1);
+        int n = 0;
+        while (!tmp.find(toFind)) {
+            tmp.erase(0, toFind.size());
+            // std::cout << "this is :" << tmp << std::endl;
+            n++;
+        }
+        if( n == 2 ) {
+            // std::cout << "this is the request target after :" << this->request->getRequestTarget() << std::endl;
+            this->request->getRequestTarget().erase(0, toFind.size());
+        }   
+        // std::cout << "this is the root :" << n << "-" << this->request->getRoot() << std::endl;
+    }
+    if ( isDirectory(this->request->getRequestTarget()) ) {
         bool isValidPath = false;
         std::vector<std::string> &index = this->configFile->getIndex();
         if (index.size()) {
@@ -191,12 +241,16 @@ void Response::validateRequestTarget() {
                 return ;
             }
         }
-        else {
-            
+        else if (this->location.listing) {
+            listingDirectory = true;
         }
+        else
+            this->errorCode = "404" ;
+        // std::cout << "this is where the 404 thrown " << std::endl;
     }
     else {
         if (access( this->request->getRequestTarget().c_str(), F_OK ) == -1) {
+            // std::cout << "665556656556565 ->>>>" << this->request->getRequestTarget().c_str() << "<<<<<----" << std::endl;
             this->errorCode = "404";
             return;
         }   
@@ -207,7 +261,48 @@ void Response::validateRequestTarget() {
     }
 }
 
-
+void Response::sendDirectoryList( size_t fd ) {
+    struct dirent   *entry;
+    std::string response;
+    std::string htmlContent = "<!DOCTYPE html>\n"
+        "<html lang=\"en\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+        "    <title>Directory Listing</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>Directory Listing From " + this->request->getRoot() + " </h1>"
+        "    <div class=\"container\">\n"
+        "        <nav class=\"nav\">\n"
+        "            <ul>\n";
+    DIR *dir = opendir(this->request->getRequestTarget().c_str());
+    if (dir) {
+        while ( (entry = readdir(dir)) ) {
+            std::string &requestTarget = this->request->getRequestTarget();
+            if ( requestTarget.size() && requestTarget.at(requestTarget.size() - 1) != '/')
+                requestTarget.push_back('/');
+            htmlContent += "<li><a href=\"" + this->request->getRequestTarget() + std::string(entry->d_name) + "\">";
+            htmlContent += entry->d_name + std::string("</a></li>\n");
+        }
+        htmlContent += "            </ul>\n"
+        "        </nav>\n"
+        "    </div>\n"
+        "</body>\n"
+        "</html>\n";
+        std::string hexaNumber = convertDecimalToHexaToString(htmlContent.size()); 
+        response += hexaNumber + CRLF;
+        response += htmlContent + CRLF;
+        if (send(fd, response.c_str(), response.size(), 0) == -1) {
+            std::cout << "Error sending data" << std::endl;
+            // Handle send error
+        }
+        (void)entry;
+        this->isResponseSent = true;
+        return;
+    }
+    this->errorCode = "500";
+}
 
 void Response::sendRedirectionResponse( size_t fd, Location &location ) {
     std::string response;
@@ -237,9 +332,9 @@ void Response::generateHeader ( int fd, std::string &response) {
         validateRequestTarget();
         if (this->errorCode.size())
             return ;
-        if (this->request->getRequestTarget().find(".") != std::string::npos ) {
-                // std::cout << ".." << this->request->getRequestTarget().substr(    
-                    // this->request->getRequestTarget().find_last_of(".")) << std::endl;
+        if ( this->listingDirectory )
+            this->header["Content-Type"] = "text/html; charset=UTF-8";
+        else if (this->request->getRequestTarget().find(".") != std::string::npos ) {
             std::map<std::string, std::string>::iterator it = this->mime.find( \
                 this->request->getRequestTarget().substr(    \
                     this->request->getRequestTarget().find_last_of(".")));
@@ -261,7 +356,7 @@ void Response::generateHeader ( int fd, std::string &response) {
     if (send(fd, response.c_str(), response.size(), 0) == -1) {
         std::cerr << "Error sending data" << std::endl; 
     }
-    if (!this->request->getCgi())
+    if ( !this->request->getCgi() && !this->listingDirectory )
         setTargetFile();
     this->isHeaderSent = true;
     response.clear();
@@ -283,7 +378,7 @@ void Response::setConfigFile(ServerConfig* configFile) {
 void Response::methodGet( size_t fd ) {
     std::string         response;
     char                buffer[BUFFER_SIZE_R];
-    std::streamsize     bytesRead;
+    std::streamsize     bytesRead = 0;
 
     if (!this->isHeaderSent) {
         generateHeader(fd, response);
@@ -291,7 +386,9 @@ void Response::methodGet( size_t fd ) {
     if ( this->isResponseSent || this->errorCode.size())
         return;
     memset(buffer, 0, sizeof(buffer));
-    if (this->request->getCgi()) {
+    if ( this->listingDirectory )
+        sendDirectoryList(fd);
+    else if (this->request->getCgi()) {
         fcntl(this->fd[0], F_SETFL, O_NONBLOCK);
         bytesRead = read(this->fd[0], buffer, BUFFER_SIZE_R);
     }
@@ -310,7 +407,7 @@ void Response::methodGet( size_t fd ) {
         }
     }
     if (targetFile.eof() || bytesRead < BUFFER_SIZE_R) {
-        std::cerr << "lol" << std::endl;
+        // std::cerr << "lol" << std::endl;
         response = "0" + std::string(CRLF) + CRLF;
         send(fd, response.c_str(), response.size(), 0);
         this->isResponseSent = true;
@@ -352,15 +449,22 @@ void Response::sendNoContentResponse( size_t fd ) {
 
 void Response::sendSuccessResponse( size_t fd ) {
     std::string response;
-    std::string body = "File uploaded succefully !!";
+    std::string body;
 
     if (this->request->getHeader()->getValue("CONNECTION") == "close") {
         this->header["Connection"] = "close";
     }
-    this->header["Content-Length"] = calculateBodyLength( body );
     this->header["Content-Type"] = this->mime[".txt"];
     this->header.erase("Transfer-Encoding");
-    response += this->httpVersion + " 201 " + this->statusCodes["201"] + CRLF;
+    if ( this->request->getBody()->getCreated() ) {
+        response += this->httpVersion + " 201 " + this->statusCodes["201"] + CRLF;
+        body = "File uploaded succefully !!";
+    }
+    else {
+        response += this->httpVersion + " 200 " + this->statusCodes["200"] + CRLF;
+        body = "No Content :( !!";
+    }
+    this->header["Content-Length"] = calculateBodyLength( body );
     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
         response += it->first + ": " + it->second + CRLF;
     response += CRLF;
@@ -370,17 +474,6 @@ void Response::sendSuccessResponse( size_t fd ) {
 }
 
 void Response::methodPost( size_t fd ) {
-    // if (this->request->getHeader()->getValue("Content-Length").size()) {
-    //     size_t contentLength = strtod(this->request->getHeader()->getValue("Content-Length").c_str(), NULL);
-    //     if (contentLength != this->request->getBody()->getBodyLength()) {
-    //         std::cout <<  "from methodPost : " << contentLength << "-" << this->request->getBody()->getBodyLength()  << std::endl;
-    //         this->errorCode = "400";
-    //         return ;
-    //     } else if ( !contentLength ) {
-    //         sendNoContentResponse( fd );
-    //         return ;
-    //     }
-    // }
     if (this->request->getCgi())
         methodGet(fd);
     else
@@ -392,7 +485,7 @@ void Response::methodPost( size_t fd ) {
 void Response::methodDelete( size_t fd ) {
     std::string path = this->request->getRequestTarget();
     if (access( path.c_str(), R_OK ) == -1 || isDirectory(path)) {
-        std::cout << "kjdsflkjsflds : " << path << std::endl;
+        // std::cout << "kjdsflkjsflds : " << path << std::endl;
         this->errorCode = "404";
         return;
     }
@@ -450,6 +543,8 @@ void Response::resetAttributes() {
     this->isHeaderSent      = false;
     this->isResponseSent    = false;
     this->isCgiComplet      = false;
+    this->listingDirectory  = false;
+    this->initiatConfigFile = false;
 
     if (this->request->getCgi()) {
         close(this->fd[0]);
@@ -485,4 +580,8 @@ Response::ResponseExceptions::ResponseExceptions ( const std::string& errorMsg )
 
 const char* Response::ResponseExceptions::what() const throw() {
     return (this->errorMsg.c_str());
+}
+
+void Response::setIsReadyForNextRequest ( bool isReadyForNextRequest ) {
+    this->isReadyForNextRequest = isReadyForNextRequest;
 }

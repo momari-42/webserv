@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/17 23:03:28 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 02:49:27 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@ Body::Body( Header *header, bool &isRequestComplete, std::string &errorCode ) : 
     this->bodyTrackingNumber    = 0;
     this->isBodyInitiates       = false;
     this->isShunked             = false;
-    this->contentLength         = 0;
-    // this->bodyLength            = 0;
+    this->created               = false;
+    this->contentLength         = -1;
+    this->bodyLength            = 0;
     (void) this->errorCode;
 }
 
@@ -78,8 +79,10 @@ void Body::manageFile(const std::string fileName, const std::string data ) {
             path = fileName;
         else
             path = this->requestTarget + fileName;
+        // std::cout << "this is the request target : " << this->requestTarget << std::endl;
         std::ofstream outputFile( path, std::ios::binary | std::ios::app);
         outputFile.write(data.data(), data.size());
+        this->created               = true;
     }
 }
 
@@ -88,7 +91,7 @@ void Body::validateFileName( void ) {
         for ( std::vector<boundaryData_t>::iterator it = this->data.begin(); it != this->data.end() - 1; it++ ) {
             unlink(( this->requestTarget + it->content).c_str());
         }
-        // std::cout << "from validateFileName" << std::endl;
+        std::cout << "from validateFileName" << std::endl;
         this->errorCode = "400";
     }
 }
@@ -100,6 +103,8 @@ void Body::setBoundaryBody( std::string& requestData, const std::string& token )
             if (!this->data.back().isBodyComplete)
                 manageFile(this->data.back().content, this->rest.substr(0, this->rest.find(token + "--") - 2));
             this->isRequestComplete = true;
+            this->rest.erase(0, this->rest.find(token + "--") + token.size() + 4);
+            this->nextRequest = this->rest;
             this->rest = "";
             break;
         }
@@ -152,10 +157,9 @@ void Body::initiateBodyParams( void ) {
     else if (this->header->getValue("TRANSFER_ENCODING") == "chunked")
         this->bodyRequestType = "chunked";
     else if (this->header->getValue("CONTENT_LENGTH") != "") {
-        // this->contentLength = strtol(this->header->getValue("Content-Length").c_str(), NULL, 0);
         this->bodyRequestType = "Content-Length";
     }
-    if (!this->header->getValue("Content-Length").empty())
+    if (!this->header->getValue("CONTENT_LENGTH").empty())
         this->contentLength = strtol(this->header->getValue("CONTENT_LENGTH").c_str(), NULL, 0);
 }
 
@@ -184,18 +188,48 @@ void Body::setCgi( std::string& requestData ) {
         this->isRequestComplete = true;
 }
 
+void Body::unlinkCreatedFiles( std::vector<boundaryData_t> &data ) {
+    for (std::vector<boundaryData_t>::iterator it = data.begin(); it < data.end(); it++) {
+        unlink ((this->requestTarget + it->content).c_str());
+    }
+}
+
+static bool isDirectory(std::string &path) {
+    DIR *dir = opendir(path.c_str());
+    if (dir) {
+        closedir(dir);
+        return (true);
+    }
+    return (false);
+}
+
 void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
     if (!this->isBodyInitiates) {
         initiateBodyParams();
         this->cgi = cgi;
         this->method = method;
         this->isBodyInitiates = true;
-        if (this->contentLength > this->configFile->getBodyLimit()) {
+        if (this->contentLength > static_cast<ssize_t>(this->configFile->getBodyLimit())) {
             this->errorCode = "413";
             return;
         }
+        if ( !this->cgi && this->method == "POST" && !isDirectory(this->requestTarget) ) {
+            std::cout << "from set body" << this->cgi << std::endl;
+            this->errorCode = "400";
+            return;
+        }
     }
-    // this->bodyLength += body.size();
+    this->bodyLength += body.size();
+    if ( (this->method == "GET" || this->method == "DELETE") && this->bodyLength > 1024 ) {
+        this->errorCode = "413";
+        return;
+    }
+    if (this->contentLength == -1 && (this->bodyLength > static_cast<ssize_t>(this->configFile->getBodyLimit()))) {
+        if ( this->data.size() )
+            unlinkCreatedFiles(data);
+        this->errorCode = "413";
+        return;
+    }
     if ( this->cgi )
         Body::setCgi(body);
     else if (this->bodyRequestType == "chunked")
@@ -206,8 +240,10 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
         Body::setBoundaryChunkedBody( body );
     else if (this->bodyRequestType == "Content-Length")
         Body::setContentLengthBody( body );
-    else
+    else {
+        nextRequest = body;
         this->isRequestComplete = true;
+    }
 }
 
 void Body::generateRandomeName( std::string& name ) {
@@ -236,6 +272,7 @@ void Body::resetAttributes (void) {
     this->bodyTrackingNumber        = 0;
     this->isBodyInitiates           = false;
     this->isShunked                 = false;
+    this->created                   = false;
 
     this->randomeFileName           = "";
     this->randomeContentLengthName  = "";
@@ -243,8 +280,8 @@ void Body::resetAttributes (void) {
     this->body                      = "";
     this->rest                      = "";
     this->bodyRequestType           = "";
-    // this->bodyLength                = 0;
-    this->contentLength             = 0;
+    this->bodyLength                = 0;
+    this->contentLength             = -1;
     this->data                      = tmp;
 }
 
@@ -253,6 +290,10 @@ void Body::resetAttributes (void) {
 void Body::setContentLengthBody( std::string& requestData ) {
     if ( this->bodyRequestType == "Content-Length" && !this->cgi ) {
         // std::cout << "from chunked" << std::endl;
+        if ( !this->contentLength ) {
+            this->isRequestComplete = true;
+            return;
+        }
         this->errorCode = "400";
         return ;
     }
@@ -302,7 +343,7 @@ void Body::setChunkedCgiBody( std::string& body ) {
 void Body::setChunkedBody( std::string& body ) {
 
     if ( this->bodyRequestType == "chunked" && !this->cgi ) {
-        // std::cout << "from chunked" << std::endl;
+        std::cout << "from chunked" << std::endl;
         this->errorCode = "400";
         return ;
     }
@@ -353,15 +394,6 @@ void Body::setConfigFile(ServerConfig* configFile) {
     this->configFile = configFile;
 }
 
-static bool isDirectory(std::string &path) {
-    DIR *dir = opendir(path.c_str());
-    if (dir) {
-        closedir(dir);
-        return (true);
-    }
-    return (false);
-}
-
 void Body::checkAccess( std::string &requestTarget ) {
     if (isDirectory(requestTarget)) {
         bool isValidPath = false;
@@ -408,3 +440,14 @@ std::string Body::getBodyRequestType() {
 // size_t Body::getBodyLength() {
 //     return ( this->bodyLength );
 // }
+
+std::string &Body::getNextRequest() {
+    return (this->nextRequest);
+}
+void Body::setNextRequest( std::string nextRequest ) {
+    this->nextRequest = nextRequest;
+}
+
+bool Body::getCreated() {
+    return (this->created);
+}

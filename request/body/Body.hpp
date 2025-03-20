@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/16 13:20:45 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 23:06:38 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,12 @@ typedef struct  boundaryData {
 class Body : public EmimTypes
 {
     private:
-
+        std::string                         nextRequest;
         std::string                         &errorCode;
         std::string                         requestTarget;
         // this boolen is for request complete it point to a boolen in Reqeust class
         bool                                &isRequestComplete;
+        bool                                created;
         
         // this just for test
         // bool                                requestComplete;
@@ -44,9 +45,9 @@ class Body : public EmimTypes
         // this is a pointer to header request
         Header                              *header;
 
-        // size_t                             bodyLength;
+        ssize_t                             bodyLength;
         // this attributes is for content length parse
-        size_t                             contentLength;
+        ssize_t                             contentLength;
         std::string                        randomeContentLengthName;
     
 
@@ -93,7 +94,11 @@ class Body : public EmimTypes
         void manageFile(const std::string fileName, const std::string data );
         void manageExistinceFile(std::string &fileName);
         std::string getBodyRequestType();
+        std::string &getNextRequest();
+        void setNextRequest( std::string nextRequest );
         size_t getBodyLength();
+        bool getCreated();
+        void unlinkCreatedFiles( std::vector<boundaryData_t> &data );
         
         ~Body();
 };

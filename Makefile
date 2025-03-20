@@ -5,7 +5,7 @@ SRC			= main.cpp server/Server.cpp socket/Socket.cpp  request/Request.cpp \
 OBJ			= $(SRC:.cpp=.o)
 NAME		= webserv
 CPP			= c++
-CPPFLAGS	= -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
+CPPFLAGS	= -Wall -Wextra -Werror -std=c++98 #-fsanitize=address -g
 HDERS		= webserver.hpp server/Server.hpp socket/Socket.hpp request/Request.hpp request/body/Body.hpp \
 				request/header/Header.hpp request/requestLine/RequestLine.hpp response/Response.hpp \
 				error/Error.hpp client/Client.hpp configFile/ConfigFile.hpp \
@@ -40,7 +40,7 @@ start:
 		sleep 0.7; \
 	done; \
 	printf "\n\033[0m" # Reset text color
-	@./webserv config/default.conf 
+	@./webserv config/config.conf 
 
 rm :
 	@rm -rf ./upload/*
