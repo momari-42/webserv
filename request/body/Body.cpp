@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 02:49:27 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 16:05:44 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,6 +210,7 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
         this->method = method;
         this->isBodyInitiates = true;
         if (this->contentLength > static_cast<ssize_t>(this->configFile->getBodyLimit())) {
+            // std::cout << "1";
             this->errorCode = "413";
             return;
         }
@@ -221,12 +222,14 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
     }
     this->bodyLength += body.size();
     if ( (this->method == "GET" || this->method == "DELETE") && this->bodyLength > 1024 ) {
+            // std::cout << "2";
         this->errorCode = "413";
         return;
     }
     if (this->contentLength == -1 && (this->bodyLength > static_cast<ssize_t>(this->configFile->getBodyLimit()))) {
         if ( this->data.size() )
             unlinkCreatedFiles(data);
+        // std::cout << "3";
         this->errorCode = "413";
         return;
     }

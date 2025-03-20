@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 15:03:44 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 16:07:17 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,6 @@ void Response::makeResponse ( size_t fd, size_t kq ) {
         std::ofstream sessionFile("cookie/" + this->sessionID);
         sessionFile.close();
     }
-    std::cout << this->sessionID << std::endl;
     setServerCookies();
     if (!initiatConfigFile) {
         this->configFile =  this->socket->getServerConfig(this->request->getHeader()->getValue("HOST"));
@@ -352,7 +351,7 @@ void Response::generateHeader ( int fd, std::string &response) {
     for (std::map<std::string, std::string>::iterator it = this->request->cookies.begin(); it != this->request->cookies.end(); it++)
         response += "Set-Cookie: " + it->first + "=" + it->second + "; Path=" + this->request->getPath() + CRLF ;
     response += CRLF;
-    std::cout << response;
+    // std::cout << response;
     if (send(fd, response.c_str(), response.size(), 0) == -1) {
         std::cerr << "Error sending data" << std::endl; 
     }
@@ -405,9 +404,9 @@ void Response::methodGet( size_t fd ) {
             std::cout << "Error sending data" << std::endl;
             // Handle send error
         }
+        response.clear();
     }
     if (targetFile.eof() || bytesRead < BUFFER_SIZE_R) {
-        // std::cerr << "lol" << std::endl;
         response = "0" + std::string(CRLF) + CRLF;
         send(fd, response.c_str(), response.size(), 0);
         this->isResponseSent = true;
