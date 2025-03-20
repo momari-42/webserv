@@ -27,6 +27,8 @@ class Request
 
 
 
+        bool                &isReadyForNextRequest;
+
         std::string         path;
         std::string         root;
         Location            location;
@@ -53,7 +55,7 @@ class Request
     public:
         // Reponse     response;
         // default  constructor and destructor
-        Request( );
+        Request( bool &isReadyForNextRequest );
         ~Request();
         void print( void );
         void parseRequest ( std::string requestData );
@@ -78,5 +80,6 @@ class Request
         bool        getBodyComplete( void);
         size_t      getTrackingRequestNumber( void );
         void        setConfigFile(ServerConfig* configFile);
+        ServerConfig *getConfigFile( void );
         void        validateMethod(std::string &method, std::vector<std::string> &methods);
 };

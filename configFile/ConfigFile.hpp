@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/15 10:32:35 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/19 15:46:49 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ public:
     size_t      getURILimit();
     std::string &getMatchedLocation();
     std::map<std::string, Location> &getLocations();
+    std::map<std::string, std::string> &getErrorPages();
     // bool        getListing(const std::string& path);
     // bool        isAllowedMethod(const std::string& path);
 };

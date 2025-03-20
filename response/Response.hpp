@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/18 02:32:15 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 01:41:42 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,17 @@
 class Response : public MimeTypes, public HttpResponse
 {
     private:
+
+        std::string                                 queryString;
+
+        bool                                        &isReadyForNextRequest;
+    
         Socket*                                     socket;
         ServerConfig*                               configFile;
         Location                                    location;
         bool                                        initiatConfigFile;
+        bool                                        listingDirectory;
+        std::string                                 folderName;
         // this for error Code
         std::string                                 errorCode;
         // RequestLine *requestLine;
@@ -73,7 +80,7 @@ class Response : public MimeTypes, public HttpResponse
 
     public:
         
-        Response( Request *request );
+        Response( Request *request, bool &isReadyForNextRequest );
         ~Response();
         void makeResponse ( size_t fd, size_t kq );
         void methodGet( size_t fd );
@@ -89,6 +96,9 @@ class Response : public MimeTypes, public HttpResponse
         void setSocket( Socket *socket );
         void sendSuccessResponse( size_t fd );
         void sendNoContentResponse( size_t fd );
+        void sendDirectoryList( size_t fd );
+
+        void setIsReadyForNextRequest ( bool isReadyForNextRequest );
 
         void sendRedirectionResponse( size_t fd, Location &location );
         class ResponseExceptions : public std::exception

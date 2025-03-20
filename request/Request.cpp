@@ -6,19 +6,21 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/16 23:43:54 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 15:53:04 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request( ) : requestLine( this->errorCode ),
+Request::Request( bool &isReadyForNextRequest ) : isReadyForNextRequest(isReadyForNextRequest) , requestLine( this->errorCode ),
                             header( this->errorCode ),
                                 body( &header, this->isRequestComplete, this->errorCode ) {
+    // this->isReadyForNextRequest     = isReadyForNextRequest;
     this->trackingRequestNumber     = 0;
     this->isRequestComplete         = false;
     this->checkRequestLine          = false;
     this->cgi                       = false;
+    (void)this->isReadyForNextRequest;
 }
 
 // Red     : \033[31m
@@ -45,7 +47,10 @@ void Request::validateMethod(std::string &method, std::vector<std::string> &meth
 // }
 
 void Request::parseRequest ( std::string requestData ) {
+    // std::cerr << "the request data is :" << std::endl;
+    // std::cerr << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
+        this->isReadyForNextRequest = false;
         this->requestLine.setRequestLine(requestData, this->trackingRequestNumber );
     }
     if (this->trackingRequestNumber == 1) {
@@ -171,4 +176,7 @@ bool Request::getCgi() {
 
 std::string Request::getCgiExtention() {
     return (this->cgiExtention);
+}
+ServerConfig *Request::getConfigFile( void ) {
+    return (this->configFile);
 }
