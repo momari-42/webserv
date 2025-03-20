@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestLine.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:10:34 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/18 00:43:08 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 13:25:52 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ class RequestLine
         std::string method;
         std::string requestTarget;
         std::string httpVersion;
+        std::string path;
+        std::string data;
         std::string tempraryRequestLine;
 
         // additional methods
@@ -33,6 +35,8 @@ class RequestLine
         void setRequestLine( std::string& requestLine, int& trackingRequestNumber );
         std::string &getMethod ( void );
         std::string &getRequestTarget ( void );
+        std::string &getPath ( void );
+        std::string &getData ( void );
         std::string &getTempraryRequestLine ( void );
         void        resetAttributes (void);
 

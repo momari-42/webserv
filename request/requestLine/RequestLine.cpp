@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestLine.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/18 01:57:17 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 13:27:15 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,12 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->method = parts[0];
         this->requestTarget = parts[1];
         this->httpVersion = parts[2];
+        if (this->requestTarget.find("?") != std::string::npos) {
+            this->data = this->requestTarget.substr(this->requestTarget.find("?") + 1);
+            this->requestTarget.erase(this->requestTarget.find("?"));
+            this->path = this->requestTarget;
+            std::cout << "The data is " << this->data << std::endl;
+        }
         this->rest = "";
         this->tempraryRequestLine = "";
         requestLine.erase(0, requestLine.find("\r\n") + 2);
@@ -109,6 +115,14 @@ std::string &RequestLine::getMethod ( void ) {
 
 std::string &RequestLine::getRequestTarget ( void ) {
     return (this->requestTarget);
+}
+
+std::string &RequestLine::getPath ( void ) {
+    return (this->path);
+}
+
+std::string &RequestLine::getData ( void ) {
+    return (this->data);
 }
 
 std::string &RequestLine::getTempraryRequestLine ( void ) {

@@ -51,6 +51,7 @@ class Request
         Socket              *socket;
 
     public:
+        std::map<std::string, std::string> cookies;
         // Reponse     response;
         // default  constructor and destructor
         Request( );
@@ -64,6 +65,7 @@ class Request
         
         void resetAttributes (void);
         void setSocket( Socket *socket );
+        void setCookies();
 
         std::string &getErrorCode();
         // this is just for test
@@ -79,4 +81,5 @@ class Request
         size_t      getTrackingRequestNumber( void );
         void        setConfigFile(ServerConfig* configFile);
         void        validateMethod(std::string &method, std::vector<std::string> &methods);
+        // bool        checkUserSession();
 };

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/18 02:32:15 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/19 13:15:23 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,9 @@ class Response : public MimeTypes, public HttpResponse
         ServerConfig*                               configFile;
         Location                                    location;
         bool                                        initiatConfigFile;
+
+        std::string                                 sessionID;
+        std::map<std::string, std::string>          cookies;
         // this for error Code
         std::string                                 errorCode;
         // RequestLine *requestLine;
@@ -89,6 +92,8 @@ class Response : public MimeTypes, public HttpResponse
         void setSocket( Socket *socket );
         void sendSuccessResponse( size_t fd );
         void sendNoContentResponse( size_t fd );
+        // bool checkUserSession();
+        void setServerCookies();
 
         void sendRedirectionResponse( size_t fd, Location &location );
         class ResponseExceptions : public std::exception

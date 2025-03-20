@@ -3,14 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/18 02:35:17 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 01:26:42 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+
+std::string generateSessionID() {
+    std::stringstream ss;
+    ss << std::hex << (rand() % 0xFFFFFFF); // Generate a random hex string
+    return ss.str();
+}
 
 Response::Response ( Request *request ) {
     this->request = request;
@@ -28,6 +34,9 @@ Response::Response ( Request *request ) {
     this->header["Server"] = "momari-zaelarb";
     this->header["Connection"] = "keep-alive";
     this->header["Transfer-Encoding"] = "chunked";
+
+    srand(time(NULL));
+    this->sessionID = generateSessionID();
 }
 
 void Response::executeCGI ( size_t fd, size_t kq ) {
@@ -85,7 +94,55 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     this->isCgiComplet = true;
 }
 
+void Response::setServerCookies() {
+    std::ifstream inFile("cookie/" + this->sessionID);
+    if (inFile.is_open()) {
+        std::string line;
+        while (getline(inFile, line)) {
+            std::string value;
+            std::string key = line.substr(0, line.find(":"));
+            line.erase(0, line.find(":") + 1);
+            value = line.substr(0);
+            this->request->cookies[key] = value;
+        }
+    }
+    std::string cookiesLine = this->request->getRequestLine()->getData();
+    while (cookiesLine.size()) {
+        std::string value;
+        std::string key = cookiesLine.substr(0, cookiesLine.find("="));
+        cookiesLine.erase(0, cookiesLine.find("=") + 1);
+        if (cookiesLine.find("&") != std::string::npos) {
+            value = cookiesLine.substr(0, cookiesLine.find("&"));
+            cookiesLine.erase(0, cookiesLine.find("&") + 1);
+        } else {
+            value = cookiesLine.substr(0);
+            cookiesLine.erase(0);
+        }
+        for (size_t i = 0; i < value.size(); i++)
+        {
+            if (value[i] == '+')
+                value[i] = ' ';
+        }
+        this->request->cookies[key] = value;
+    }
+    std::ofstream of("cookie/" + this->sessionID, std::ios::out);
+    if (of.is_open()) {
+        for (std::map<std::string, std::string>::iterator it = this->request->cookies.begin(); it != this->request->cookies.end(); it++)
+            of << it->first + ":" + it->second + "\n";
+    }
+}
+
 void Response::makeResponse ( size_t fd, size_t kq ) {
+    if (this->request->cookies["session_id"].size()) {
+        this->sessionID = this->request->cookies["session_id"];
+    } else
+        this->request->cookies["session_id"] = this->sessionID;
+    if (access(("cookie/" + this->sessionID).c_str(), R_OK) == -1) {
+        std::ofstream sessionFile("cookie/" + this->sessionID);
+        sessionFile.close();
+    }
+    std::cout << this->sessionID << std::endl;
+    setServerCookies();
     if (!initiatConfigFile) {
         this->configFile =  this->socket->getServerConfig(this->request->getHeader()->getValue("HOST"));
         this->location =  this->configFile->getLocations()[this->configFile->getMatchedLocation()];
@@ -162,6 +219,10 @@ void Response::sendRedirectionResponse( size_t fd, Location &location ) {
     }
 }
 
+// void setCookie(std::string& response, std::string& sessionID) {
+    
+// }
+
 void Response::generateHeader ( int fd, std::string &response) {
     Location &location =  this->request->getLocation();
     if (!location.redirection.first.empty() && !location.redirection.second.empty()) {
@@ -188,12 +249,17 @@ void Response::generateHeader ( int fd, std::string &response) {
         }
     }
     response += this->httpVersion + " 200 " + this->statusCodes["200"] + CRLF;
-    for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
+    for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++) {
+        if (it->first == "COOKIE")
+            continue;
         response += it->first + ": " + it->second + CRLF;
+    }
+    for (std::map<std::string, std::string>::iterator it = this->request->cookies.begin(); it != this->request->cookies.end(); it++)
+        response += "Set-Cookie: " + it->first + "=" + it->second + "; Path=" + this->request->getPath() + CRLF ;
     response += CRLF;
+    std::cout << response;
     if (send(fd, response.c_str(), response.size(), 0) == -1) {
-        std::cerr << "Error sending data" << std::endl;
-        // Handle send error
+        std::cerr << "Error sending data" << std::endl; 
     }
     if (!this->request->getCgi())
         setTargetFile();
