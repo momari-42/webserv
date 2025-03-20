@@ -6,7 +6,7 @@
 /*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 15:06:19 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/20 15:27:52 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,7 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->httpVersion = parts[2];
         if (this->requestTarget.find("?") != std::string::npos) {
             this->data = this->requestTarget.substr(this->requestTarget.find("?") + 1);
-            this->requestTarget.erase(this->requestTarget.find("?"));
-            this->path = this->requestTarget;
-            std::cout << "The data is " << this->data << std::endl;
+            this->path = this->requestTarget.substr(0, this->requestTarget.find("?"));
         }
         this->rest = "";
         this->tempraryRequestLine = "";
