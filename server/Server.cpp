@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 02:20:20 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 15:06:42 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,9 +269,9 @@ void Server::startServer() {
             if (std::time(NULL) - it->second > 30) {
                 size_t fd = it->first;
                 std::cout << "Client " << fd << " timed out" << std::endl;
-                close(fd);
                 this->clients.erase(fd);
                 this->timeout.erase(fd);
+                close(fd);
                 it = this->timeout.begin();
             } else {
                 it++;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 14:13:39 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 15:05:53 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,29 @@ void Request::validateMethod(std::string &method, std::vector<std::string> &meth
 //     return (false);
 // }
 
+// "Cookie: session_id=abc123; theme=dark; user=JohnDoe\r\n"
+
+void Request::setCookies() {
+    std::fstream outFile;
+    std::string cookiesLine = this->getHeader()->getValue("COOKIE");
+    while (cookiesLine.size()) {
+        std::string key = cookiesLine.substr(0, cookiesLine.find("="));
+        std::string value;
+        cookiesLine.erase(0, cookiesLine.find("=") + 1);
+        if (cookiesLine.find(";") != std::string::npos)
+            value = cookiesLine.substr(0, cookiesLine.find(";"));
+        else
+            value = cookiesLine.substr(0);
+        for (size_t i = 0; i < value.size(); i++)
+        {
+            if (value[i] == '+')
+                value[i] = ' ';
+        }
+        cookiesLine.erase(0, value.size() + 1);
+        this->cookies[key] = value;
+    }
+}
+
 void Request::parseRequest ( std::string requestData ) {
     // std::cerr << "the request data is :" << std::endl;
     // std::cerr << requestData << std::endl;
@@ -57,6 +80,7 @@ void Request::parseRequest ( std::string requestData ) {
         this->header.setHeader(requestData, this->trackingRequestNumber);
     }
     if (this->trackingRequestNumber == 2) {
+        setCookies();
         if (!this->checkRequestLine) {
             this->configFile =  this->socket->getServerConfig(this->header.getValue("Host"));
             this->body.setConfigFile(this->socket->getServerConfig(this->header.getValue("Host")));

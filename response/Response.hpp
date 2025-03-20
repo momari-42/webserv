@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 01:41:42 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 15:04:44 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,9 @@ class Response : public MimeTypes, public HttpResponse
         ServerConfig*                               configFile;
         Location                                    location;
         bool                                        initiatConfigFile;
+
+        std::string                                 sessionID;
+        std::map<std::string, std::string>          cookies;
         bool                                        listingDirectory;
         std::string                                 folderName;
         // this for error Code
@@ -96,6 +99,8 @@ class Response : public MimeTypes, public HttpResponse
         void setSocket( Socket *socket );
         void sendSuccessResponse( size_t fd );
         void sendNoContentResponse( size_t fd );
+        // bool checkUserSession();
+        void setServerCookies();
         void sendDirectoryList( size_t fd );
 
         void setIsReadyForNextRequest ( bool isReadyForNextRequest );
