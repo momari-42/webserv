@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 16:05:44 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/20 23:23:34 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,7 +221,7 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
         }
     }
     this->bodyLength += body.size();
-    if ( (this->method == "GET" || this->method == "DELETE") && this->bodyLength > 1024 ) {
+    if ( (this->method == "GET" || this->method == "DELETE") && this->bodyLength > 1048576 ) {
             // std::cout << "2";
         this->errorCode = "413";
         return;

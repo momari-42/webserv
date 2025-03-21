@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 16:07:17 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/21 01:33:37 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     }
     queryString = "QUERY_STRING=";
     queryString += this->queryString;
+    // std::cerr << "this is the script --->>>>: " << this->request->getLocation().cgi[this->request->getCgiExtention()].c_str() << std::endl;
+    // std::cerr << "this is the script --->>>>: " << requestTarget.c_str() << std::endl;
     argv[0] = const_cast<char *>( this->request->getLocation().cgi[this->request->getCgiExtention()].c_str());
     argv[1] = const_cast<char *>( requestTarget.c_str());
     argv[2] = NULL;
@@ -91,7 +93,9 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
         index++;
     }
     env[index] = 0;
-    pipe(this->fd);
+    if (pipe(this->fd) == -1) {
+        exit(1);
+    }
     this->pid = fork();
     if (pid == 0) {
         close(this->fd[0]);
@@ -99,6 +103,7 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
         close(this->fd[1]);
         if (execve(argv[0], argv, env) == -1) {
             freeEnvSpaces(env);
+        // std::cerr << "0000000000000000000000000000000000000000000000000000000000000000000000000000" << std::endl;
             std::cerr << "lolo" << std::endl;
             exit(1);
         }
@@ -563,10 +568,12 @@ void Response::setSocket( Socket *socket ) {
 }
 
 Response::~Response (void) {
-    dup2(inout[0], 0);
-    dup2(inout[1], 1);
-    close(this->inout[0]);
-    close(this->inout[1]);
+    if (this->request->getCgi()) {
+        dup2(inout[0], 0);
+        dup2(inout[1], 1);
+        close(this->inout[0]);
+        close(this->inout[1]);
+    }
 }
 
 

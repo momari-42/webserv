@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 15:05:53 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/21 01:23:35 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ void Request::setCookies() {
     std::fstream outFile;
     std::string cookiesLine = this->getHeader()->getValue("COOKIE");
     while (cookiesLine.size()) {
+        cookiesLine.erase(0, cookiesLine.find_first_not_of(" "));
         std::string key = cookiesLine.substr(0, cookiesLine.find("="));
         std::string value;
         cookiesLine.erase(0, cookiesLine.find("=") + 1);
@@ -110,14 +111,7 @@ void Request::parseRequest ( std::string requestData ) {
                 this->cgiExtention = ".php";
                 if (this->requestTarget.find(".py") != std::string::npos)
                     this->cgiExtention = ".py";
-                
                 std::map<std::string, std::string> mapcgi = this->location.cgi;
-
-                std::cout << "----------------------------------------------------------" << this->location.index[0] << std::endl;
-                for (std::map<std::string, std::string>::iterator it = mapcgi.begin(); it != mapcgi.end(); it++) {
-                    std::cout << it->first << "-" << it->second << std::endl;
-                }
-                std::cout << "----------------------------------------------------------" << std::endl;
                 if (this->location.cgi.count(this->cgiExtention)) {
                     this->cgi = true;
                 }

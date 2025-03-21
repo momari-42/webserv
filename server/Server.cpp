@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 15:06:42 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/21 01:35:03 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,9 @@ void Server::startServer() {
                     this->buffer = "";
                     if ( this->clients[this->readyEvents[i].ident].getRequest().getErrorCode().size() ) {
                         std::cout << "\033[1;31m    this is and error happend with code : " << this->clients[this->readyEvents[i].ident].getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
+                        
+                        // std::map<std::string, std::string> map;
+                        std::cout << "                          this is wehe 404 founds" << std::endl;
                         Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode(), this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
                         error.sendErrorPage();
                         removeFdFromKqueue(kq, this->readyEvents[i].ident, EVFILT_READ);
@@ -207,8 +210,8 @@ void Server::startServer() {
                             std::cout << "\033[32m  reqeust keep-alive : " << this->numberOfRequest++  << " Done!!"  << "\033[0m" << std::endl;
                             removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
                             addFdToKqueue(this->kq, this->readyEvents[i].ident, EVFILT_READ);
-                            this->clients[this->readyFd].getRequest().resetAttributes();
                             this->clients[this->readyFd].getResponse().resetAttributes();
+                            this->clients[this->readyFd].getRequest().resetAttributes();
                             this->clients[this->readyFd].getResponse().setIsReadyForNextRequest(true);
                         }
                     }
@@ -219,7 +222,7 @@ void Server::startServer() {
 
                     waitpid(this->readyEvents[i].ident, &exitStatus, WNOHANG);
                     removeFdFromKqueue(this->kq, this->readyFd, EVFILT_TIMER);
-                    std::cout << WEXITSTATUS(exitStatus) << std::endl;
+                    // std::cout << WEXITSTATUS(exitStatus) << std::endl;
                     // WEXITSTATUS(&exitStatus);
                     if (WEXITSTATUS(exitStatus)) {
                         Error error( *fdClient, "500", this->clients[*fdClient].getRequest().getConfigFile()->getErrorPages() );
