@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/20 15:41:16 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/21 02:11:15 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void readConfigFile(std::fstream& configFile, std::string& file) {
 }
 
 int main(int ac, char **av) {
-
+    signal (SIGPIPE, SIG_IGN);
     if (ac != 2) {
         std::cerr << "Program work with: ./webserv [configuration file]" << std::endl;
         return 1;
