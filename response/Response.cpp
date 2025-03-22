@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/21 01:33:37 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 01:18:13 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     }
     env[index] = 0;
     if (pipe(this->fd) == -1) {
-        exit(1);
+        // exit(1);
     }
     this->pid = fork();
     if (pid == 0) {
@@ -117,7 +117,7 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     if (kevent(kq, &eventForDelete, 1, NULL, 0, NULL) == -1)
         throw (Response::ResponseExceptions(strerror(errno)));
     EV_SET(&events[0], this->pid, EVFILT_PROC, EV_ADD | EV_ENABLE, NOTE_EXIT, 0, &this->fdClient);
-    EV_SET(&events[1], this->pid, EVFILT_TIMER, EV_ADD | EV_ENABLE, 0, 10000, &this->fdClient);
+    EV_SET(&events[1], this->pid, EVFILT_TIMER, EV_ADD | EV_ENABLE, 0, 5000, &this->fdClient);
 
     if (kevent(kq, events, 2, NULL, 0, NULL) == -1) {
         throw (Response::ResponseExceptions(strerror(errno)));
@@ -164,6 +164,7 @@ void Response::setServerCookies() {
 }
 
 void Response::makeResponse ( size_t fd, size_t kq ) {
+
     if (this->request->cookies["session_id"].size()) {
         this->sessionID = this->request->cookies["session_id"];
     } else
@@ -189,8 +190,9 @@ void Response::makeResponse ( size_t fd, size_t kq ) {
         }
         initiatConfigFile = true;
     }
-    if (this->request->getCgi() && !this->isCgiComplet)
+    if (this->request->getCgi() && !this->isCgiComplet) {
         executeCGI( fd, kq );
+    }
     else if (this->request->getRequestLine()->getMethod() == "GET")
         methodGet( fd );
     else if (this->request->getRequestLine()->getMethod() == "POST")
@@ -207,23 +209,23 @@ std::string convertDecimalToHexaToString ( size_t number ) {
 }
 
 void Response::validateRequestTarget() {
-    if ( this->location.listing ) {
-        std::string tmp = this->request->getRequestTarget();
-        std::string toFind = this->request->getRoot();
-        if (toFind.size() && toFind.at(toFind.size() - 1) == '/')
-            toFind.erase(toFind.size() - 1);
-        int n = 0;
-        while (!tmp.find(toFind)) {
-            tmp.erase(0, toFind.size());
-            // std::cout << "this is :" << tmp << std::endl;
-            n++;
-        }
-        if( n == 2 ) {
-            // std::cout << "this is the request target after :" << this->request->getRequestTarget() << std::endl;
-            this->request->getRequestTarget().erase(0, toFind.size());
-        }   
-        // std::cout << "this is the root :" << n << "-" << this->request->getRoot() << std::endl;
-    }
+    // if ( this->location.listing || this->request->getRequestTarget().find(".php") != std::string::npos ) {
+    //     std::string tmp = this->request->getRequestTarget();
+    //     std::string toFind = this->request->getRoot();
+    //     if (toFind.size() && toFind.at(toFind.size() - 1) == '/')
+    //         toFind.erase(toFind.size() - 1);
+    //     int n = 0;
+    //     while (!tmp.find(toFind)) {
+    //         tmp.erase(0, toFind.size());
+    //         // std::cout << "this is :" << tmp << std::endl;
+    //         n++;
+    //     }
+    //     if( n == 2 ) {
+    //         // std::cout << "this is the request target after :" << this->request->getRequestTarget() << std::endl;
+    //         this->request->getRequestTarget().erase(0, toFind.size());
+    //     }   
+    //     // std::cout << "this is the root :" << n << "-" << this->request->getRoot() << std::endl;
+    // }
     if ( isDirectory(this->request->getRequestTarget()) ) {
         bool isValidPath = false;
         std::vector<std::string> &index = this->configFile->getIndex();
@@ -276,7 +278,7 @@ void Response::sendDirectoryList( size_t fd ) {
         "    <title>Directory Listing</title>\n"
         "</head>\n"
         "<body>\n"
-        "<h1>Directory Listing From " + this->request->getRoot() + " </h1>"
+        "<h1>Directory Listing From "  + this->request->getRoot() + " </h1>"
         "    <div class=\"container\">\n"
         "        <nav class=\"nav\">\n"
         "            <ul>\n";
@@ -286,7 +288,11 @@ void Response::sendDirectoryList( size_t fd ) {
             std::string &requestTarget = this->request->getRequestTarget();
             if ( requestTarget.size() && requestTarget.at(requestTarget.size() - 1) != '/')
                 requestTarget.push_back('/');
-            htmlContent += "<li><a href=\"" + this->request->getRequestTarget() + std::string(entry->d_name) + "\">";
+            // std::cerr << "-->>>>> : " << this->request->getRequestLine()->getRequestTarget() << std::endl;
+            if ( this->request->getRequestLine()->getRequestTarget() == "/" )
+                htmlContent += "<li><a href=\"" + this->request->getRequestLine()->getRequestTarget() +  std::string(entry->d_name) + "\">";
+            else 
+                htmlContent += "<li><a href=\"" + this->request->getRequestLine()->getRequestTarget() + "/" +  std::string(entry->d_name) + "\">";
             htmlContent += entry->d_name + std::string("</a></li>\n");
         }
         htmlContent += "            </ul>\n"
@@ -299,10 +305,11 @@ void Response::sendDirectoryList( size_t fd ) {
         response += htmlContent + CRLF;
         if (send(fd, response.c_str(), response.size(), 0) == -1) {
             std::cout << "Error sending data" << std::endl;
+            closedir(dir);
             // Handle send error
         }
-        (void)entry;
         this->isResponseSent = true;
+        closedir(dir);
         return;
     }
     this->errorCode = "500";
@@ -569,6 +576,9 @@ void Response::setSocket( Socket *socket ) {
 
 Response::~Response (void) {
     if (this->request->getCgi()) {
+        close(this->fd[0]);
+        close(this->fd[1]);
+
         dup2(inout[0], 0);
         dup2(inout[1], 1);
         close(this->inout[0]);

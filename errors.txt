@@ -1,2 +1,4 @@
 1 - two file descriptors one for la7ya and one for momari.py
 3 - resinsing
+
+... problem pipes

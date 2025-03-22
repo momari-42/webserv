@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/21 01:23:35 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 00:28:30 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ Request::Request( bool &isReadyForNextRequest ) : isReadyForNextRequest(isReadyF
     this->isRequestComplete         = false;
     this->checkRequestLine          = false;
     this->cgi                       = false;
+    this->configFile                = NULL;
     (void)this->isReadyForNextRequest;
 }
 

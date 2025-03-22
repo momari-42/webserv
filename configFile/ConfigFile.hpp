@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/19 15:46:49 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/21 14:45:52 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ private:
     std::string                                     root;
     std::map<std::string, Location>                 locations;
     std::map<std::string, std::string>              errorPages;
-    size_t                                          bodyLimit;
+    long                                          bodyLimit;
     size_t                                          URILimit;
 
     // this for the return of indexes

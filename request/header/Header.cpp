@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 00:36:28 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/21 23:01:07 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,24 @@ void toLowerCase(std::string &str ) {
         str.at(n) = tolower(str.at(n));
     }
     // std::cout << "this is the str after : " << str << std::endl;
+}
+
+bool checkHost(std::string& host) {
+    std::vector<std::string> parts;
+    std::string word;
+    if ( host.find("\t") != std::string::npos )
+        return (false);
+    while (host.size()) {
+        host.erase(0, host.find_first_not_of(" "));
+        if (!host.size())
+            break;
+        word = host.substr(0, host.find_first_of(" "));
+        host.erase(0, host.find_first_of(" "));
+        parts.push_back(word);
+    }
+    if ( parts.size() != 1)
+        return (false);
+    return (true);
 }
 
 void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
@@ -64,6 +82,10 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
                 secondPortion = portion.substr(portion.find_first_not_of(" "));
             else
                 secondPortion = portion.substr(0);
+            if ( firstPortion == "HOST" && (!checkHost(secondPortion) || this->httpHeadersMap.count("HOST"))) {
+                this->errorCode = "400";
+                return;
+            }
             toLowerCase(secondPortion);
             this->httpHeadersMap[firstPortion] = secondPortion;
             this->rest.erase(0, this->rest.find("\r\n") + 2);

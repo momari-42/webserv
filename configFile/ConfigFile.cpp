@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/19 22:55:49 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/21 14:46:46 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ void ServerConfig::setBodyLimit(std::vector<std::string>& parts) {
         throw ErrorHandling("Wrong number of arguments in Body Limit");
     else if(!ft_isdigits(parts[1]))
         throw ErrorHandling("Body limit is not digit");
-    else if (parts[1].length() > 10)
+    else if (parts[1].length() > 20)
         throw ErrorHandling("Invalid argument in body limit");
     else
         this->bodyLimit = atol(parts[1].c_str());
