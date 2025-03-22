@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/21 14:46:46 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 15:36:27 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ bool ServerConfig::operator==(ServerConfig& obj) {
             if (it->first == iter->first && it->second == iter->second) {
                 for (std::vector<std::string>::iterator name = this->names.begin(); name != this->names.end(); name++) {
                     for (std::vector<std::string>::iterator name1 = obj.names.begin(); name1 != obj.names.end(); name1++) {
-                        // std::cout << *name << " " << *name1 << std::endl;
                         if (*name == *name1)
                             return true;
                     }

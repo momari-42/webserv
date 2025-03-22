@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 01:18:13 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 15:48:22 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 std::string generateSessionID() {
     std::stringstream ss;
-    ss << std::hex << (rand() % 0xFFFFFFF); // Generate a random hex string
+    ss << std::hex << (rand() % 0xFFFFFFF);
     return ss.str();
 }
 
@@ -69,12 +69,9 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     }
     queryString = "QUERY_STRING=";
     queryString += this->queryString;
-    // std::cerr << "this is the script --->>>>: " << this->request->getLocation().cgi[this->request->getCgiExtention()].c_str() << std::endl;
-    // std::cerr << "this is the script --->>>>: " << requestTarget.c_str() << std::endl;
     argv[0] = const_cast<char *>( this->request->getLocation().cgi[this->request->getCgiExtention()].c_str());
     argv[1] = const_cast<char *>( requestTarget.c_str());
     argv[2] = NULL;
-    // this where i init the env;
     varValue = "UPLOAD_TMP_DIR=" + varValue;
     method   = "METHOD=" + method;
     setenv("QUERY_STRING", queryString.c_str(), 1);
@@ -94,39 +91,52 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     }
     env[index] = 0;
     if (pipe(this->fd) == -1) {
-        // exit(1);
+        std::cerr << "Error: pipe() failed" << std::endl;
+        this->errorCode = "500";
+        return ;
     }
     this->pid = fork();
-    if (pid == 0) {
+    if (this->pid == -1) {
+        std::cerr << "Error: fork() failed" << std::endl;
+        this->errorCode = "500";
+        return ;
+    }
+    if (this->pid == 0) {
         close(this->fd[0]);
         dup2(this->fd[1], 1);
         close(this->fd[1]);
         if (execve(argv[0], argv, env) == -1) {
+            std::cerr << "Error: execve() failed" << std::endl;
             freeEnvSpaces(env);
-        // std::cerr << "0000000000000000000000000000000000000000000000000000000000000000000000000000" << std::endl;
-            std::cerr << "lolo" << std::endl;
             exit(1);
         }
     }
-    // usleep(200);
     freeEnvSpaces(env);
     struct kevent eventForDelete;
     struct kevent events[2];
 
     EV_SET(&eventForDelete, fd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-    if (kevent(kq, &eventForDelete, 1, NULL, 0, NULL) == -1)
-        throw (Response::ResponseExceptions(strerror(errno)));
+    if (kevent(kq, &eventForDelete, 1, NULL, 0, NULL) == -1) {
+        std::cerr << "Error: kevent() failed" << std::endl;
+        this->errorCode = "500";
+    }
     EV_SET(&events[0], this->pid, EVFILT_PROC, EV_ADD | EV_ENABLE, NOTE_EXIT, 0, &this->fdClient);
     EV_SET(&events[1], this->pid, EVFILT_TIMER, EV_ADD | EV_ENABLE, 0, 5000, &this->fdClient);
 
     if (kevent(kq, events, 2, NULL, 0, NULL) == -1) {
-        throw (Response::ResponseExceptions(strerror(errno)));
+        std::cerr << "Error: kevent() failed" << std::endl;
+        this->errorCode = "500";
     }
     this->isCgiComplet = true;
 }
 
 void Response::setServerCookies() {
     std::ifstream inFile("cookie/" + this->sessionID);
+    if (!inFile.is_open()) {
+        std::cerr << "Error: open file failed1" << std::endl;
+        this->errorCode = "500";
+        return;
+    }
     if (inFile.is_open()) {
         std::string line;
         while (getline(inFile, line)) {
@@ -157,6 +167,11 @@ void Response::setServerCookies() {
         this->request->cookies[key] = value;
     }
     std::ofstream of("cookie/" + this->sessionID, std::ios::out);
+    if (!of.is_open()) {
+        std::cerr << "Error: open file failed2" << std::endl;
+        this->errorCode = "500";
+        return;
+    }
     if (of.is_open()) {
         for (std::map<std::string, std::string>::iterator it = this->request->cookies.begin(); it != this->request->cookies.end(); it++)
             of << it->first + ":" + it->second + "\n";
@@ -171,6 +186,11 @@ void Response::makeResponse ( size_t fd, size_t kq ) {
         this->request->cookies["session_id"] = this->sessionID;
     if (access(("cookie/" + this->sessionID).c_str(), R_OK) == -1) {
         std::ofstream sessionFile("cookie/" + this->sessionID);
+        if (!sessionFile.is_open()) {
+            std::cerr << "Error: open file failed3" << std::endl;
+            this->errorCode = "500";
+            return;
+        }
         sessionFile.close();
     }
     setServerCookies();
@@ -180,13 +200,16 @@ void Response::makeResponse ( size_t fd, size_t kq ) {
         if ( this->request->getCgi() ) {
             this->inout[0] = dup(0);
             this->inout[1] = dup(1);
+            if (this->inout[0] == -1 || this->inout[1] == -1) {
+                std::cerr << "Error: dup() failed" << std::endl;
+                this->errorCode = "500";
+                return;
+            }
         }
         size_t      queryPos        = this->request->getRequestTarget().find("?");
         if (queryPos != std::string::npos) {
-            std::cout << "before : " << this->request->getRequestTarget()<< std::endl;
             this->queryString = this->request->getRequestTarget().substr(queryPos + 1);
             this->request->getRequestTarget().erase(queryPos);
-            std::cout << "after  : " << this->queryString<< std::endl;
         }
         initiatConfigFile = true;
     }
@@ -209,23 +232,6 @@ std::string convertDecimalToHexaToString ( size_t number ) {
 }
 
 void Response::validateRequestTarget() {
-    // if ( this->location.listing || this->request->getRequestTarget().find(".php") != std::string::npos ) {
-    //     std::string tmp = this->request->getRequestTarget();
-    //     std::string toFind = this->request->getRoot();
-    //     if (toFind.size() && toFind.at(toFind.size() - 1) == '/')
-    //         toFind.erase(toFind.size() - 1);
-    //     int n = 0;
-    //     while (!tmp.find(toFind)) {
-    //         tmp.erase(0, toFind.size());
-    //         // std::cout << "this is :" << tmp << std::endl;
-    //         n++;
-    //     }
-    //     if( n == 2 ) {
-    //         // std::cout << "this is the request target after :" << this->request->getRequestTarget() << std::endl;
-    //         this->request->getRequestTarget().erase(0, toFind.size());
-    //     }   
-    //     // std::cout << "this is the root :" << n << "-" << this->request->getRoot() << std::endl;
-    // }
     if ( isDirectory(this->request->getRequestTarget()) ) {
         bool isValidPath = false;
         std::vector<std::string> &index = this->configFile->getIndex();
@@ -252,11 +258,9 @@ void Response::validateRequestTarget() {
         }
         else
             this->errorCode = "404" ;
-        // std::cout << "this is where the 404 thrown " << std::endl;
     }
     else {
         if (access( this->request->getRequestTarget().c_str(), F_OK ) == -1) {
-            // std::cout << "665556656556565 ->>>>" << this->request->getRequestTarget().c_str() << "<<<<<----" << std::endl;
             this->errorCode = "404";
             return;
         }   
@@ -288,7 +292,6 @@ void Response::sendDirectoryList( size_t fd ) {
             std::string &requestTarget = this->request->getRequestTarget();
             if ( requestTarget.size() && requestTarget.at(requestTarget.size() - 1) != '/')
                 requestTarget.push_back('/');
-            // std::cerr << "-->>>>> : " << this->request->getRequestLine()->getRequestTarget() << std::endl;
             if ( this->request->getRequestLine()->getRequestTarget() == "/" )
                 htmlContent += "<li><a href=\"" + this->request->getRequestLine()->getRequestTarget() +  std::string(entry->d_name) + "\">";
             else 
@@ -304,7 +307,7 @@ void Response::sendDirectoryList( size_t fd ) {
         response += hexaNumber + CRLF;
         response += htmlContent + CRLF;
         if (send(fd, response.c_str(), response.size(), 0) == -1) {
-            std::cout << "Error sending data" << std::endl;
+            std::cerr << "Error sending data" << std::endl;
             closedir(dir);
             // Handle send error
         }
@@ -324,10 +327,6 @@ void Response::sendRedirectionResponse( size_t fd, Location &location ) {
         std::cerr << "Error sending data" << std::endl; 
     }
 }
-
-// void setCookie(std::string& response, std::string& sessionID) {
-    
-// }
 
 void Response::generateHeader ( int fd, std::string &response) {
     Location &location =  this->request->getLocation();
@@ -363,9 +362,10 @@ void Response::generateHeader ( int fd, std::string &response) {
     for (std::map<std::string, std::string>::iterator it = this->request->cookies.begin(); it != this->request->cookies.end(); it++)
         response += "Set-Cookie: " + it->first + "=" + it->second + "; Path=" + this->request->getPath() + CRLF ;
     response += CRLF;
-    // std::cout << response;
     if (send(fd, response.c_str(), response.size(), 0) == -1) {
-        std::cerr << "Error sending data" << std::endl; 
+        std::cerr << "Error sending data" << std::endl;
+        this->errorCode = "500";
+        return;
     }
     if ( !this->request->getCgi() && !this->listingDirectory )
         setTargetFile();
@@ -407,27 +407,36 @@ void Response::methodGet( size_t fd ) {
         targetFile.read(buffer, BUFFER_SIZE_R);
         bytesRead = targetFile.gcount();
     }
+    if (bytesRead == -1) {
+        this->errorCode = "500";
+        return;
+    }
     if (bytesRead > 0) {
         std::string content(buffer, bytesRead);
         std::string hexaNumber = convertDecimalToHexaToString(bytesRead); 
         response += hexaNumber + CRLF;
         response += content + CRLF;
         if (send(fd, response.c_str(), response.size(), 0) == -1) {
-            std::cout << "Error sending data" << std::endl;
-            // Handle send error
+            std::cerr << "Error sending data From Sever To Client" << std::endl;
+            this->errorCode = "500";
+            return;
         }
         response.clear();
     }
     if (targetFile.eof() || bytesRead < BUFFER_SIZE_R) {
         response = "0" + std::string(CRLF) + CRLF;
-        send(fd, response.c_str(), response.size(), 0);
+        if (send(fd, response.c_str(), response.size(), 0) == -1) {
+            std::cerr << "Error sending data From Sever To Client" << std::endl;
+            this->errorCode = "500";
+            return;
+        }
         this->isResponseSent = true;
         if (this->request->getCgi()) {
             close (this->fd[0]);
             close (this->fd[1]);
         }
         else 
-            targetFile.close(); // Close the file
+            targetFile.close();
     }
 }
 
@@ -454,7 +463,11 @@ void Response::sendNoContentResponse( size_t fd ) {
         response += it->first + ": " + it->second + CRLF;
     response += CRLF;
     response += body;
-    write(fd, response.c_str(), response.size());
+    if ( send(fd, response.c_str(), response.size(), 0) == -1) {
+        std::cerr << "Error sending data From Sever To Client" << std::endl;
+        this->errorCode = "500";
+        return;
+    }
     this->isResponseSent = true;
 }
 
@@ -480,7 +493,11 @@ void Response::sendSuccessResponse( size_t fd ) {
         response += it->first + ": " + it->second + CRLF;
     response += CRLF;
     response += body;
-    write(fd, response.c_str(), response.size());
+    if (send(fd, response.c_str(), response.size(), 0) == -1) {
+        std::cerr << "Error sending data From Sever To Client" << std::endl;
+        this->errorCode = "500";
+        return ;
+    }
     this->isResponseSent = true;
 }
 
@@ -496,7 +513,6 @@ void Response::methodPost( size_t fd ) {
 void Response::methodDelete( size_t fd ) {
     std::string path = this->request->getRequestTarget();
     if (access( path.c_str(), R_OK ) == -1 || isDirectory(path)) {
-        // std::cout << "kjdsflkjsflds : " << path << std::endl;
         this->errorCode = "404";
         return;
     }
@@ -515,7 +531,11 @@ void Response::methodDelete( size_t fd ) {
             response += it->first + ": " + it->second + CRLF;
         response += CRLF;
         response += body;
-        write(fd, response.c_str(), response.size());
+        if (send(fd, response.c_str(), response.size(), 0) == -1) {
+            std::cerr << "Error sending data From Sever To Client" << std::endl;
+            this->errorCode = "500";
+            return ;
+        }
         this->isResponseSent = true;
         return;
     } else {
@@ -533,7 +553,11 @@ void Response::methodDelete( size_t fd ) {
             response += it->first + ": " + it->second + CRLF;
         response += CRLF;
         response += body;
-        write(fd, response.c_str(), response.size());
+        if (send(fd, response.c_str(), response.size(), 0) == -1) {
+            std::cerr << "Error sending data From Sever To Client" << std::endl;
+            this->errorCode = "500";
+            return ;
+        }
         this->isResponseSent = true;
     }
 }
@@ -544,6 +568,10 @@ bool Response::getIsResponseSent() {
 
 void Response::setTargetFile() {
     this->targetFile.open(this->request->getRequestTarget(), std::ios::in);
+    if (!this->targetFile.is_open()) {
+        std::cerr << "Error: open file failed4" << std::endl;
+        this->errorCode = "500";
+    }
 }
 
 std::string &Response::getErrorCode() {
@@ -590,9 +618,6 @@ Response::~Response (void) {
 Response::ResponseExceptions::ResponseExceptions ( const std::string& errorMsg ) {
     this->errorMsg = errorMsg;
 }
-
-// Response::ResponseExceptions::~ResponseExceptions ( ) throw() {
-// }
 
 const char* Response::ResponseExceptions::what() const throw() {
     return (this->errorMsg.c_str());

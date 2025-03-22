@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 00:28:30 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 14:51:11 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,6 @@ void Request::setCookies() {
 }
 
 void Request::parseRequest ( std::string requestData ) {
-    // std::cerr << "the request data is :" << std::endl;
-    // std::cerr << requestData << std::endl;
     if (this->trackingRequestNumber == 0) {
         this->isReadyForNextRequest = false;
         this->requestLine.setRequestLine(requestData, this->trackingRequestNumber );
@@ -136,12 +134,12 @@ size_t Request::getTrackingRequestNumber( void ) {
 }
 
 
-void Request::print( void ) {
-    std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
-    std::cout << "\033[31m" << "|--------------This is the Body---------------|" << "\033[0m" << std::endl;
-    std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
-    this->body.printBody();
-}
+// void Request::print( void ) {
+//     std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
+//     std::cout << "\033[31m" << "|--------------This is the Body---------------|" << "\033[0m" << std::endl;
+//     std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
+//     this->body.printBody();
+// }
 
 
 Request::~Request () {

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 00:34:33 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 15:47:54 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,22 +96,24 @@ bool Server::findFdSocket ( size_t sockfd ) {
     return (false);
 }
 
-void addFdToKqueue(int kq, size_t fd, int flag) {
+bool addFdToKqueue(int kq, size_t fd, int flag) {
     struct kevent change;
     
     EV_SET(&change, fd, flag, EV_ADD | EV_ENABLE, 0, 0, NULL);
     if (kevent(kq, &change, 1, NULL, 0, NULL) == -1) {
-        throw ErrorHandling(strerror(errno));
+        return (true);
     }
+    return (false);
 }
 
-void removeFdFromKqueue(int kq, size_t fd, int flag) {
+bool removeFdFromKqueue(int kq, size_t fd, int flag) {
     struct kevent change;
     
     EV_SET(&change, fd, flag, EV_DELETE, 0, 0, NULL);
     if (kevent(kq, &change, 1, NULL, 0, NULL) == -1) {
-        throw ErrorHandling(strerror(errno));
+        return (true);
     }
+    return (false);
 }
 
 void Server::startServer() {
@@ -128,7 +130,8 @@ void Server::startServer() {
         throw (Server::ServerExceptions(strerror(errno)));
     memset(events, 0, sizeof(events));
     for (size_t i = 0; i < this->sockets.size(); i++) {
-        addFdToKqueue(kq, this->sockets[i].getSockfd(), EVFILT_READ);
+        if ( addFdToKqueue(kq, this->sockets[i].getSockfd(), EVFILT_READ))
+            throw ErrorHandling(strerror(errno));
     }
     
     while (true) {
@@ -143,12 +146,18 @@ void Server::startServer() {
                     this->sockfdClient = accept(this->readyFd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
 
                     if (this->sockfdClient == -1) {
-                        std::cout << "Problem in accept function" << std::endl; 
+                        std::cerr << "Problem in accept function" << std::endl; 
                         continue;
                     }
-                    
                     fcntl(this->sockfdClient, F_SETFL, O_NONBLOCK);
-                    addFdToKqueue(kq, this->sockfdClient, EVFILT_READ);
+                    if ( addFdToKqueue(kq, this->sockfdClient, EVFILT_READ)) {
+                        std::map<std::string, std::string> errorPages;
+                        Error error( this->sockfdClient, "500",  errorPages);
+                        error.sendErrorPage();
+                        std::cerr << "Problem in kevent (failed add Event of client to kq)" << std::endl; 
+                        close(this->sockfdClient);
+                        continue;
+                    }
                     
                     this->clients[this->sockfdClient].setConfig(this->readyFd, this->sockets);
                     this->timeout[this->sockfdClient] = std::time(NULL);
@@ -157,8 +166,16 @@ void Server::startServer() {
                 else if ( this->readyEvents[i].filter == EVFILT_READ ) {
                     this->timeout[this->readyFd] = std::time(NULL);
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
-                    if (bytesRead <= 0) {
-                        std::cout << "  Client disconnected" << std::endl;
+                    // std::cerr << "." << std::endl;
+                    if (this->bytesRead <= 0) { 
+                        if ( bytesRead == 0)
+                            std::cerr << "  Client disconnected" << std::endl;
+                        else {
+                            std::map<std::string, std::string> errorPages;
+                            Error error( this->sockfdClient, "500",  errorPages);
+                            error.sendErrorPage();
+                            std::cerr << "  recv failed !!" << std::endl;
+                        }
                         close(this->readyFd);
                         this->clients.erase(this->readyFd);
                         this->timeout.erase(this->readyFd);
@@ -178,24 +195,46 @@ void Server::startServer() {
                             errorPages = configFile->getErrorPages();
                         Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getRequest().getErrorCode(), errorPages );
                         error.sendErrorPage();
-                        removeFdFromKqueue(kq, this->readyEvents[i].ident, EVFILT_READ);
+                        if ( removeFdFromKqueue(kq, this->readyEvents[i].ident, EVFILT_READ) ) {
+                            Error error( this->readyEvents[i].ident, "500", errorPages );
+                            error.sendErrorPage();
+                            std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl; 
+                        }
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
                         this->timeout.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getRequest().getBodyComplete() == true) {
-                        addFdToKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
-                        removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_READ);
+                        if ( addFdToKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE) ) {
+                            Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
+                            error.sendErrorPage();
+                            std::cerr << "Problem in kevent (failed add Event of client to kq)" << std::endl; 
+                            close(this->readyEvents[i].ident);
+                            this->clients.erase(this->readyEvents[i].ident);
+                            this->timeout.erase(this->readyEvents[i].ident);
+                        }
+                        if ( removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_READ) ) {
+                            Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
+                            error.sendErrorPage();
+                            std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl; 
+                            close(this->readyEvents[i].ident);
+                            this->clients.erase(this->readyEvents[i].ident);
+                            this->timeout.erase(this->readyEvents[i].ident);
+                        }
                     }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_WRITE ) {
                     this->timeout[this->readyFd] = std::time(NULL);
                     this->clients[this->readyEvents[i].ident].getResponse().makeResponse( this->readyEvents[i].ident, kq );
                     if ( this->clients[this->readyEvents[i].ident].getResponse().getErrorCode().size() ) {                        
-                        std::cout << "\033[1;31m    this is and error happend with code : " << this->clients[this->readyEvents[i].ident].getResponse().getErrorCode() <<  "!\033[0m" << std::endl;
                         Error error( this->readyEvents[i].ident, this->clients[this->readyEvents[i].ident].getResponse().getErrorCode(), this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
                         error.sendErrorPage();
-                        removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
+                        std::cout << "\033[1;31m    this is and error happend with code : " << this->clients[this->readyEvents[i].ident].getResponse().getErrorCode() <<  "!\033[0m" << std::endl;
+                        if ( removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE) ) {
+                            Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
+                            error.sendErrorPage();
+                            std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl; 
+                        }
                         close(this->readyEvents[i].ident);
                         this->clients.erase(this->readyEvents[i].ident);
                         this->timeout.erase(this->readyEvents[i].ident);
@@ -203,15 +242,35 @@ void Server::startServer() {
                     else if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
                         if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("CONNECTION") == "close") {
                             std::cout << "\033[32m  reqeust  closed : " << this->numberOfRequest++ << " Done!!"  << "\033[0m" << std::endl;
-                            removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
+                            if (removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE)) {
+                                Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
+                                error.sendErrorPage();
+                                std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl; 
+                            }
                             close(this->readyEvents[i].ident);
                             this->clients.erase(this->readyEvents[i].ident);
                             this->timeout.erase(this->readyEvents[i].ident);
                         }
                         else {
                             std::cout << "\033[32m  reqeust keep-alive : " << this->numberOfRequest++  << " Done!!"  << "\033[0m" << std::endl;
-                            removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE);
-                            addFdToKqueue(this->kq, this->readyEvents[i].ident, EVFILT_READ);
+                            if (removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE)) {
+                                Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
+                                error.sendErrorPage();
+                                std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl;
+                                close(this->readyEvents[i].ident);
+                                this->clients.erase(this->readyEvents[i].ident);
+                                this->timeout.erase(this->readyEvents[i].ident);
+                                continue;
+                            }
+                            if ( addFdToKqueue(this->kq, this->readyEvents[i].ident, EVFILT_READ) ) {
+                                Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );
+                                error.sendErrorPage();
+                                std::cerr << "Problem in kevent (failed add Event of client to kq)" << std::endl;
+                                close(this->readyEvents[i].ident);
+                                this->clients.erase(this->readyEvents[i].ident);
+                                this->timeout.erase(this->readyEvents[i].ident);
+                                continue;
+                            }
                             this->clients[this->readyFd].getResponse().resetAttributes();
                             this->clients[this->readyFd].getRequest().resetAttributes();
                             this->clients[this->readyFd].getResponse().setIsReadyForNextRequest(true);
@@ -223,16 +282,30 @@ void Server::startServer() {
                     int             fdClient  = *(static_cast<int *>(this->readyEvents[i].udata));
 
                     waitpid(this->readyEvents[i].ident, &exitStatus, WNOHANG);
-                    removeFdFromKqueue(this->kq, this->readyFd, EVFILT_TIMER);
+                    if (removeFdFromKqueue(this->kq, this->readyFd, EVFILT_TIMER)) {
+                        Error error( fdClient, "500", this->clients[fdClient].getRequest().getConfigFile()->getErrorPages() );
+                        error.sendErrorPage();
+                        std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl;
+                        close(fdClient);
+                        this->clients.erase(fdClient);
+                        this->timeout.erase(fdClient);
+                        continue;
+                    }
                     if (WEXITSTATUS(exitStatus)) {
-                        // std::cerr << "hi from 500 errro and this is the exit status : " << WEXITSTATUS(exitStatus) << std::endl;
                         Error error( fdClient, "500", this->clients[fdClient].getRequest().getConfigFile()->getErrorPages() );
                         error.sendErrorPage();
                         close(fdClient);
                         this->clients.erase(fdClient);
                         this->timeout.erase(fdClient);
-                    } else
-                        addFdToKqueue(this->kq, fdClient, EVFILT_WRITE);
+                    } else {
+                        if (addFdToKqueue(this->kq, fdClient, EVFILT_WRITE)) {
+                            Error error( fdClient, "500", this->clients[fdClient].getRequest().getConfigFile()->getErrorPages() );
+                            error.sendErrorPage();
+                            close(fdClient);
+                            this->clients.erase(fdClient);
+                            this->timeout.erase(fdClient);
+                        }
+                    }
                 }
                 else if ( this->readyEvents[i].filter == EVFILT_TIMER ) {
                     int             fdClient = *(static_cast<int *>(this->readyEvents[i].udata));
@@ -243,30 +316,46 @@ void Server::startServer() {
                     close(fdClient);
                     this->clients.erase(fdClient);
                     this->timeout.erase(fdClient);
-                    // std::cout << "loolololo "  << std::endl;
-                    removeFdFromKqueue(this->kq, this->readyFd, EVFILT_PROC);
-                    removeFdFromKqueue(this->kq, this->readyFd, EVFILT_TIMER);
-                    // std::cout << "------------>>> : " << fdClient << std::endl;
+                    if ( removeFdFromKqueue(this->kq, this->readyFd, EVFILT_PROC)) {
+                        std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl;
+                        close(fdClient);
+                        this->clients.erase(fdClient);
+                        this->timeout.erase(fdClient);
+                    }
+                    if (removeFdFromKqueue(this->kq, this->readyFd, EVFILT_TIMER)) {
+                        std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl;
+                        close(fdClient);
+                        this->clients.erase(fdClient);
+                        this->timeout.erase(fdClient);
+                    }
                 }
             }
         }
         for ( std::map<size_t, Client>::iterator it = this->clients.begin(); it != this->clients.end(); it++) {
             if ( !it->second.getRequest().getBody()->getNextRequest().empty() && it->second.getIsReadyForNextRequest() ) {
-                // std::cout << "hohohohoho" << std::endl;
                 it->second.getRequest().parseRequest(it->second.getRequest().getBody()->getNextRequest());
                 it->second.getRequest().getBody()->setNextRequest("");
                 if ( it->second.getRequest().getErrorCode().size() ) {
                     std::cout << "\033[1;31mthis is and error happend with code : " <<it->second.getRequest().getErrorCode() <<  "!\033[0m" << std::endl;
                     Error error( it->first, it->second.getRequest().getErrorCode(), it->second.getRequest().getConfigFile()->getErrorPages() );
                     error.sendErrorPage();
-                    removeFdFromKqueue(kq, it->first, EVFILT_READ);
+                    if (removeFdFromKqueue(kq, it->first, EVFILT_READ))
+                        std::cerr << "Problem in kevent (failed remove Event of client from kq)" << std::endl;
                     close(it->first);
                     this->clients.erase(it->first);
                     this->timeout.erase(it->first);
                 }
                 else if (it->second.getRequest().getBodyComplete() == true) {
-                    addFdToKqueue(this->kq, it->first, EVFILT_WRITE);
-                    removeFdFromKqueue(this->kq, it->first, EVFILT_READ);
+                    if (addFdToKqueue(this->kq, it->first, EVFILT_WRITE)) {
+                        close (it->first);
+                        this->clients.erase(it->first);
+                        this->timeout.erase(it->first);
+                    }
+                    if (removeFdFromKqueue(this->kq, it->first, EVFILT_READ)) {
+                        close (it->first);
+                        this->clients.erase(it->first);
+                        this->timeout.erase(it->first);
+                    }
                 }
             }
         }

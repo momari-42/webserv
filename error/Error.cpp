@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/03/19 15:34:50 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 14:50:43 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ Error::Error ( int fd, std::string statusCode, std::map<std::string, std::string
         errorFile.open("error/errorPages/" + this->statusCode + ".html");
     }
     if (!errorFile.is_open()) {
-        std::cout << "we are hirring error here " << std::endl;
+        std::cerr << "we are hirring error here " << std::endl;
     }
     while (true) {
         errorFile.read(buffer, BUFFER_E - 1);

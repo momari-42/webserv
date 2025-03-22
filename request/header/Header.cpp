@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/21 23:01:07 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 14:51:46 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             portion = this->rest.substr(0, this->rest.find("\r\n"));
             firstPortion = portion.substr(0, portion.find(":"));
             if (firstPortion.find(" ") != std::string::npos || firstPortion.find("\t") != std::string::npos) {
-                std::cout << "from setHeader" << std::endl;
+                // std::cout << "from setHeader" << std::endl;
                 this->errorCode = "400";
                 return ;
             }
@@ -91,7 +91,7 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             this->rest.erase(0, this->rest.find("\r\n") + 2);
         }
         else {
-            std::cout << "from setHeader" << std::endl;
+            // std::cout << "from setHeader" << std::endl;
             this->errorCode = "400";
             return ;
         }
@@ -104,11 +104,11 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
 std::string Header::getValue(const std::string& key) {
     return this->httpHeadersMap[key];
 }
-void Header::print() {
-    for (std::map<std::string, std::string>::iterator it = this->httpHeadersMap.begin(); it != this->httpHeadersMap.end(); it++) {
-        std::cout << ">" << (*it).first << "<->" << (*it).second << "<" << std::endl;
-    }
-}
+// void Header::print() {
+//     for (std::map<std::string, std::string>::iterator it = this->httpHeadersMap.begin(); it != this->httpHeadersMap.end(); it++) {
+//         std::cout << ">" << (*it).first << "<->" << (*it).second << "<" << std::endl;
+//     }
+// }
 
 Header::~Header ( void ) {
     

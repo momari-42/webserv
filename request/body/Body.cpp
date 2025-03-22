@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 23:23:34 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 17:08:45 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,6 @@ Body::Body( Header *header, bool &isRequestComplete, std::string &errorCode ) : 
     (void) this->errorCode;
 }
 
-
-
-void Body::printBody( void ) {
-}
-
 Body::~Body() {}
 
 void parseFileName(std::string &fileName) {
@@ -40,7 +35,6 @@ void parseFileName(std::string &fileName) {
     }
     while (access(("upload/" + fileName + extPortion).c_str(), F_OK) == 0) {
         fileName += "_";
-        // std::cout << "inf loop" << std::endl;
     }
     fileName += extPortion;
 }
@@ -55,7 +49,6 @@ void Body::parseBoundaryHeader(const std::string& header) {
     if (header.find("filename=\"") != std::string::npos) {
         part.content = header.substr(header.find("filename=\"") + 10);
         part.content = part.content.substr(0, part.content.find("\""));
-        // parseFileName(part.content);
         part.isFile = true;
     }
     this->data.push_back(part);
@@ -82,6 +75,14 @@ void Body::manageFile(const std::string fileName, const std::string data ) {
         // std::cout << "this is the request target : " << this->requestTarget << std::endl;
         std::ofstream outputFile( path, std::ios::binary | std::ios::app);
         outputFile.write(data.data(), data.size());
+        if (outputFile.fail()) {
+            unlinkCreatedFiles(this->data);
+            if (this->randomeFileName.size()) {
+                unlink(this->randomeFileName.c_str());
+            }
+            this->errorCode = "500";
+            return;
+        }
         this->created               = true;
     }
 }
@@ -91,7 +92,7 @@ void Body::validateFileName( void ) {
         for ( std::vector<boundaryData_t>::iterator it = this->data.begin(); it != this->data.end() - 1; it++ ) {
             unlink(( this->requestTarget + it->content).c_str());
         }
-        std::cout << "from validateFileName" << std::endl;
+        // std::cout << "from validateFileName" << std::endl;
         this->errorCode = "400";
     }
 }
@@ -215,7 +216,7 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
             return;
         }
         if ( !this->cgi && this->method == "POST" && !isDirectory(this->requestTarget) ) {
-            std::cout << "from set body" << this->cgi << std::endl;
+            // std::cout << "from set body" << this->cgi << std::endl;
             this->errorCode = "400";
             return;
         }
@@ -346,7 +347,7 @@ void Body::setChunkedCgiBody( std::string& body ) {
 void Body::setChunkedBody( std::string& body ) {
 
     if ( this->bodyRequestType == "chunked" && !this->cgi ) {
-        std::cout << "from chunked" << std::endl;
+        // std::cout << "from chunked" << std::endl;
         this->errorCode = "400";
         return ;
     }

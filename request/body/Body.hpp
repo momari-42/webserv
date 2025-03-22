@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/19 23:06:38 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 15:37:24 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,6 @@ class Body : public EmimTypes
         void validateFileName( void );
     public:
         Body( Header *header, bool &isRequestComplete, std::string &errorCode );
-        void printBody( void );
         void setBody( std::string& body, bool &cgi, std::string &method );
         void parseBoundaryHeader(const std::string& header);
 

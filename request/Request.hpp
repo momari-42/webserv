@@ -58,7 +58,6 @@ class Request
         // default  constructor and destructor
         Request( bool &isReadyForNextRequest );
         ~Request();
-        void print( void );
         void parseRequest ( std::string requestData );
         RequestLine* getRequestLine();
         Header* getHeader();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/18 10:40:54 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/22 14:52:34 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ Socket::Socket ( const std::string& port, const std::string& host , ServerConfig
 
     this->sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (this->sockfd == -1) {
-        std::cout << "Problem in socket function" << std::endl;
+        std::cerr << "Problem in socket function" << std::endl;
         throw (SocketExceptions(strerror(errno)));
     }
 
@@ -50,12 +50,12 @@ Socket::Socket ( const std::string& port, const std::string& host , ServerConfig
     fcntl(this->sockfd, F_SETFL, O_NONBLOCK);
     
     if (bind(this->sockfd, res->ai_addr, res->ai_addrlen) == -1) {
-        std::cout << "Problem in bind function" << std::endl;
+        std::cerr << "Problem in bind function" << std::endl;
         throw (SocketExceptions(strerror(errno)));
     }
 
     if (listen(this->sockfd, this->backlog) == -1) {
-        std::cout << "Problem in listen function" << std::endl;
+        std::cerr << "Problem in listen function" << std::endl;
         throw (SocketExceptions(strerror(errno)));
     }
 

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/21 02:17:12 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 16:05:05 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE_R 1500
+#define BUFFER_SIZE_R 16384
 
 #define CRLF "\r\n"
 

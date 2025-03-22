@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:16:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 00:10:48 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 15:37:32 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,4 @@ class Header
         ~Header();
 
         void resetAttributes (void);
-        // this just for debug
-        void print( void );
 };

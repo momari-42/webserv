@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestLine.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 13:12:25 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/20 15:39:57 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/22 14:38:31 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,9 @@ RequestLine::RequestLine( std::string &errorCode ) : errorCode(errorCode) {
 } 
 
 void RequestLine::validateMethod( ) {
-    // std::cout << "the method is : " << this->method << std::endl;
     if ((this->method != "GET" && this->method != "POST" && this->method != "DELETE")
         || (this->requestTarget.find("/") == std::string::npos)
         ||  (this->httpVersion != "HTTP/1.1")) {
-        // std::cout <<  "from validateMethod" << std::endl;
         this->errorCode = "400";
         return ;
     }
@@ -75,14 +73,12 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->tempraryRequestLine = this->rest.substr(0, this->rest.find("\r\n"));
         this->rest.erase(this->rest.find("\r\n"));
         if (this->rest.find('\t') != std::string::npos || this->rest.find_first_not_of(" ")) {
-            // std::cout << "from set request line" << std::endl;
             this->errorCode = "400";
             return;
         }
         std::vector<std::string> parts;
         ft_split(this->tempraryRequestLine, parts);
         if (parts.size() != 3) {
-            // std::cout << "from three" << std::endl;
             this->errorCode = "400";
             return;
         }
@@ -96,9 +92,7 @@ void RequestLine::setRequestLine( std::string& requestLine, int& trackingRequest
         this->rest = "";
         this->tempraryRequestLine = "";
         requestLine.erase(0, requestLine.find("\r\n") + 2);
-        // std::cout << "  This is the request target before the changes :" << this->requestTarget << std::endl;
         decodeUrlEncodedCharacters(this->requestTarget);
-        // std::cout << "  This is the request target after  the changes :" << this->requestTarget << std::endl;
         validateMethod();
         if (this->errorCode.size())
             return ;
