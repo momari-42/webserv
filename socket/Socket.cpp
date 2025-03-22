@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 14:52:34 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:25:42 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,18 +66,8 @@ Socket::Socket ( const std::string& port, const std::string& host , ServerConfig
 }
 
 Socket::~Socket ( void ) {
+    close(this->sockfd);
 }
-
-
-// void Socket::socketListning ( void ) {
-//     int status;
-
-//     status = listen(this->sockfd, this->backlog);
-//     if (status == -1) {
-//         std::cout << "Problem in listen function" << std::endl;
-//         throw (SocketExceptions(strerror(errno)));
-//     }
-// }
 
 size_t Socket::getSockfd ( void ) {
     return (this->sockfd);
@@ -91,10 +81,6 @@ std::string& Socket::getHost() {
     return this->host;
 }
 
-// void Socket::initializeSocketCommunication ( void ) {
-//     Socket::socketListning();
-// }
-
 Socket::SocketExceptions::SocketExceptions ( const std::string& errorMsg ) {
     this->errorMsg = errorMsg;
 }
@@ -102,4 +88,3 @@ Socket::SocketExceptions::SocketExceptions ( const std::string& errorMsg ) {
 const char* Socket::SocketExceptions::what() const throw() {
     return (this->errorMsg.c_str());
 }
-

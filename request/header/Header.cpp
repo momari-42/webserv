@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:32:10 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 14:51:46 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:23:31 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,17 @@ Header::Header ( std::string &errorCode ) : errorCode(errorCode) {
 }
 
 void toUpperCase(std::string &str ) {
-    // std::cout << "this is the str before : " << str << std::endl;
     for ( size_t n = 0; n < str.size(); n++) {
         str.at(n) = toupper(str.at(n));
         if (str.at(n) == '-')
             str.at(n) = '_';
     }
-    // std::cout << "this is the str after : " << str << std::endl;
 }
 
 void toLowerCase(std::string &str ) {
-    // std::cout << "this is the str before : " << str << std::endl;
     for ( size_t n = 0; n < str.size(); n++) {
         str.at(n) = tolower(str.at(n));
     }
-    // std::cout << "this is the str after : " << str << std::endl;
 }
 
 bool checkHost(std::string& host) {
@@ -72,7 +68,6 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             portion = this->rest.substr(0, this->rest.find("\r\n"));
             firstPortion = portion.substr(0, portion.find(":"));
             if (firstPortion.find(" ") != std::string::npos || firstPortion.find("\t") != std::string::npos) {
-                // std::cout << "from setHeader" << std::endl;
                 this->errorCode = "400";
                 return ;
             }
@@ -91,7 +86,6 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
             this->rest.erase(0, this->rest.find("\r\n") + 2);
         }
         else {
-            // std::cout << "from setHeader" << std::endl;
             this->errorCode = "400";
             return ;
         }
@@ -104,11 +98,6 @@ void Header::setHeader( std::string &header, int& trackingRequestNumber ) {
 std::string Header::getValue(const std::string& key) {
     return this->httpHeadersMap[key];
 }
-// void Header::print() {
-//     for (std::map<std::string, std::string>::iterator it = this->httpHeadersMap.begin(); it != this->httpHeadersMap.end(); it++) {
-//         std::cout << ">" << (*it).first << "<->" << (*it).second << "<" << std::endl;
-//     }
-// }
 
 Header::~Header ( void ) {
     

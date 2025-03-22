@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 14:51:11 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:24:02 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,39 +15,18 @@
 Request::Request( bool &isReadyForNextRequest ) : isReadyForNextRequest(isReadyForNextRequest) , requestLine( this->errorCode ),
                             header( this->errorCode ),
                                 body( &header, this->isRequestComplete, this->errorCode ) {
-    // this->isReadyForNextRequest     = isReadyForNextRequest;
     this->trackingRequestNumber     = 0;
     this->isRequestComplete         = false;
     this->checkRequestLine          = false;
     this->cgi                       = false;
     this->configFile                = NULL;
-    (void)this->isReadyForNextRequest;
 }
-
-// Red     : \033[31m
-// Green   : \033[32m
-// Yellow  : \033[33m
-// Blue    : \033[34m
-// Magenta : \033[35m
-// Cyan    : \033[36m
-// White   : \033[37m
 
 void Request::validateMethod(std::string &method, std::vector<std::string> &methods) {
     std::vector<std::string>::iterator it = std::find(methods.begin(), methods.end(), method);
     if (it == methods.end())
         this->errorCode = "405";
 }
-
-// static bool isDirectory(std::string &path) {
-//     DIR *dir = opendir(path.c_str());
-//     if (dir) {
-//         closedir(dir);
-//         return (true);
-//     }
-//     return (false);
-// }
-
-// "Cookie: session_id=abc123; theme=dark; user=JohnDoe\r\n"
 
 void Request::setCookies() {
     std::fstream outFile;
@@ -132,15 +111,6 @@ bool Request::getBodyComplete( void) {
 size_t Request::getTrackingRequestNumber( void ) {
     return (this->trackingRequestNumber);
 }
-
-
-// void Request::print( void ) {
-//     std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
-//     std::cout << "\033[31m" << "|--------------This is the Body---------------|" << "\033[0m" << std::endl;
-//     std::cout << "\033[31m" << "-----------------------------------------------" << "\033[0m" << std::endl;
-//     this->body.printBody();
-// }
-
 
 Request::~Request () {
 }

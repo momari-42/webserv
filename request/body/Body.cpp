@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 17:08:45 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:23:03 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ void Body::manageFile(const std::string fileName, const std::string data ) {
             path = fileName;
         else
             path = this->requestTarget + fileName;
-        // std::cout << "this is the request target : " << this->requestTarget << std::endl;
         std::ofstream outputFile( path, std::ios::binary | std::ios::app);
         outputFile.write(data.data(), data.size());
         if (outputFile.fail()) {
@@ -92,7 +91,6 @@ void Body::validateFileName( void ) {
         for ( std::vector<boundaryData_t>::iterator it = this->data.begin(); it != this->data.end() - 1; it++ ) {
             unlink(( this->requestTarget + it->content).c_str());
         }
-        // std::cout << "from validateFileName" << std::endl;
         this->errorCode = "400";
     }
 }
@@ -144,7 +142,6 @@ void Body::setBoundaryBody( std::string& requestData, const std::string& token )
 }
 
 void Body::setBoundaryChunkedBody( std::string& body) {
-    // std::cout<< "from here here here here here here here " << std::endl;
     Body::setChunkedBody(body);
     Body::setBoundaryBody(this->body, "--" + this->header->getValue("CONTENT_TYPE").substr(this->header->getValue("CONTENT_TYPE").find("boundary=") + 9));
 }
@@ -211,26 +208,22 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
         this->method = method;
         this->isBodyInitiates = true;
         if (this->contentLength > static_cast<ssize_t>(this->configFile->getBodyLimit())) {
-            // std::cout << "1";
             this->errorCode = "413";
             return;
         }
         if ( !this->cgi && this->method == "POST" && !isDirectory(this->requestTarget) ) {
-            // std::cout << "from set body" << this->cgi << std::endl;
             this->errorCode = "400";
             return;
         }
     }
     this->bodyLength += body.size();
     if ( (this->method == "GET" || this->method == "DELETE") && this->bodyLength > 1048576 ) {
-            // std::cout << "2";
         this->errorCode = "413";
         return;
     }
     if (this->contentLength == -1 && (this->bodyLength > static_cast<ssize_t>(this->configFile->getBodyLimit()))) {
         if ( this->data.size() )
             unlinkCreatedFiles(data);
-        // std::cout << "3";
         this->errorCode = "413";
         return;
     }
@@ -269,7 +262,6 @@ void Body::generateRandomeName( std::string& name ) {
     }
 }
 
-
 void Body::resetAttributes (void) {
     std::vector<boundaryData_t>     tmp;
 
@@ -289,11 +281,8 @@ void Body::resetAttributes (void) {
     this->data                      = tmp;
 }
 
-
-
 void Body::setContentLengthBody( std::string& requestData ) {
     if ( this->bodyRequestType == "Content-Length" && !this->cgi ) {
-        // std::cout << "from chunked" << std::endl;
         if ( !this->contentLength ) {
             this->isRequestComplete = true;
             return;
@@ -347,7 +336,6 @@ void Body::setChunkedCgiBody( std::string& body ) {
 void Body::setChunkedBody( std::string& body ) {
 
     if ( this->bodyRequestType == "chunked" && !this->cgi ) {
-        // std::cout << "from chunked" << std::endl;
         this->errorCode = "400";
         return ;
     }
@@ -415,19 +403,16 @@ void Body::checkAccess( std::string &requestTarget ) {
             }
         }
         if (!isValidPath) {
-            // std::cout << "from check access" << std::endl;
             this->errorCode = "404";
             return ;
         }
     }
     else {
         if (access( requestTarget.c_str(), F_OK ) == -1) {
-            // std::cout << "from check access 11" << std::endl;
             this->errorCode = "404";
             return;
         }   
         if (access( requestTarget.c_str(), R_OK ) == -1) {
-            // std::cout << "from check access 2" << std::endl;
             this->errorCode = "401";
             return;
         }
@@ -441,9 +426,6 @@ void Body::setRequestTarget(std::string &requestTarget) {
 std::string Body::getBodyRequestType() {
     return ( this->bodyRequestType );
 }
-// size_t Body::getBodyLength() {
-//     return ( this->bodyLength );
-// }
 
 std::string &Body::getNextRequest() {
     return (this->nextRequest);

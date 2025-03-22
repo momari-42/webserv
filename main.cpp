@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 14:50:11 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:31:40 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,11 @@ void readConfigFile(std::fstream& configFile, std::string& file) {
         throw ErrorHandling("Syntax Error");
 }
 
+void validateFileExtention( std::string fileName ) {
+    if ( fileName.size() < 5 || fileName.substr(fileName.size() - 5) != ".conf" )
+        throw ErrorHandling("Invalid file extention .conf !!!");
+}
+
 int main(int ac, char **av) {
     signal (SIGPIPE, SIG_IGN);
     if (ac != 2) {
@@ -68,6 +73,7 @@ int main(int ac, char **av) {
         return 1;
     }
     try {
+        validateFileExtention(av[1]);
         std::fstream configFile(av[1]);
         if (!configFile.is_open()) {
             throw ErrorHandling("Config File Can't Open!!!!");

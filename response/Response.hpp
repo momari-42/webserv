@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 16:05:05 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:24:39 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,6 @@ class Response : public MimeTypes, public HttpResponse
         std::string                                 target;
         std::map<std::string, std::string>          description;
         std::map<std::string, std::string>          header;
-        // std::map<std::string, std::string>          mime;
-        // ServerConfig                                *configFile;
 
         std::fstream                                targetFile;
         bool                                        isHeaderSent;
@@ -79,7 +77,6 @@ class Response : public MimeTypes, public HttpResponse
         int                                         fd[2];
         int                                         inout[2];
         int                                         fdClient;
-        // int                                         exitStatus;
 
     public:
         
@@ -99,7 +96,6 @@ class Response : public MimeTypes, public HttpResponse
         void setSocket( Socket *socket );
         void sendSuccessResponse( size_t fd );
         void sendNoContentResponse( size_t fd );
-        // bool checkUserSession();
         void setServerCookies();
         void sendDirectoryList( size_t fd );
 

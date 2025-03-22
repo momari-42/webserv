@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 15:37:24 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:23:12 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,10 @@ class Body : public EmimTypes
         ServerConfig                        *configFile;
         
         std::string                         method;
+        
         // this variables are all for cgi http request
         bool                                cgi;
         bool                                isShunked;
-        // std::map<std::string, std::string>         mime;
         std::string                         boundryToken;
         
         void generateRandomeName( std::string& name );

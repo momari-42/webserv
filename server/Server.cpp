@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 15:47:54 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:15:06 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,9 @@ Server::Server ( std::string& config ) {
         ServerConfig server;
         server.parse(serverInfo);
         this->configs.push_back(server);
-        // server.showServerConfig();
     }
     checkServersConflict();
     
-    // The old part
     this->lenSocket = sizeof(this->addressClient);
     for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it != this->configs.end(); it++) {
         std::vector<std::pair<const std::string, const std::string> > ports = (*it).getPorts();
@@ -166,7 +164,6 @@ void Server::startServer() {
                 else if ( this->readyEvents[i].filter == EVFILT_READ ) {
                     this->timeout[this->readyFd] = std::time(NULL);
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
-                    // std::cerr << "." << std::endl;
                     if (this->bytesRead <= 0) { 
                         if ( bytesRead == 0)
                             std::cerr << "  Client disconnected" << std::endl;
@@ -240,7 +237,7 @@ void Server::startServer() {
                         this->timeout.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
-                        if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("CONNECTION") == "close") {
+                        if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("CONNECTION") == "CLOSE") {
                             std::cout << "\033[32m  reqeust  closed : " << this->numberOfRequest++ << " Done!!"  << "\033[0m" << std::endl;
                             if (removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE)) {
                                 Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );

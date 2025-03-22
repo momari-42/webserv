@@ -54,8 +54,7 @@ class Request
 
     public:
         std::map<std::string, std::string> cookies;
-        // Reponse     response;
-        // default  constructor and destructor
+
         Request( bool &isReadyForNextRequest );
         ~Request();
         void parseRequest ( std::string requestData );
@@ -69,7 +68,7 @@ class Request
         void setCookies();
 
         std::string &getErrorCode();
-        // this is just for test
+
         std::string &getPath();
         std::string &getRandomeFileName();
         std::string &getRoot();

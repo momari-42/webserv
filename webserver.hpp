@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:45:41 by momari            #+#    #+#             */
-/*   Updated: 2025/02/14 17:35:36 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:39:39 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,3 +25,7 @@
 #include <csignal>
 
 // #include <cstring>
+void validateFileExtention( std::string fileName );
+void readConfigFile(std::fstream& configFile, std::string& file);
+bool areClosed(std::string& file);
+void resolveLine(std::string &line);

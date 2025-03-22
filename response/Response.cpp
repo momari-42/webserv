@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 15:48:22 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 22:24:30 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -452,7 +452,7 @@ void Response::sendNoContentResponse( size_t fd ) {
     std::string response;
     std::string body = "No Content :(";
 
-    if (this->request->getHeader()->getValue("CONNECTION") == "close") {
+    if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
         this->header["Connection"] = "close";
     }
     this->header["Content-Length"] = calculateBodyLength( body );
@@ -475,7 +475,7 @@ void Response::sendSuccessResponse( size_t fd ) {
     std::string response;
     std::string body;
 
-    if (this->request->getHeader()->getValue("CONNECTION") == "close") {
+    if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
         this->header["Connection"] = "close";
     }
     this->header["Content-Type"] = this->mime[".txt"];
@@ -520,7 +520,7 @@ void Response::methodDelete( size_t fd ) {
         std::string response;
         std::string body = "The file will delete by server later !!";
 
-        if (this->request->getHeader()->getValue("CONNECTION") == "close") {
+        if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
             this->header["Connection"] = "close";
         }
         this->header["Content-Length"] = calculateBodyLength( body );
@@ -542,7 +542,7 @@ void Response::methodDelete( size_t fd ) {
         std::string response;
         std::string body = "File is deleted. !!";
 
-        if (this->request->getHeader()->getValue("CONNECTION") == "close") {
+        if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
             this->header["Connection"] = "close";
         }
         this->header["Content-Length"] = calculateBodyLength( body );
@@ -598,7 +598,6 @@ void Response::resetAttributes() {
 }
 
 void Response::setSocket( Socket *socket ) {
-    // std::cout << "I'm here body if YOU NEED ME!!" << std::endl;
     this->socket = socket;
 }
 
