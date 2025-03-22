@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 22:25:42 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 23:27:37 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ ServerConfig* Socket::getServerConfig(std::string serverName) {
 Socket::Socket ( const std::string& port, const std::string& host , ServerConfig *server) {
     struct addrinfo hints, *res;
     
+    this->backlog = 10;
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
@@ -63,10 +64,10 @@ Socket::Socket ( const std::string& port, const std::string& host , ServerConfig
     this->servers.push_back(server);
     this->host = host;
     this->port = port;
+    std::cout << "The server listening on " << this->host << ":" << this->port << "..." << std::endl;
 }
 
 Socket::~Socket ( void ) {
-    close(this->sockfd);
 }
 
 size_t Socket::getSockfd ( void ) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 22:15:06 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 23:47:18 by zaelarb          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ Server::Server ( std::string& config ) {
         this->configs.push_back(server);
     }
     checkServersConflict();
-    
+    std::cout << "Config File parssing is Done!" << std::endl;
     this->lenSocket = sizeof(this->addressClient);
     for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it != this->configs.end(); it++) {
         std::vector<std::pair<const std::string, const std::string> > ports = (*it).getPorts();
@@ -131,12 +131,13 @@ void Server::startServer() {
         if ( addFdToKqueue(kq, this->sockets[i].getSockfd(), EVFILT_READ))
             throw ErrorHandling(strerror(errno));
     }
-    
     while (true) {
         memset(this->readyEvents, 0, sizeof(this->readyEvents));
         nevents = kevent(kq, NULL, 0, readyEvents, 128, &time);
-        if (nevents == -1)
-            throw (Server::ServerExceptions(strerror(errno)));
+        if (nevents == -1) {
+            std::cerr << "Error: kevent() failed" << std::endl;
+            continue;
+        }
         else if (nevents > 0) {
             for (ssize_t i = 0; i < nevents; i++) {
                 this->readyFd = readyEvents[i].ident;
@@ -144,7 +145,7 @@ void Server::startServer() {
                     this->sockfdClient = accept(this->readyFd, reinterpret_cast<sockaddr *>(&this->addressClient), &this->lenSocket);
 
                     if (this->sockfdClient == -1) {
-                        std::cerr << "Problem in accept function" << std::endl; 
+                        std::cerr << "Problem in accept function" << std::endl;
                         continue;
                     }
                     fcntl(this->sockfdClient, F_SETFL, O_NONBLOCK);
@@ -164,7 +165,7 @@ void Server::startServer() {
                 else if ( this->readyEvents[i].filter == EVFILT_READ ) {
                     this->timeout[this->readyFd] = std::time(NULL);
                     this->bytesRead = recv(this->readyFd, buffer, sizeof(buffer) - 1, 0);
-                    if (this->bytesRead <= 0) { 
+                    if (this->bytesRead <= 0) {
                         if ( bytesRead == 0)
                             std::cerr << "  Client disconnected" << std::endl;
                         else {
