@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 14:50:43 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/22 17:27:35 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,20 +42,22 @@ Error::Error ( int fd, std::string statusCode, std::map<std::string, std::string
     else {
         errorFile.open("error/errorPages/" + this->statusCode + ".html");
     }
-    if (!errorFile.is_open()) {
-        std::cerr << "we are hirring error here " << std::endl;
+    if (errorFile.is_open()) {
+        while (true) {
+            errorFile.read(buffer, BUFFER_E - 1);
+            bytesRead = errorFile.gcount();
+            buffer[bytesRead] = '\0';
+            this->content.append(buffer, bytesRead);
+            if (errorFile.eof())
+                break;
+        }
+        errorFile.close();
     }
-    while (true) {
-        errorFile.read(buffer, BUFFER_E - 1);
-        bytesRead = errorFile.gcount();
-        buffer[bytesRead] = '\0';
-        this->content.append(buffer, bytesRead);
-        if (errorFile.eof())
-            break;
+    else {
+        this->content = "Error Code " + this->statusCode;
     }
     contentLength << this->content.size();
     this->header["Content-Length"] = contentLength.str();
-    errorFile.close();
 }
 
 void Error::sendErrorPage ( void ) {
@@ -67,14 +69,10 @@ void Error::sendErrorPage ( void ) {
         response += it->first + ": " + it->second + CRLF;
     response += CRLF;
     response += this->content;
-    write(this->fd, response.c_str(), response.size());
-    // std::cout << "we are here in the end of  class error" << std::endl;
-
+    if (send(this->fd, response.c_str(), response.size(), 0) == -1) {
+        std::cerr << "Error: send() failed" << std::endl;
+    }
 }
 
 Error::~Error ( void ) {
 }
-
-// std::string &Error::getDescription (void) {
-//     return (this->description[this->errorCode]);
-// }
