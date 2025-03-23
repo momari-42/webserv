@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 22:24:30 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 02:39:21 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,17 @@ void freeEnvSpaces(char **env) {
     }
 }
 
+void Response::checkForRequestTarget() {
+    if (access( this->request->getRequestTarget().c_str(), F_OK ) == -1) {
+        this->errorCode = "404";
+        return;
+    }   
+    if (access( this->request->getRequestTarget().c_str(), R_OK ) == -1) {
+        this->errorCode = "401";
+        return;
+    }
+}
+
 void Response::executeCGI ( size_t fd, size_t kq ) {
     std::map<std::string, std::string> httpHeadersMap = this->request->getHeader()->getHttpHeadersMap();
     char                               *env[httpHeadersMap.size() + 4];
@@ -60,6 +71,9 @@ void Response::executeCGI ( size_t fd, size_t kq ) {
     std::string queryString;
     
     this->fdClient = fd;
+    checkForRequestTarget();
+    if ( this->errorCode.size() )
+        return ;
     if (this->request->getRequestLine()->getMethod() == "POST") {
         std::string inFile = this->request->getRandomeFileName();
         int fd = open(inFile.c_str(), O_RDONLY);
@@ -309,6 +323,8 @@ void Response::sendDirectoryList( size_t fd ) {
         if (send(fd, response.c_str(), response.size(), 0) == -1) {
             std::cerr << "Error sending data" << std::endl;
             closedir(dir);
+            this->errorCode = "500";
+            return ;
             // Handle send error
         }
         this->isResponseSent = true;
@@ -324,7 +340,9 @@ void Response::sendRedirectionResponse( size_t fd, Location &location ) {
     response += this->httpVersion + " " + location.redirection.first + " "  + this->statusCodes[location.redirection.first] + CRLF;
     response += "Location: " + location.redirection.second + CRLF + CRLF;
     if (send(fd, response.c_str(), response.size(), 0) == -1) {
-        std::cerr << "Error sending data" << std::endl; 
+        std::cerr << "Error sending data" << std::endl;
+        this->errorCode = "500";
+        return ;
     }
 }
 
@@ -452,7 +470,7 @@ void Response::sendNoContentResponse( size_t fd ) {
     std::string response;
     std::string body = "No Content :(";
 
-    if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
+    if (this->request->getHeader()->getValue("CONNECTION") == "close") {
         this->header["Connection"] = "close";
     }
     this->header["Content-Length"] = calculateBodyLength( body );
@@ -475,7 +493,7 @@ void Response::sendSuccessResponse( size_t fd ) {
     std::string response;
     std::string body;
 
-    if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
+    if (this->request->getHeader()->getValue("CONNECTION") == "close") {
         this->header["Connection"] = "close";
     }
     this->header["Content-Type"] = this->mime[".txt"];
@@ -520,7 +538,7 @@ void Response::methodDelete( size_t fd ) {
         std::string response;
         std::string body = "The file will delete by server later !!";
 
-        if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
+        if (this->request->getHeader()->getValue("CONNECTION") == "close") {
             this->header["Connection"] = "close";
         }
         this->header["Content-Length"] = calculateBodyLength( body );
@@ -542,7 +560,7 @@ void Response::methodDelete( size_t fd ) {
         std::string response;
         std::string body = "File is deleted. !!";
 
-        if (this->request->getHeader()->getValue("CONNECTION") == "CLOSE") {
+        if (this->request->getHeader()->getValue("CONNECTION") == "close") {
             this->header["Connection"] = "close";
         }
         this->header["Content-Length"] = calculateBodyLength( body );

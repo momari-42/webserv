@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 23:47:18 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/23 02:43:42 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ Server::Server ( std::string& config ) {
         this->configs.push_back(server);
     }
     checkServersConflict();
-    std::cout << "Config File parssing is Done!" << std::endl;
+    std::cout << "Config File parssing is Done!\n" << std::endl;
     this->lenSocket = sizeof(this->addressClient);
     for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it != this->configs.end(); it++) {
         std::vector<std::pair<const std::string, const std::string> > ports = (*it).getPorts();
@@ -238,7 +238,7 @@ void Server::startServer() {
                         this->timeout.erase(this->readyEvents[i].ident);
                     }
                     else if (this->clients[this->readyEvents[i].ident].getResponse().getIsResponseSent()) {
-                        if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("CONNECTION") == "CLOSE") {
+                        if ( this->clients[this->readyEvents[i].ident].getRequest().getHeader()->getValue("CONNECTION") == "close") {
                             std::cout << "\033[32m  reqeust  closed : " << this->numberOfRequest++ << " Done!!"  << "\033[0m" << std::endl;
                             if (removeFdFromKqueue(this->kq, this->readyEvents[i].ident, EVFILT_WRITE)) {
                                 Error error( this->readyEvents[i].ident, "500", this->clients[this->readyEvents[i].ident].getRequest().getConfigFile()->getErrorPages() );

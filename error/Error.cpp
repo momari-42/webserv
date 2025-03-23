@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 17:27:35 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 02:43:31 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ Error::Error ( int fd, std::string statusCode, std::map<std::string, std::string
 void Error::sendErrorPage ( void ) {
     std::string response;
 
-    // std::cout << "this is the content :" << this->content << std::endl;
     response += this->httpVersion + " " + this->statusCode + " " + this->statusCodes[this->statusCode] + CRLF;
     for (std::map<std::string, std::string>::iterator it = this->header.begin(); it != this->header.end(); it++)
         response += it->first + ": " + it->second + CRLF;

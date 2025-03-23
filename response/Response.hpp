@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:08 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 22:24:39 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 02:37:27 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ class Response : public MimeTypes, public HttpResponse
         void sendNoContentResponse( size_t fd );
         void setServerCookies();
         void sendDirectoryList( size_t fd );
+        void checkForRequestTarget();
 
         void setIsReadyForNextRequest ( bool isReadyForNextRequest );
 

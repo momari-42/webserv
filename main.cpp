@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:41:11 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 22:43:38 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/23 00:39:06 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,27 @@ bool areClosed(std::string& file) {
     
 }
 
+// bool isDirectory(std::string &path) {
+//     DIR *dir = opendir(path.c_str());
+//     if (dir) {
+//         closedir(dir);
+//         return (true);
+//     }
+//     return (false);
+// }
+
+void openCookieDir() {
+    std::string cookieDirName = "./cookie";
+
+    DIR *dir = opendir(cookieDirName.c_str());
+    if (dir) {
+        closedir(dir);
+        return ;
+    }
+    if (mkdir(cookieDirName.c_str(), 0755) == -1)
+        std::cerr << "Error: mkdir failed" << std::endl;
+}
+
 void readConfigFile(std::fstream& configFile, std::string& file) {
     std::string line;
     while (getline(configFile, line)) {
@@ -78,6 +99,7 @@ int main(int ac, char **av) {
         if (!configFile.is_open()) {
             throw ErrorHandling("Config File Can't Open!!!!");
         }
+        openCookieDir();
         std::string config;
         readConfigFile(configFile, config);
         configFile.close();

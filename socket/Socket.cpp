@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/22 23:27:37 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/03/23 00:40:27 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ Socket::Socket ( const std::string& port, const std::string& host , ServerConfig
     this->servers.push_back(server);
     this->host = host;
     this->port = port;
-    std::cout << "The server listening on " << this->host << ":" << this->port << "..." << std::endl;
+    std::cout << "      The server listening on " << this->host << ":" << this->port << "..." << std::endl;
 }
 
 Socket::~Socket ( void ) {

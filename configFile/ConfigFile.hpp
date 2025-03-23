@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:00:21 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/21 14:45:52 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 02:43:13 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ public:
     bool                                             upload;
 
     void parseLocation(std::string& config);
-    void showLocation();
 private:
     void setPath(std::string& config);
     void setIndex(std::vector<std::string>& parts);
@@ -60,7 +59,6 @@ public:
     ServerConfig();
     void parse(std::string &config);
     void checkRequirement();
-    void showServerConfig();
     bool operator==(ServerConfig& obj);
 
     // Seters

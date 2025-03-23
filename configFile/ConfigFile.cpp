@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:03:12 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 15:36:27 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 02:43:29 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,50 +40,7 @@ bool ServerConfig::isExistName(const std::string& name) {
     }
     return false;
 }
-void ServerConfig::showServerConfig() {
-    std::cout <<  "------------------------------ Start Server ------------------------" << std::endl;
-    std::cout << "Server Names : ";
-    for (std::vector<std::string>::iterator it = this->names.begin(); it != this->names.end(); ++it) {
-        std::cout << "|" << (*it) << "|";
-    }
-    std::cout << std::endl <<"Server Ports : " << std::endl;
-    for (std::vector<std::pair<const std::string, const std::string> >::iterator it = this->ports.begin(); it != this->ports.end(); it++)
-        std::cout << "|" << it->first << "|" << it->second << "|" << std::endl;
-    std::cout <<"Error Pages : \n";
-    for (std::map<std::string, std::string>::iterator it = this->errorPages.begin(); it != this->errorPages.end(); it++)
-        std::cout << "|" << (*it).first << "|" << (*it).second << "|" << std::endl;
-    std::cout << "Server Indexs : ";
-    for (std::vector<std::string>::iterator it = this->index.begin(); it != this->index.end(); it++) {
-        std::cout << "|" << (*it) << "|";
-    }
-    std::cout << "\nRoot : " << "|" << this->root << "|" << std::endl;
-    std::cout << "Body Limit : " << this->bodyLimit << std::endl;
-    std::cout << "Locations"<< std::endl;
-    for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
-        std::cout << (*it).first << std::endl;
-        // (*it).second.showLocation();
-    }
-    // std::cout <<  "------------------------------ End Server ------------------------" << std::endl;
-}
 
-void Location::showLocation() {
-    std::cout << "\tRoot : |" << this->root << "|" << std::endl;
-    std::cout << "\tIndexes : ";
-    for (std::vector<std::string>::iterator it = this->index.begin(); it != this->index.end(); it++)
-        std::cout << "|" << *it << "|";
-    std::cout << std::endl;
-    std::cout << "\tMethodes : ";
-    for (std::vector<std::string>::iterator it = this->methods.begin(); it != this->methods.end(); it++)
-        std::cout << "|" << *it << "|";
-    std::cout << std::endl;
-    std::cout << "\tListning : " << this->listing << std::endl;
-    std::cout << "\tRedirection : ";
-    std::cout << redirection.first << " " << redirection.second << std::endl;
-    // for (std::map<std::string, std::string>::iterator it = this->redirection.begin(); it != this->redirection.end(); it++)
-    //     std::cout << "|" << (*it).first << "|" << (*it).second << "|" << std::endl;
-    std::cout << std::endl;
-    // std::cout << "the cgi is : " << cgi[0].first << cgi[0].second << std::endl;
-}
 
 void ServerConfig::setPorts(std::vector<std::string>& parts) {
     // 0 - 65535
@@ -180,16 +137,11 @@ void ServerConfig::setURILimit(std::vector<std::string>& parts) {
 void ServerConfig::setLocation(std::string &serverInfo) {
     std::string first = serverInfo.substr(0, serverInfo.find('{') + 1);
     std::vector<std::string> parts;
-    // std::cout << first << std::endl;
     ft_split(first, parts);
-    // std::cout << parts[0] << " " << parts[1] << " " << parts[2] << std::endl;
     if (parts.size() != 3)
         throw ErrorHandling("Syntax Error in location args");
-    // else if (parts[1][parts[1].size() - 1] != '/')
-    //     throw ErrorHandling("Location path should be ended with [/]");
     std::string location = serverInfo.substr(0, serverInfo.find('}') + 1);
     serverInfo.erase(0, serverInfo.find('}') + 2);
-    // location.erase(0, location.find('{') + 1);
     location = location.substr(0, location.find('}') + 1);
     Location loc;
     loc.parseLocation(location);
@@ -365,8 +317,16 @@ std::string ServerConfig::getRoot( std::string& path, std::string &errorCode) {
 
     this->matchedLocation = "";
     for (std::map<std::string, Location>::iterator it = this->locations.begin(); it != this->locations.end(); it++) {
-        if ( path.find(it->first) == 0 )
-            matchedLocations.push_back(it->first);
+        if ( path.find(it->first) == 0 ) {
+            std::string tmp = it->first;
+            if (tmp.size() == path.size() || (tmp.size() && tmp.at(tmp.size() - 1) == '/'))
+                matchedLocations.push_back(it->first);
+            else {
+                tmp += '/';
+                if ( path.size() >= tmp.size() && path.find(tmp) == 0)
+                    matchedLocations.push_back(it->first);
+            }
+        }
     }
     for (std::vector<std::string>::iterator it = matchedLocations.begin(); it != matchedLocations.end(); it++) {
         if ( (*it).size() > bestMatchedLocation.size()) {

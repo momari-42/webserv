@@ -6,20 +6,18 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:03:33 by momari            #+#    #+#             */
-/*   Updated: 2025/03/07 13:44:04 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 00:25:22 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse() {
-    // 1xx: Informational responses
     this->statusCodes["100"] = "Continue";
     this->statusCodes["101"] = "Switching Protocols";
     this->statusCodes["102"] = "Processing";
     this->statusCodes["103"] = "Early Hints";
 
-    // 2xx: Successful responses
     this->statusCodes["200"] = "OK";
     this->statusCodes["201"] = "Created";
     this->statusCodes["202"] = "Accepted";
@@ -31,7 +29,6 @@ HttpResponse::HttpResponse() {
     this->statusCodes["208"] = "Already Reported";
     this->statusCodes["226"] = "IM Used";
 
-    // 3xx: Redirection messages
     this->statusCodes["300"] = "Multiple Choices";
     this->statusCodes["301"] = "Moved Permanently";
     this->statusCodes["302"] = "Found";
@@ -42,7 +39,6 @@ HttpResponse::HttpResponse() {
     this->statusCodes["307"] = "Temporary Redirect";
     this->statusCodes["308"] = "Permanent Redirect";
 
-    // 4xx: Client error responses
     this->statusCodes["400"] = "Bad Request";
     this->statusCodes["401"] = "Unauthorized";
     this->statusCodes["402"] = "Payment Required";
@@ -73,7 +69,6 @@ HttpResponse::HttpResponse() {
     this->statusCodes["431"] = "Request Header Fields Too Large";
     this->statusCodes["451"] = "Unavailable For Legal Reasons";
 
-    // 5xx: Server error responses
     this->statusCodes["500"] = "Internal Server Error";
     this->statusCodes["501"] = "Not Implemented";
     this->statusCodes["502"] = "Bad Gateway";

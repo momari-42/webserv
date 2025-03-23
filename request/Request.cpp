@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 22:24:02 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 02:30:53 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ void Request::parseRequest ( std::string requestData ) {
             this->body.setConfigFile(this->socket->getServerConfig(this->header.getValue("Host")));
             this->path = this->requestLine.getRequestTarget();
             this->root = this->configFile->getRoot(this->path, this->errorCode);
+            if ( this->errorCode.size() )
+                return ;
             this->location =  this->configFile->getLocations()[this->configFile->getMatchedLocation()];
             if (this->requestLine.getTempraryRequestLine().size() > this->configFile->getURILimit()) {
                 this->errorCode = "414";
