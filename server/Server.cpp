@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/23 02:43:42 by momari           ###   ########.fr       */
+/*   Updated: 2025/03/23 10:29:09 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,6 +373,10 @@ void Server::startServer() {
 }
 
 Server::~Server ( void ) {
+    for (std::vector<Socket>::iterator it = this->sockets.begin(); it != this->sockets.end(); it++) {
+        close(it->getSockfd());
+    }
+    close(kq);
 }
 
 Server::ServerExceptions::ServerExceptions ( const std::string& errorMsg ) {
