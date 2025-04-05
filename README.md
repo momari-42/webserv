@@ -197,14 +197,23 @@ curl -v http://localhost:8080/
 
 | Resource | Description |
 |----------|-------------|
-| [**HTTP/1.1 (RFC 2616)**]([https://tools.ietf.org/html/rfc2616](https://datatracker.ietf.org/doc/html/rfc2616)) | Official HTTP protocol specification |
-| [**Kqueue Tutorial**]([https://www.freebsd.org/cgi/man.cgi?query=kqueue](https://wiki.netbsd.org/tutorials/kqueue_tutorial/)) | Event notification system for BSD/macOS |
-| [**CGI 1.1 Specification**]([https://tools.ietf.org/html/rfc3875](https://datatracker.ietf.org/doc/html/rfc3875)) | Common Gateway Interface standards |
-| [**Socket Programming**]([https://beej.us/guide/bgnet/](https://beej.us/guide/bgnet/pdf/bgnet_usl_c_1.pdf)) | Network programming fundamentals |
+| [**HTTP/1.1 (RFC 2616)**](https://tools.ietf.org/html/rfc2616) | Official HTTP protocol specification |
+| [**Kqueue Tutorial**](https://www.freebsd.org/cgi/man.cgi?query=kqueue) | Event notification system for BSD/macOS |
+| [**CGI 1.1 Specification**](https://tools.ietf.org/html/rfc3875) | Common Gateway Interface standards |
+| [**Socket Programming**](https://beej.us/guide/bgnet/) | Network programming fundamentals |
 
-### Reference Servers:
-[**NGINX**]([https://tools.ietf.org/html/rfc2616](https://datatracker.ietf.org/doc/html/rfc2616))
+### 🛠️ Recommended Tools
+- [Postman](https://www.postman.com/) - API development & testing  
+- [Burp Suite](https://portswigger.net/burp) - **Web security testing** (Proxy/Scanner/Repeater)  
+- [Wireshark](https://www.wireshark.org/) - Network protocol analysis  
+- [httpie](https://httpie.io/) - Modern CLI HTTP client  
 
-### 🌟 Recommended Tools
-- [Postman](https://www.postman.com/) - API testing client
-- [Burp Suite](https://portswigger.net/burp) - **Web security testing** (Proxy/Scanner/Repeater)
+---
+
+### Why Burp Suite?
+```diff
++ Perfect for testing your server's:
+  - Request/Response inspection
+  - Security vulnerability scanning
+  - Session manipulation
+  - Automated penetration testing
