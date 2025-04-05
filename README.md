@@ -185,7 +185,7 @@ cd webserv
 make
 
 # Run server (with config file)
-./webserv config/conf.conf
+./webserv config/config.conf
 
 # Test with curl
 curl -v http://localhost:8080/
