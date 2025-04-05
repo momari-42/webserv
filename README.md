@@ -97,3 +97,15 @@ server {
     }
 }
 ```
+## Architecture
+graph TD
+    A[Main Event Loop] --> B[Kqueue/Poll]
+    B --> C[New Connections]
+    B --> D[Client Requests]
+    D --> E[Request Parser]
+    E --> F[Route Handler]
+    F -->|Static| G[File Server]
+    F -->|Dynamic| H[CGI Executor]
+    G --> I[Response Builder]
+    H --> I
+    I --> J[Send Response]
