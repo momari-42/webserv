@@ -154,7 +154,6 @@ echo "<h1>Hello from WebServ!</h1>";
 
 ### 🏗️ Robust Design Principles
 - **No uncaught exceptions** → Fail-safe defaults  
-- **Graceful degradation** → User-friendly fallbacks  
 - **Custom error pages** → Branded UX for errors  
 - **Comprehensive logging** → Detailed debug trails  
 
@@ -169,3 +168,26 @@ echo "<h1>Hello from WebServ!</h1>";
 | `501`| Not Implemented       | Unavailable server functionality       |
 
 *All errors trigger both user-facing responses and backend logs.*
+
+
+---
+
+## 🛠️ Build & Usage
+
+### 📥 Clone the Repository
+```bash
+# Clone the project
+git clone https://github.com/yourusername/webserv.git
+
+# Change directory to webserv
+cd webserv
+
+# Build project
+make
+
+# Run server (with config file)
+./webserv config/conf.conf
+
+# Test with curl
+curl -v http://localhost:8080/
+```
