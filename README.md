@@ -98,7 +98,7 @@ server {
 }
 ```
 ## Architecture
-graph TD
+```graph TD
     A[Main Event Loop] --> B[Kqueue/Poll]
     B --> C[New Connections]
     B --> D[Client Requests]
@@ -109,3 +109,4 @@ graph TD
     G --> I[Response Builder]
     H --> I
     I --> J[Send Response]
+```
