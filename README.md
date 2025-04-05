@@ -132,7 +132,7 @@ graph TD
 ---
 
 ### Alternative (Simpler Version):
-```markdown
+
 ## 🚀 CGI Support
 
 ### 🔧 Key Features
