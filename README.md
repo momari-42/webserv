@@ -205,8 +205,6 @@ curl -v http://localhost:8080/
 ### 🛠️ Recommended Tools
 - [Postman](https://www.postman.com/) - API development & testing  
 - [Burp Suite](https://portswigger.net/burp) - **Web security testing** (Proxy/Scanner/Repeater)  
-- [Wireshark](https://www.wireshark.org/) - Network protocol analysis  
-- [httpie](https://httpie.io/) - Modern CLI HTTP client  
 
 ---
 
