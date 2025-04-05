@@ -215,3 +215,36 @@ curl -v http://localhost:8080/
   - Security vulnerability scanning
   - Session manipulation
   - Automated penetration testing
+```
+
+## 👥 Team
+
+This project was crafted with ❤️ through intense pair programming sessions:
+
+### 🚀 Core Contributors
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="https://avatars.githubusercontent.com/yourusername" width="100" style="border-radius:50%"><br>
+      <b>Your Name</b><br>
+      <a href="https://github.com/yourusername">@yourusername</a><br>
+      <a href="https://linkedin.com/in/yourprofile">LinkedIn</a>
+    </td>
+    <td align="center" width="50%">
+      <img src="https://avatars.githubusercontent.com/zakariabelarbi" width="100" style="border-radius:50%"><br>
+      <b>Zakaria Belarbi</b><br>
+      <a href="https://github.com/zakariabelarbi">@zakariabelarbi</a><br>
+      <a href="https://linkedin.com/in/zakaria-belarbi">LinkedIn</a>
+    </td>
+  </tr>
+</table>
+
+### 🤝 Collaboration Philosophy
+
+```diff
++ 100% Pair Programming
++ Daily Code Reviews
++ Shared Code Ownership
++ Continuous Learning
+```
