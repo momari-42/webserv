@@ -219,7 +219,7 @@ curl -v http://localhost:8080/
 
 ## 👥 Team
 
-This project was crafted with ❤️ through intense pair programming sessions:
+This project was coded 💻 line-by-line through pair programming: 
 
 ### 🚀 Core Contributors
 
