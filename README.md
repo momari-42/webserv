@@ -123,8 +123,7 @@ graph TD
     D --> E[Response Generated<br><small><i>Status/Headers/Body</i></small>]
 ```
 
-📡 Supported Methods
-Method	Description
-GET	Retrieve resources
-POST	Submit data/CGI
-DELETE	Remove resources
+### 🛠️ Supported Methods  
+- **`GET`** → Retrieve resources  
+- **`POST`** → Submit data/CGI  
+- **`DELETE`** → Remove resources  
