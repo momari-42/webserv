@@ -231,7 +231,7 @@ This project was coded 💻 line-by-line through pair programming:
       <a href="https://www.linkedin.com/in/mohammed-omari-24a338249/">LinkedIn</a>
     </td>
     <td align="center" width="50%">
-      <img src="https://avatars.githubusercontent.com/zakariabelarbi" width="100" style="border-radius:50%"><br>
+      <img src="https://cdn.intra.42.fr/users/2a272f965ef7f3b8b08450b10f657ae7/zbelarbi.jpg" width="100" style="border-radius:50%"><br>
       <b>Zakaria Belarbi</b><br>
       <a href="https://github.com/zakariabelarbi">@zakariabelarbi</a><br>
       <a href="https://linkedin.com/in/zakaria-belarbi">LinkedIn</a>
