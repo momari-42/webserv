@@ -226,9 +226,9 @@ This project was coded 💻 line-by-line through pair programming:
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="https://avatars.githubusercontent.com/yourusername" width="100" style="border-radius:50%"><br>
+      <img src="https://avatars.githubusercontent.com/u/122695838?v=4" width="100" style="border-radius:50%"><br>
       <b>Your Name</b><br>
-      <a href="https://github.com/yourusername">@yourusername</a><br>
+      <a href="https://github.com/momari-42">@momari</a><br>
       <a href="https://linkedin.com/in/yourprofile">LinkedIn</a>
     </td>
     <td align="center" width="50%">
