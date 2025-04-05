@@ -1,7 +1,8 @@
 # WebServ - Custom HTTP Server in C++98
 
+<section style="background-color: black">
 ![WebServ Demonstration](https://github.com/momari-42/webserv/blob/main/images/hero-section.gif)
-
+</section>
 **This is when you finally understand why a URL starts with HTTP**
 
 A complete HTTP/1.1 compliant web server implemented from scratch in C++98 as part of our school curriculum. Developed collaboratively by [Your Name] and [Zakaria Belarbi].
