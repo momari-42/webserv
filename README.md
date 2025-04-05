@@ -148,6 +148,8 @@ echo "<h1>Hello from WebServ!</h1>";
 ?>
 ```
 
+---
+
 ## 🛡️ Error Handling
 
 ### 🏗️ Robust Design Principles
