@@ -121,3 +121,10 @@ graph TD
     B --> C[Route Matched<br><small><i>Config rules</i></small>]
     C --> D[Handler Executed<br><small><i>Static/CGI</i></small>]
     D --> E[Response Generated<br><small><i>Status/Headers/Body</i></small>]
+```
+
+📡 Supported Methods
+Method	Description
+GET	Retrieve resources
+POST	Submit data/CGI
+DELETE	Remove resources
