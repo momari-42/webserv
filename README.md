@@ -1,6 +1,6 @@
 # WebServ - Custom HTTP Server in C++98
 
-![WebServ Demonstration](./images/hero-serction.gif)
+![WebServ Demonstration](/images/hero-serction.gif)
 
 **This is when you finally understand why a URL starts with HTTP**
 
