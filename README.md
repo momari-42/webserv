@@ -16,7 +16,6 @@ A complete HTTP/1.1 compliant web server implemented from scratch in C++98 as pa
 - [CGI Support](#cgi-support)
 - [Error Handling](#error-handling)
 - [Build & Usage](#build--usage)
-- [Testing](#testing)
 - [Resources](#resources)
 - [Team](#team)
 
