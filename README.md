@@ -147,3 +147,23 @@ echo "Content-Type: text/html\r\n\r\n";
 echo "<h1>Hello from WebServ!</h1>";
 ?>
 ```
+
+## 🛡️ Error Handling
+
+### 🏗️ Robust Design Principles
+- **No uncaught exceptions** → Fail-safe defaults  
+- **Graceful degradation** → User-friendly fallbacks  
+- **Custom error pages** → Branded UX for errors  
+- **Comprehensive logging** → Detailed debug trails  
+
+### 🚨 Common HTTP Error Codes
+| Code | Status Text           | Typical Cause                          |
+|------|-----------------------|----------------------------------------|
+| `400`| Bad Request           | Malformed client request               |
+| `403`| Forbidden             | Unauthorized resource access           |
+| `404`| Not Found             | Invalid URI path                       |
+| `405`| Method Not Allowed    | Unsupported HTTP verb for route        |
+| `500`| Internal Server Error | Server-side processing failure         |
+| `501`| Not Implemented       | Unavailable server functionality       |
+
+*All errors trigger both user-facing responses and backend logs.*
