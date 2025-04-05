@@ -98,8 +98,9 @@ server {
 }
 ```
 ## Architecture
-```graph TD
-    A[Main Event Loop] --> B[Kqueue/Poll]
+```mermaid
+graph TD
+    [Main Event Loop] --> B[Kqueue/Poll]
     B --> C[New Connections]
     B --> D[Client Requests]
     D --> E[Request Parser]
