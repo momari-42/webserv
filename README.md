@@ -127,3 +127,25 @@ graph TD
 - **`GET`** → Retrieve resources  
 - **`POST`** → Submit data/CGI  
 - **`DELETE`** → Remove resources  
+
+
+---
+
+### Alternative (Simpler Version):
+```markdown
+## 🚀 CGI Support
+
+### 🔧 Key Features
+- **Env Variables**: `PATH_INFO`, `QUERY_STRING`, `REQUEST_METHOD`, etc.
+- **Methods Supported**:
+  - `GET`: Parameters via URL
+  - `POST`: Data via stdin
+
+### 📝 PHP Example
+```php
+<?php
+echo "HTTP/1.1 200 OK\r\n";
+echo "Content-Type: text/html\r\n\r\n";
+echo "<h1>Hello from WebServ!</h1>";
+?>
+```
