@@ -74,3 +74,26 @@ WebServ is a multi-server HTTP implementation that:
 execve, dup, dup2, pipe, fork, socketpair
 fcntl, poll, kqueue, kevent, socket, accept
 listen, send, recv, bind, connect, etc.
+```
+## Configuration
+
+### Sample webserv.conf:
+```conf
+server {
+    listen 8080;
+    server_name localhost;
+    client_max_body_size 10M;
+    
+    location / {
+        root /var/www/html;
+        index index.html;
+        allowed_methods GET POST;
+    }
+    
+    location /cgi-bin {
+        root /var/www/cgi;
+        cgi_extension .py .php;
+        allowed_methods GET POST;
+    }
+}
+```
