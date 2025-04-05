@@ -111,3 +111,13 @@ graph TD
     H --> I
     I --> J[Send Response]
 ```
+
+## 🌐 HTTP Implementation
+
+### 🔄 Request Processing Flow
+```mermaid
+graph TD
+    A[Connection Accepted<br><small><i>Non-blocking</i></small>] --> B[Request Parsed<br><small><i>Headers + Body</i></small>]
+    B --> C[Route Matched<br><small><i>Config rules</i></small>]
+    C --> D[Handler Executed<br><small><i>Static/CGI</i></small>]
+    D --> E[Response Generated<br><small><i>Status/Headers/Body</i></small>]
