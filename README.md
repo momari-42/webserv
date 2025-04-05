@@ -131,8 +131,6 @@ graph TD
 
 ---
 
-### Alternative (Simpler Version):
-
 ## 🚀 CGI Support
 
 ### 🔧 Key Features
