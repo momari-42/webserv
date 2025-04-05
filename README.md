@@ -100,7 +100,7 @@ server {
 ## Architecture
 ```mermaid
 graph TD
-    [Main Event Loop] --> B[Kqueue/Poll]
+    A[Main Event Loop] --> B[Kqueue/Poll]
     B --> C[New Connections]
     B --> D[Client Requests]
     D --> E[Request Parser]
