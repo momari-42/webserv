@@ -175,7 +175,7 @@ echo "<h1>Hello from WebServ!</h1>";
 ### 📥 Clone the Repository
 ```bash
 # Clone the project
-git clone https://github.com/yourusername/webserv.git
+git clone https://github.com/momari-42/webserv
 
 # Change directory to webserv
 cd webserv
