@@ -50,7 +50,7 @@ private:
     std::string                                     root;
     std::map<std::string, Location>                 locations;
     std::map<std::string, std::string>              errorPages;
-    long                                          bodyLimit;
+    long                                            bodyLimit;
     size_t                                          URILimit;
 
     // this for the return of indexes

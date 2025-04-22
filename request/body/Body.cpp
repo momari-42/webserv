@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 14:39:20 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 22:23:03 by momari           ###   ########.fr       */
+/*   Updated: 2025/04/17 12:49:54 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,7 +212,7 @@ void Body::setBody( std::string& body, bool &cgi, std::string &method ) {
             return;
         }
         if ( !this->cgi && this->method == "POST" && !isDirectory(this->requestTarget) ) {
-            this->errorCode = "400";
+            this->errorCode = "404";
             return;
         }
     }
@@ -386,8 +386,8 @@ void Body::setConfigFile(ServerConfig* configFile) {
     this->configFile = configFile;
 }
 
-void Body::checkAccess( std::string &requestTarget ) {
-    if (isDirectory(requestTarget)) {
+void Body::checkAccess( std::string &requestTarget, const std::string& method ) {
+    if (isDirectory(requestTarget) && method == "GET") {
         bool isValidPath = false;
         std::vector<std::string> &index = this->configFile->getIndex();
         std::string tempraryRequestTarget;
@@ -397,6 +397,10 @@ void Body::checkAccess( std::string &requestTarget ) {
         for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); it++) {
             tempraryRequestTarget = requestTarget + *it;
             if (access( tempraryRequestTarget.c_str(), F_OK ) != -1) {
+                if (access( requestTarget.c_str(), R_OK ) == -1){
+                    this->errorCode = "401";
+                    return;
+                }
                 requestTarget = tempraryRequestTarget;
                 isValidPath = true;
                 break;
@@ -407,7 +411,7 @@ void Body::checkAccess( std::string &requestTarget ) {
             return ;
         }
     }
-    else {
+    else if ( method == "GET" ) {
         if (access( requestTarget.c_str(), F_OK ) == -1) {
             this->errorCode = "404";
             return;

@@ -25,7 +25,7 @@ class Request
         bool                cgi;
         std::string         cgiExtention;
 
-
+        std::string         queryString;
 
         bool                &isReadyForNextRequest;
 
@@ -70,6 +70,7 @@ class Request
         std::string &getErrorCode();
 
         std::string &getPath();
+        std::string &getQueryString();
         std::string &getRandomeFileName();
         std::string &getRoot();
         std::string &getRequestTarget();

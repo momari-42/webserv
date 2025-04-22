@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/23 10:29:09 by momari           ###   ########.fr       */
+/*   Updated: 2025/04/17 12:45:01 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ Server::Server ( std::string& config ) {
         this->configs.push_back(server);
     }
     checkServersConflict();
-    std::cout << "Config File parssing is Done!\n" << std::endl;
+    std::cout << BLUE  << "Config File parssing is Done!\n" << RESET << std::endl;
     this->lenSocket = sizeof(this->addressClient);
     for (std::vector<ServerConfig>::iterator it = this->configs.begin(); it != this->configs.end(); it++) {
         std::vector<std::pair<const std::string, const std::string> > ports = (*it).getPorts();

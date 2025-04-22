@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE_R 16384
+#define BUFFER_SIZE_R 4096
 
 #define CRLF "\r\n"
 

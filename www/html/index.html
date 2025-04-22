@@ -3,48 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attack on Ports!</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>ATTACK ON PORTS | WebServ HTTP Server</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-3"></div>
+    
     <header>
-        <div class="container">
-            <h1>Welcome to <span class="highlight">Attack on Ports!</span></h1>
-            <p>Your gateway to mastering web servers and port security.</p>
-        </div>
+        <div class="logo">ATTACK <span>ON</span> PORTS</div>
+        <nav>
+            <ul>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#code">Code</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
     </header>
-
-    <section class="about">
-        <div class="container">
-            <h2>About the Project</h2>
-            <p>This project is a collaborative effort by <span class="contributor">Momari</span> and <span class="contributor">Zaelarb</span> to explore the intricacies of web servers, port management, and cybersecurity. Join us on this journey to fortify your knowledge and skills!</p>
-        </div>
-    </section>
-
-    <section class="features">
-        <div class="container">
-            <h2>Project Features</h2>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <h3>Server Hardening</h3>
-                    <p>Discover techniques to make your server impenetrable.</p>
-                </div>
-                <div class="feature-item">
-                    <h3>Server Hardening</h3>
-                    <p>Discover techniques to make your server impenetrable.</p>
-                </div>
-                <div class="feature-item">
-                    <h3>Server Hardening</h3>
-                    <p>Discover techniques to make your server impenetrable.</p>
+    
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>WebServ</h1>
+                <h2 class="typewriter">This is when you finally understand why a URL starts with HTTP</h2>
+                <p>
+                    We built a custom HTTP/1.1 compliant web server from scratch in C++98, implementing core web protocols 
+                    and features to deeply understand how web communication works at the lowest levels.
+                </p>
+                <a href="#features" class="cta-button">Explore Features</a>
+            </div>
+            <div class="hero-image">
+                <div class="server-visualization">
+                    <div class="server-node">HTTP/1.1</div>
+                    <div class="server-node">Non-Blocking I/O</div>
+                    <div class="server-node">CGI</div>
+                    <div class="server-node">Config</div>
                 </div>
             </div>
         </div>
     </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 <span class="highlight">Attack on Ports!</span> | Created by Momari & Zaelarb</p>
+    
+    <section class="features" id="features">
+        <h2 class="section-title">Core Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h3 class="feature-title">HTTP/1.1 Compliance</h3>
+                <p class="feature-desc">
+                    Fully implements HTTP/1.1 protocol with support for GET, POST, and DELETE methods, matching NGINX behavior.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="feature-title">Non-Blocking Architecture</h3>
+                <p class="feature-desc">
+                    Uses poll() for efficient event handling with single-threaded, non-blocking architecture that handles multiple connections.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="feature-title">Configurable Server</h3>
+                <p class="feature-desc">
+                    Flexible configuration file allows setting ports, server names, error pages, client limits, and route-specific behaviors.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <h3 class="feature-title">File Uploads</h3>
+                <p class="feature-desc">
+                    Supports client file uploads with configurable save locations and size limits, handling both regular and chunked transfers.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="feature-title">CGI Support</h3>
+                <p class="feature-desc">
+                    Executes CGI scripts (PHP, Python, etc.) with proper environment setup, handling both GET and POST methods.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Robust & Resilient</h3>
+                <p class="feature-desc">
+                    Designed to never crash with proper error handling. Stress-tested to remain available under heavy loads.
+                </p>
+            </div>
         </div>
+    </section>
+
+    <section class="code-showcase" id="code">
+        <h2 class="section-title">Technical Implementation</h2>
+        <div class="code-container">
+            <div class="code-display">
+                <div class="code-header">
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                </div>
+                <div class="code-content">
+                    <span class="code-line"><span class="code-comment">// WebServ - HTTP Server Implementation</span></span>
+                    <span class="code-line"><span class="code-keyword">class</span> <span class="code-function">WebServ</span> {</span>
+                    <span class="code-line">  <span class="code-keyword">private</span>:</span>
+                    <span class="code-line">    std::vector&lt;ServerConfig&gt; <span class="code-function">_configs</span>;</span>
+                    <span class="code-line">    std::map&lt;int, Client&gt; <span class="code-function">_clients</span>;</span>
+                    <span class="code-line">    <span class="code-keyword">int</span> <span class="code-function">_kq</span>; <span class="code-comment">// kqueue fd</span></span>
+                    <span class="code-line"></span>
+                    <span class="code-line">  <span class="code-keyword">public</span>:</span>
+                    <span class="code-line">    <span class="code-function">WebServ</span>(<span class="code-keyword">const</span> std::string&amp; configFile);</span>
+                    <span class="code-line">    <span class="code-keyword">void</span> <span class="code-function">start</span>();</span>
+                    <span class="code-line">    <span class="code-keyword">void</span> <span class="code-function">handleRequest</span>(Client&amp; client);</span>
+                    <span class="code-line">    <span class="code-keyword">void</span> <span class="code-function">sendResponse</span>(Client&amp; client);</span>
+                    <span class="code-line">};</span>
+                    <span class="code-line"></span>
+                    <span class="code-line"><span class="code-comment">// Event loop using kqueue</span></span>
+                    <span class="code-line"><span class="code-keyword">void</span> WebServ::<span class="code-function">start</span>() {</span>
+                    <span class="code-line">    <span class="code-keyword">struct</span> kevent events[<span class="code-number">MAX_EVENTS</span>];</span>
+                    <span class="code-line">    <span class="code-keyword">while</span> (<span class="code-number">true</span>) {</span>
+                    <span class="code-line">        <span class="code-keyword">int</span> nev = kevent(_kq, NULL, <span class="code-number">0</span>, events, MAX_EVENTS, NULL);</span>
+                    <span class="code-line">        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = <span class="code-number">0</span>; i &lt; nev; i++) {</span>
+                    <span class="code-line">            <span class="code-keyword">if</span> (events[i].filter == EVFILT_READ)</span>
+                    <span class="code-line">                <span class="code-function">handleRequest</span>(_clients[events[i].ident]);</span>
+                    <span class="code-line">            <span class="code-keyword">else if</span> (events[i].filter == EVFILT_WRITE)</span>
+                    <span class="code-line">                <span class="code-function">sendResponse</span>(_clients[events[i].ident]);</span>
+                    <span class="code-line">        }</span>
+                    <span class="code-line">    }</span>
+                    <span class="code-line">}</span>
+                </div>
+            </div>
+            <div class="cyber-box">
+                <h3>Technical Highlights</h3>
+                <ul style="list-style-type: none; line-height: 2;">
+                    <li><i class="fas fa-check-circle" style="color: var(--primary);"></i> C++98 Standard Compliance</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--primary);"></i> Non-blocking I/O with kqueue/poll</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--primary);"></i> HTTP/1.1 Protocol Implementation</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--primary);"></i> Configuration File Parsing</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--primary);"></i> CGI Execution Handling</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--primary);"></i> Chunked Transfer Encoding</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--primary);"></i> Robust Error Handling</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    
+
+    <section class="team" id="team">
+        <h2 class="section-title">The Dynamic Duo</h2>
+        <div class="team-intro">
+            <p>Every line of code was crafted together through intensive pair programming, with both contributors equally involved in all aspects of development.</p>
+        </div>
+        <div class="team-members">
+            <div class="member-card">
+                <div class="member-photo">
+                    <img src="images/zbelarbi.jpg" alt="Zakaria Belarbi">
+                </div>
+                <h3 class="member-name">Zakaria Belarbi</h3>
+                <p class="member-role">Core Systems Specialist</p>
+                <p class="member-bio">
+                    Brought deep expertise in system architecture and low-level optimization, with particular focus on:
+                    <ul class="member-contributions">
+                        <li>Event-driven server core with kqueue</li>
+                        <li>Configuration parsing and validation</li>
+                        <li>I/O performance optimization</li>
+                    </ul>
+                </p>
+                <div class="member-social">
+                    <a href="https://github.com/zakariabelarbi" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="member-card">
+                <div class="member-photo">
+                    <img src="images/momari.jpg" alt="Mohammed Omari">
+                </div>
+                <h3 class="member-name">Mohammed Omari</h3>
+                <p class="member-role">Protocol & Application Logic</p>
+                <p class="member-bio">
+                    Focused on high-level protocol implementation and application flow:
+                    <ul class="member-contributions">
+                        <li>HTTP/1.1 protocol compliance</li>
+                        <li>Routing and request handling</li>
+                        <li>CGI integration and response generation</li>
+                    </ul>
+                </p>
+                <div class="member-social">
+                    <a href="https://github.com/momari-42/" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/mohammed-omari-24a338249/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="collaboration-note">
+            <p><strong>Collaboration Approach:</strong> All work was done through shared screens, continuous code reviews, and mutual ownership of every component.</p>
+        </div>
+    </section>
+    <footer id="contact">
+        <div class="footer-logo">ATTACK <span>ON</span> PORTS</div>
+        <div class="footer-links">
+            <a href="#features">Features</a>
+            <a href="#code">Code</a>
+            <a href="#team">Team</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <div class="social-links">
+            <a href="https://github.com/momari-42/" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/mohammed-omari-24a338249/" target="_blank"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <p class="copyright">
+            © 2023 ATTACK ON PORTS | WebServ HTTP Server Project<br>
+            This is when you finally understand why a URL starts with HTTP
+        </p>
     </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const typewriter = document.querySelector('.typewriter');
+            const text = typewriter.textContent;
+            typewriter.textContent = '';
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < text.length) {
+                    typewriter.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, Math.random() * 100 + 50);
+                }
+            }
+            
+            setTimeout(typeWriter, 1000);
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.server-node').forEach(node => {
+                observer.observe(node);
+            });
+        });
+    </script>
 </body>
 </html>

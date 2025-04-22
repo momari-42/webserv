@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:39:39 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/23 02:30:53 by momari           ###   ########.fr       */
+/*   Updated: 2025/04/17 12:50:36 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,12 @@ void Request::parseRequest ( std::string requestData ) {
             else
                 this->requestTarget = this->root + this->path;
             this->body.setRequestTarget(this->requestTarget);
+            size_t      queryPos        = this->requestTarget.find("?");
+            if (queryPos != std::string::npos) {
+                this->queryString = this->requestTarget.substr(queryPos + 1);
+                this->requestTarget.erase(queryPos);
+            }
+            this->body.checkAccess(this->requestTarget, this->requestLine.getMethod());
             this->index = this->configFile->getIndex();
             if ( this->requestLine.getMethod() != "DELETE" &&
                     (this->requestTarget.find(".php") != std::string::npos
@@ -177,4 +183,8 @@ std::string Request::getCgiExtention() {
 }
 ServerConfig *Request::getConfigFile( void ) {
     return (this->configFile);
+}
+
+std::string &Request::getQueryString() {
+    return (this->queryString);
 }

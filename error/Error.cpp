@@ -6,19 +6,13 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 21:14:47 by momari            #+#    #+#             */
-/*   Updated: 2025/03/23 02:43:31 by momari           ###   ########.fr       */
+/*   Updated: 2025/04/17 12:56:27 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Error.hpp"
 #define BUFFER_E 8000
-//204 301 403 404 500 409
 
-
-// Content-Type: text/html; charset=UTF-8
-// Server: ECAcc (nyd/D13E)
-// Content-Length: 1256
-// Date: Fri, 28 Jun 2024 11:40:58 GMT
  
 Error::Error ( int fd, std::string statusCode, std::map<std::string, std::string> errorPages ) {
     char                buffer[BUFFER_E];

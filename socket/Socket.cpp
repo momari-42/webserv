@@ -6,12 +6,14 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:07:18 by momari            #+#    #+#             */
-/*   Updated: 2025/03/23 00:40:27 by momari           ###   ########.fr       */
+/*   Updated: 2025/04/16 19:46:20 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Socket.hpp"
 #include <fstream>
+#define BLUE "\033[34m"
+#define RESET "\033[0m"
 
 void Socket::setServer(ServerConfig *server) {
     this->servers.push_back(server);
@@ -64,7 +66,7 @@ Socket::Socket ( const std::string& port, const std::string& host , ServerConfig
     this->servers.push_back(server);
     this->host = host;
     this->port = port;
-    std::cout << "      The server listening on " << this->host << ":" << this->port << "..." << std::endl;
+    std::cout << BLUE << "      The server listening on " << this->host << ":" << this->port << ";" << RESET << std::endl;
 }
 
 Socket::~Socket ( void ) {

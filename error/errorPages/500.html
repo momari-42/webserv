@@ -3,42 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>500 - Internal Server Error</title>
+    <title>500 - System Failure</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+        
+        :root {
+            --primary: #4ee8e0;
+            --secondary: #a178ff;
+            --accent: #ff4e78;
+            --dark: #0a0520;
+            --darker: #050216;
+        }
+        
         body {
-            background-color: black;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark);
             color: white;
-            font-family: 'Orbitron', sans-serif;
-            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            overflow: hidden;
+            position: relative;
         }
-
-        .container {
+        
+        .cyber-glitch {
+            position: relative;
+        }
+        
+        .glitch-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(78, 232, 224, 0.7);
+            position: relative;
+            animation: glitch 2s infinite alternate;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+        
+        .error-subtitle {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.4;
+        }
+        
+        .error-desc {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 3rem;
             max-width: 600px;
+            text-align: center;
+            line-height: 1.6;
         }
-
-        h1 {
-            font-size: 120px;
-            margin: 0;
-            color: #666;
+        
+        .terminal-box {
+            background: rgba(10, 5, 32, 0.7);
+            border: 1px solid var(--primary);
+            padding: 2rem;
+            margin: 2rem 0;
+            width: 80%;
+            max-width: 700px;
+            position: relative;
         }
-
-        h2 {
-            font-size: 24px;
-            color: #ff5733;
+        
+        .terminal-box::before, .terminal-box::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--primary);
+        }
+        
+        .terminal-box::before {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .terminal-box::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        .terminal-text {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--primary);
+            line-height: 1.8;
+        }
+        
+        .command-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .prompt {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        
+        .command {
+            color: white;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid var(--primary);
+            width: 0;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary) }
+        }
+        
+        .response {
+            color: rgba(255,255,255,0.7);
+            margin-left: 2rem;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(78, 232, 224, 0.4);
+        }
+        
+        .team-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-top: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .team-logo span {
+            color: var(--accent);
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .pixel-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(78, 232, 224, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(78, 232, 224, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -2;
+        }
+        
+        .binary-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -3;
+        }
+        
+        .binary-digit {
+            position: absolute;
+            color: rgba(78, 232, 224, 0.1);
+            font-size: 1rem;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            to { transform: translateY(100vh) }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>500</h1>
-        <h2>OOPS! INTERNAL SERVER ERROR.</h2>
+    <div class="binary-rain" id="binaryRain"></div>
+    <div class="pixel-grid"></div>
+    <div class="scanlines"></div>
+    
+    <div class="cyber-glitch">
+        <div class="glitch-text" style="color: #ff4e4e; animation: glitch 0.5s infinite alternate">500</div>
     </div>
+    
+    <h2 class="error-subtitle">CRITICAL SYSTEM FAILURE</h2>
+    
+    <p class="error-desc">
+        Our servers encountered an unexpected condition.<br>
+        Cyber operatives are working to restore functionality.
+    </p>
+    
+    <div class="terminal-box">
+        <div class="terminal-text">
+            <div class="command-line">
+                <span class="prompt">webserv></span>
+                <span class="command" style="animation-delay: 0.5s;">GET /critical-operation HTTP/1.1</span>
+            </div>
+            <div class="response" style="animation-delay: 3.5s;">
+                HTTP/1.1 500 Internal Server Error<br>
+                X-WebServ: AttackOnPorts/1.0<br><br>
+                > ERROR: Null pointer exception<br>
+                > Stack trace dumped to logs<br>
+                > Rebooting subsystems...
+            </div>
+        </div>
+    </div>
+    
+    <a href="/" class="cta-button">RETRY CONNECTION</a>
+    
+    <div class="team-logo">ATTACK <span>ON</span> PORTS</div>
+    <script>
+        const binaryRain = document.getElementById('binaryRain');
+        const chars = '01';
+        
+        function createBinaryDigit() {
+            const digit = document.createElement('div');
+            digit.className = 'binary-digit';
+            digit.textContent = chars.charAt(Math.floor(Math.random() * chars.length));
+            digit.style.left = Math.random() * 100 + 'vw';
+            digit.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            digit.style.animationDelay = Math.random() * 5 + 's';
+            binaryRain.appendChild(digit);
+
+            setTimeout(() => {
+                digit.remove();
+            }, parseFloat(digit.style.animationDuration) * 1000);
+        }
+        
+        for (let i = 0; i < 50; i++) {
+            createBinaryDigit();
+        }
+
+        setInterval(createBinaryDigit, 200);
+
+        const glitchText = document.querySelector('.glitch-text');
+        glitchText.addEventListener('mouseenter', () => {
+            glitchText.style.animation = 'glitch 0.1s infinite alternate';
+        });
+        
+        glitchText.addEventListener('mouseleave', () => {
+            glitchText.style.animation = 'glitch 2s infinite alternate';
+        });
+    </script>
 </body>
 </html>

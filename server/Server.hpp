@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaelarb <zaelarb@student.42.fr>            +#+  +:+       +#+        */
+/*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 15:46:20 by momari            #+#    #+#             */
-/*   Updated: 2025/03/15 10:38:09 by zaelarb          ###   ########.fr       */
+/*   Updated: 2025/04/17 11:15:32 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,11 @@
 #include <fcntl.h>
 #include <signal.h>
 
+#define BLUE "\033[34m"
+#define RESET "\033[0m"
+
 // This is the buffer macro that i read from the client
-#define BUFFER_SIZE 80000
+#define BUFFER_SIZE 800000
 #define NEVENTS     128
 
 class Server

@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 15:49:06 by momari            #+#    #+#             */
-/*   Updated: 2025/03/23 02:39:21 by momari           ###   ########.fr       */
+/*   Updated: 2025/04/17 12:45:06 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,11 +220,7 @@ void Response::makeResponse ( size_t fd, size_t kq ) {
                 return;
             }
         }
-        size_t      queryPos        = this->request->getRequestTarget().find("?");
-        if (queryPos != std::string::npos) {
-            this->queryString = this->request->getRequestTarget().substr(queryPos + 1);
-            this->request->getRequestTarget().erase(queryPos);
-        }
+        this->queryString = this->request->getQueryString();
         initiatConfigFile = true;
     }
     if (this->request->getCgi() && !this->isCgiComplet) {
@@ -587,7 +583,7 @@ bool Response::getIsResponseSent() {
 void Response::setTargetFile() {
     this->targetFile.open(this->request->getRequestTarget(), std::ios::in);
     if (!this->targetFile.is_open()) {
-        std::cerr << "Error: open file failed4" << std::endl;
+        std::cerr << "Error: open file failed" << std::endl;
         this->errorCode = "500";
     }
 }

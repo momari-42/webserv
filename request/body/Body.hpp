@@ -6,7 +6,7 @@
 /*   By: momari <momari@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 11:18:55 by zaelarb           #+#    #+#             */
-/*   Updated: 2025/03/22 22:23:12 by momari           ###   ########.fr       */
+/*   Updated: 2025/04/17 12:49:52 by momari           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ class Body : public EmimTypes
         std::string &getRandomeFileName();
         void setConfigFile(ServerConfig* configFile);
         void setRequestTarget(std::string &requestTarget);
-        void checkAccess( std::string &requestTarget );
+        void checkAccess( std::string &requestTarget, const std::string& method );
         void manageFile(const std::string fileName, const std::string data );
         void manageExistinceFile(std::string &fileName);
         std::string getBodyRequestType();
